@@ -1,8 +1,7 @@
-
 // Utilitaires pour lire/écrire des réglages dans Firestore
 import { doc, setDoc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "./firebase";
-import { BlocConfiguration } from "@/types";
+import { BlocConfiguration, Produit } from "@/types";
 
 export interface ReglageFirebase {
   codeArticle: string;
@@ -164,5 +163,24 @@ export async function getBlocsConfiguration(): Promise<BlocConfiguration[] | nul
   } catch (error) {
     console.error("Firebase: Erreur lors de la récupération de la configuration des blocs:", error);
     return null;
+  }
+}
+
+// Ajoute la fonction suivante à la fin du fichier :
+export async function getAllProduits(): Promise<Produit[]> {
+  try {
+    const snapshot = await getDocs(collection(db, "reglages"));
+    const produits: Produit[] = [];
+    snapshot.forEach(docSnap => {
+      const data = docSnap.data();
+      produits.push({
+        ...data,
+        id: docSnap.id,
+      } as Produit);
+    });
+    return produits;
+  } catch (error) {
+    console.error("Erreur lors de la récupération de tous les produits:", error);
+    return [];
   }
 }
