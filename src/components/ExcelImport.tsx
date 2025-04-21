@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { ImportMapping, Produit } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -17,6 +16,9 @@ import { blocsConfiguration } from "@/data/blocConfig";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Import, Table as TableIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import DataPreviewTable from "./DataPreviewTable";
+import MappingTable from "./MappingTable";
+import ImportActions from "./ImportActions";
 
 const ExcelImport = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -26,7 +28,6 @@ const ExcelImport = () => {
   const [step, setStep] = useState(1);
   const { toast } = useToast();
 
-  // Liste de tous les champs disponibles pour le mapping (dans l'ordre des blocs + champs)
   const champsCibles = blocsConfiguration.flatMap((bloc) =>
     bloc.champs.map((champ) => ({
       id: champ.id,
@@ -41,7 +42,6 @@ const ExcelImport = () => {
     if (files && files.length > 0) {
       const selectedFile = files[0];
       
-      // Vérification du type de fichier
       if (!selectedFile.name.endsWith('.csv') && !selectedFile.name.endsWith('.xlsx') && !selectedFile.name.endsWith('.xls')) {
         toast({
           title: "Format non supporté",
@@ -53,9 +53,7 @@ const ExcelImport = () => {
       
       setFile(selectedFile);
       
-      // Simuler l'extraction des en-têtes et des données avec un jeu de données plus complet
       setTimeout(() => {
-        // Exemple d'entêtes plus complet pour démonstration
         const mockHeaders = [
           "Code Article",
           "Numéro de ligne",
@@ -109,7 +107,6 @@ const ExcelImport = () => {
           "Quick"
         ];
         
-        // Jeu de données plus complet
         const mockData = [
           {
             "Code Article": "P004",
@@ -324,11 +321,8 @@ const ExcelImport = () => {
         setHeaders(mockHeaders);
         setPreviewData(mockData);
 
-        // Initialiser le mapping pour chaque champ de l'appli 
         const initialMappings = champsCibles.map(champApp => {
-          // Chercher une entête qui "matche" ce champ
           const foundHeader = mockHeaders.find(header => {
-            // Normalisation simple pour comparaison
             const hNorm = header.toLowerCase().replace(/[\s-/]+/g, "");
             const champNomNorm = champApp.nom.toLowerCase().replace(/[\s-/]+/g, "");
             const champTechNorm = champApp.nomTechnique.toLowerCase();
@@ -340,7 +334,6 @@ const ExcelImport = () => {
           
           let champSource = "none";
           
-          // Matching spécial pour certains champs spécifiques
           if (champApp.nomTechnique === "codeArticle" && mockHeaders.find(h => h.toLowerCase().includes("code"))) {
             champSource = mockHeaders.find(h => h.toLowerCase().includes("code")) || "none";
           }
@@ -414,7 +407,6 @@ const ExcelImport = () => {
     }
   };
 
-  // Quand user change le mapping d'un champ appli
   const handleMappingChange = (champDestination: string, champSource: string) => {
     setMappings(
       mappings.map((mapping) =>
@@ -426,7 +418,6 @@ const ExcelImport = () => {
   };
 
   const processMappingAndImport = () => {
-    // Vérifier qu'au moins les champs obligatoires sont mappés à une entête
     const requiredFields = ["codeArticle", "numeroLigne", "designation"];
     const missingRequired = requiredFields.filter(field =>
       !mappings.find(m => m.champDestination === field && m.champSource !== "none")
@@ -441,14 +432,11 @@ const ExcelImport = () => {
       return;
     }
 
-    // Ici, on pourrait construire/projeter les données importées pour push en base
-    // Pour démo, toast OK
     toast({
       title: "Importation réussie",
       description: `${previewData.length} produits ont été importés avec succès.`,
     });
 
-    // Réinitialiser l'état
     setFile(null);
     setHeaders([]);
     setPreviewData([]);
@@ -496,109 +484,22 @@ const ExcelImport = () => {
                 {previewData.length} lignes détectées avec {headers.length} colonnes.
               </p>
             </div>
-
-            <div>
-              <h3 className="font-semibold mb-3">Aperçu des données</h3>
-              <ScrollArea className="h-72 rounded-md border">
-                <div className="w-max min-w-full">
-                  <Table>
-                    <TableHeader className="bg-noir-100 sticky top-0 z-10">
-                      <TableRow>
-                        {headers.map((header, index) => (
-                          <TableHead key={index} className="whitespace-nowrap">{header}</TableHead>
-                        ))}
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {previewData.map((row, rowIndex) => (
-                        <TableRow key={rowIndex}>
-                          {headers.map((header, cellIndex) => (
-                            <TableCell key={cellIndex} className="whitespace-nowrap">{row[header]}</TableCell>
-                          ))}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </ScrollArea>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-3">Mapping des champs</h3>
-              <p className="mb-4 text-sm text-noir-600">
-                Associez chaque champ de l'application à une colonne de votre fichier Excel (ou choisissez "ne pas importer").
-              </p>
-              <ScrollArea className="h-[500px] rounded-md border">
-                <div className="w-max min-w-full p-1">
-                  <Table>
-                    <TableHeader className="bg-noir-100 sticky top-0 z-10">
-                      <TableRow>
-                        <TableHead className="w-32 whitespace-nowrap">Bloc</TableHead>
-                        <TableHead className="w-64 whitespace-nowrap">Champ destination (Application)</TableHead>
-                        <TableHead className="w-64 whitespace-nowrap">Colonne source (Excel)</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {champsCibles.map((champ, index) => {
-                        const mapping = mappings.find(m => m.champDestination === champ.nomTechnique) || {
-                          champDestination: champ.nomTechnique,
-                          champSource: "none"
-                        };
-                        return (
-                          <TableRow key={champ.id}>
-                            <TableCell className="whitespace-nowrap font-medium">{champ.blocNom}</TableCell>
-                            <TableCell className="whitespace-nowrap">
-                              <div className="font-semibold">{champ.nom}</div>
-                            </TableCell>
-                            <TableCell>
-                              <Select
-                                value={mapping.champSource}
-                                onValueChange={(value) =>
-                                  handleMappingChange(champ.nomTechnique, value)
-                                }
-                              >
-                                <SelectTrigger className="w-full">
-                                  <SelectValue placeholder="Sélectionner une colonne" />
-                                </SelectTrigger>
-                                <SelectContent className="max-h-[400px]">
-                                  <SelectItem value="none">Ne pas importer</SelectItem>
-                                  {headers.map(header => (
-                                    <SelectItem value={header} key={header}>
-                                      {header}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </div>
-              </ScrollArea>
-            </div>
-
-            <div className="flex justify-end space-x-2">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setFile(null);
-                  setHeaders([]);
-                  setPreviewData([]);
-                  setMappings([]);
-                  setStep(1);
-                }}
-              >
-                Annuler
-              </Button>
-              <Button
-                onClick={processMappingAndImport}
-                className="bg-jaune-300 text-noir-800 hover:bg-jaune-400"
-              >
-                Importer les données
-              </Button>
-            </div>
+            <DataPreviewTable headers={headers} previewData={previewData} />
+            <MappingTable
+              headers={headers}
+              mappings={mappings}
+              onChange={handleMappingChange}
+            />
+            <ImportActions
+              onCancel={() => {
+                setFile(null);
+                setHeaders([]);
+                setPreviewData([]);
+                setMappings([]);
+                setStep(1);
+              }}
+              onImport={processMappingAndImport}
+            />
           </div>
         )}
       </div>
