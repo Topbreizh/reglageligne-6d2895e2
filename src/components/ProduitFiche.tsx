@@ -37,11 +37,11 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
     
     // Vérifier si le bloc est applicable pour la ligne courante
     if (produit.numeroLigne && bloc.lignesApplicables.length > 0) {
-      // Si le bloc est applicable à toutes les lignes
-      if (bloc.lignesApplicables.includes("*")) return true;
-      // Si le bloc est spécifiquement applicable à cette ligne
-      if (bloc.lignesApplicables.includes(produit.numeroLigne)) return true;
-      return false;
+      // Si le bloc n'est pas applicable à toutes les lignes (*) et qu'il a des lignes spécifiques
+      if (!bloc.lignesApplicables.includes("*")) {
+        // Vérifier si la ligne courante est dans la liste des lignes applicables
+        return bloc.lignesApplicables.includes(produit.numeroLigne);
+      }
     }
     
     return true;
@@ -70,19 +70,33 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
 
   const renderBlocs = () => {
     return blocsConfiguration
-      .filter(bloc => estBlocVisible(bloc.id))
+      .filter(bloc => {
+        // Vérifier si le bloc doit être affiché selon sa configuration et la ligne du produit
+        const blocVisible = estBlocVisible(bloc.id);
+        
+        // Pour les blocs spécifiques, vérification supplémentaire explicite
+        if (blocVisible) {
+          // Ne pas afficher le bloc façonnage 1-4-6 si on est sur ligne 2 ou 5
+          if (bloc.id === "faconnage146" && produit.numeroLigne) {
+            return ["1", "4", "6"].includes(produit.numeroLigne);
+          }
+          
+          // Ne pas afficher le bloc façonnage 2-5 si on n'est pas sur ligne 2 ou 5
+          if (bloc.id === "faconnage25" && produit.numeroLigne) {
+            return ["2", "5"].includes(produit.numeroLigne);
+          }
+          
+          // Traitement spécial pour Guillotine et Distributeur crème
+          if ((bloc.id === "guillotine" || bloc.id === "distributeurCreme") && produit.numeroLigne) {
+            // Ces blocs ne devraient pas s'afficher pour les lignes 2 et 5
+            return !["2", "5"].includes(produit.numeroLigne);
+          }
+        }
+        
+        return blocVisible;
+      })
       .sort((a, b) => a.ordre - b.ordre)
       .map(bloc => {
-        // Gestion spéciale des blocs spécifiques aux lignes
-        // Ne pas afficher les blocs spécifiques à certaines lignes si la ligne actuelle ne correspond pas
-        if (bloc.id === "faconnage146" && produit.numeroLigne && !["1", "4", "6"].includes(produit.numeroLigne)) {
-          return null;
-        }
-        
-        if (bloc.id === "faconnage25" && produit.numeroLigne && !["2", "5"].includes(produit.numeroLigne)) {
-          return null;
-        }
-        
         return (
           <div key={bloc.id} className="printable-block mb-6 p-4 border border-gray-200 rounded-lg">
             <h2 className="text-lg font-bold mb-3 text-jaune-500">{bloc.nom}</h2>
