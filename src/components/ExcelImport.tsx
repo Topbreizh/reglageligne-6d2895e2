@@ -89,10 +89,10 @@ const ExcelImport = () => {
         setHeaders(mockHeaders);
         setPreviewData(mockData);
         
-        // Initialiser les mappings avec des valeurs vides
+        // Initialiser les mappings avec "none" au lieu de chaîne vide pour les champs non mappés
         const initialMappings = mockHeaders.map(header => ({
           champSource: header,
-          champDestination: ""
+          champDestination: "none"  // Utiliser "none" au lieu de chaîne vide
         }));
         
         // Tenter d'identifier des correspondances évidentes
@@ -148,7 +148,9 @@ const ExcelImport = () => {
     
     // Vérifier qu'au moins les champs obligatoires sont mappés
     const requiredFields = ["codeArticle", "numeroLigne", "designation"];
-    const mappedFields = mappings.map(m => m.champDestination);
+    const mappedFields = mappings
+      .filter(m => m.champDestination !== "none") // Filtrer les champs non mappés ("none")
+      .map(m => m.champDestination);
     
     const missingRequired = requiredFields.filter(field => !mappedFields.includes(field));
     
