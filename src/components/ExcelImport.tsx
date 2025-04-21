@@ -126,17 +126,24 @@ const ExcelImport = () => {
       );
       
       const initialMappings = champsCibles.map(champApp => {
-        const normalize = (str: string) => str.toLowerCase()
-          .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-          .replace(/[\s-/]+/g, "");
+        const normalize = (str: string) => {
+          if (!str) return ""; // Handle undefined or empty strings
+          return str.toLowerCase()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .replace(/[\s-/]+/g, "");
+        };
         
         const findMatchingHeader = () => {
           const champNomNorm = normalize(champApp.nom);
-          const champTechNorm = normalize(champApp.nomTechnique);
+          const champTechNorm = normalize(champApp.nomTechnique || "");
           
-          let foundHeader = headers.find(header => normalize(header) === champNomNorm || normalize(header) === champTechNorm);
+          // Look for exact matches first
+          let foundHeader = headers.find(header => 
+            normalize(header) === champNomNorm || normalize(header) === champTechNorm
+          );
           if (foundHeader) return foundHeader;
           
+          // Look for partial matches
           foundHeader = headers.find(header => {
             const headerNorm = normalize(header);
             return headerNorm.includes(champNomNorm) || champNomNorm.includes(headerNorm) ||
@@ -144,7 +151,7 @@ const ExcelImport = () => {
           });
           if (foundHeader) return foundHeader;
           
-          // Mappings spécifiques pour certains champs courants
+          // Special case mappings
           switch(champApp.nomTechnique) {
             case "codeArticle":
               return headers.find(h => normalize(h).includes("code") && normalize(h).includes("article"));
@@ -169,7 +176,6 @@ const ExcelImport = () => {
       
       setMappings(initialMappings);
       setStep(2);
-      
     } catch (error) {
       console.error("Erreur lors de l'importation du fichier:", error);
       toast({
