@@ -13,10 +13,22 @@ export const parseExcelFile = (file: File): Promise<ParsedExcelData> => {
     reader.onload = (e) => {
       try {
         const data = e.target?.result;
+        if (!data) {
+          reject(new Error("Échec de lecture du fichier"));
+          return;
+        }
+        
         const workbook = XLSX.read(data, { type: 'array' });
         const firstSheetName = workbook.SheetNames[0];
+        
+        if (!firstSheetName) {
+          reject(new Error("Aucune feuille trouvée dans le fichier Excel"));
+          return;
+        }
+        
         const worksheet = workbook.Sheets[firstSheetName];
         
+        // Utilisation de sheet_to_json avec { header: 1 } pour obtenir un tableau de tableaux
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
         
         if (jsonData.length < 2) {
@@ -36,6 +48,7 @@ export const parseExcelFile = (file: File): Promise<ParsedExcelData> => {
           return rowData;
         });
         
+        console.log("Parsing réussi:", { headers: headers.length, rows: rows.length });
         resolve({ headers, data: rows });
       } catch (error) {
         console.error("Erreur lors de l'analyse du fichier Excel:", error);
@@ -43,10 +56,12 @@ export const parseExcelFile = (file: File): Promise<ParsedExcelData> => {
       }
     };
     
-    reader.onerror = () => {
+    reader.onerror = (event) => {
+      console.error("Erreur de lecture du fichier:", event);
       reject(new Error("Erreur lors de la lecture du fichier"));
     };
     
+    // Utilisation de readAsArrayBuffer pour une meilleure compatibilité
     reader.readAsArrayBuffer(file);
   });
 };
