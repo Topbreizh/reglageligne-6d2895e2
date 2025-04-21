@@ -14,6 +14,7 @@ const ExcelImport = () => {
     step,
     isImporting,
     isProcessing,
+    errorMessage,
     handleFileChange,
     handleMappingChange,
     processMappingAndImport,
@@ -29,7 +30,11 @@ const ExcelImport = () => {
         </p>
 
         {step === 1 && (
-          <FileUpload onFileChange={handleFileChange} isProcessing={isProcessing} />
+          <FileUpload 
+            onFileChange={handleFileChange} 
+            isProcessing={isProcessing} 
+            errorMessage={errorMessage}
+          />
         )}
 
         {step === 2 && (

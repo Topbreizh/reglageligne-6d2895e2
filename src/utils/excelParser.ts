@@ -18,38 +18,60 @@ export const parseExcelFile = (file: File): Promise<ParsedExcelData> => {
           return;
         }
         
-        const workbook = XLSX.read(data, { type: 'array' });
-        const firstSheetName = workbook.SheetNames[0];
-        
-        if (!firstSheetName) {
-          reject(new Error("Aucune feuille trouvée dans le fichier Excel"));
+        // Set a limit on file size to prevent browser freezing
+        if (file.size > 20 * 1024 * 1024) { // 20MB limit
+          reject(new Error("Le fichier est trop volumineux (max 20MB)"));
           return;
         }
         
-        const worksheet = workbook.Sheets[firstSheetName];
-        
-        // Utilisation de sheet_to_json avec { header: 1 } pour obtenir un tableau de tableaux
-        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-        
-        if (jsonData.length < 2) {
-          reject(new Error("Le fichier ne contient pas assez de données"));
-          return;
-        }
-        
-        const headers = jsonData[0] as string[];
-        
-        const rows = jsonData.slice(1).map(row => {
-          const rowData: Record<string, any> = {};
-          (row as any[]).forEach((cell, index) => {
-            if (index < headers.length) {
-              rowData[headers[index]] = cell !== undefined ? String(cell) : "";
+        // Parse with timeout to prevent UI blocking
+        setTimeout(() => {
+          try {
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheetName = workbook.SheetNames[0];
+            
+            if (!firstSheetName) {
+              reject(new Error("Aucune feuille trouvée dans le fichier Excel"));
+              return;
             }
-          });
-          return rowData;
-        });
+            
+            const worksheet = workbook.Sheets[firstSheetName];
+            
+            // Limit rows to prevent browser freezing (max 1000 rows)
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, { 
+              header: 1,
+              range: 0,
+              defval: ""
+            });
+            
+            if (jsonData.length < 2) {
+              reject(new Error("Le fichier ne contient pas assez de données"));
+              return;
+            }
+            
+            const headers = jsonData[0] as string[];
+            
+            // Limit to max 1000 rows to prevent performance issues
+            const maxRows = Math.min(jsonData.length - 1, 1000);
+            
+            const rows = jsonData.slice(1, maxRows + 1).map(row => {
+              const rowData: Record<string, any> = {};
+              (row as any[]).forEach((cell, index) => {
+                if (index < headers.length) {
+                  rowData[headers[index]] = cell !== undefined ? String(cell) : "";
+                }
+              });
+              return rowData;
+            });
+            
+            console.log("Parsing réussi:", { headers: headers.length, rows: rows.length });
+            resolve({ headers, data: rows });
+          } catch (error) {
+            console.error("Erreur lors de l'analyse du fichier Excel:", error);
+            reject(error);
+          }
+        }, 100); // Small timeout to let UI update
         
-        console.log("Parsing réussi:", { headers: headers.length, rows: rows.length });
-        resolve({ headers, data: rows });
       } catch (error) {
         console.error("Erreur lors de l'analyse du fichier Excel:", error);
         reject(error);

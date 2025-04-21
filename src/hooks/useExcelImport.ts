@@ -1,3 +1,4 @@
+
 import { useImportState } from "./useImportState";
 import { parseExcelFile } from "@/utils/excelParser";
 import { generateInitialMappings } from "@/utils/fieldMapping";
@@ -23,6 +24,7 @@ export const useExcelImport = () => {
   } = useImportState();
   
   const [isProcessing, setIsProcessing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
   const { toast } = useToast();
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,7 +34,11 @@ export const useExcelImport = () => {
     const selectedFile = files[0];
     console.log("Fichier sélectionné:", selectedFile.name, selectedFile.type);
     
+    // Reset any previous error state
+    setErrorMessage(undefined);
+    
     if (!selectedFile.name.endsWith('.csv') && !selectedFile.name.endsWith('.xlsx') && !selectedFile.name.endsWith('.xls')) {
+      setErrorMessage("Format non supporté. Veuillez sélectionner un fichier Excel (.xlsx, .xls) ou CSV (.csv)");
       toast({
         title: "Format non supporté",
         description: "Veuillez sélectionner un fichier Excel (.xlsx, .xls) ou CSV (.csv)",
@@ -46,10 +52,15 @@ export const useExcelImport = () => {
     
     try {
       console.log("Début de l'analyse du fichier");
+      
+      // Add timeout to let UI update before heavy processing
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       const { headers: parsedHeaders, data } = await parseExcelFile(selectedFile);
       console.log("Fichier analysé avec succès");
       
       if (parsedHeaders.length === 0) {
+        setErrorMessage("Aucune colonne détectée dans le fichier");
         toast({
           title: "Fichier invalide",
           description: "Aucune colonne détectée dans le fichier",
@@ -60,6 +71,7 @@ export const useExcelImport = () => {
       }
       
       if (data.length === 0) {
+        setErrorMessage("Aucune donnée détectée dans le fichier");
         toast({
           title: "Fichier vide",
           description: "Aucune donnée détectée dans le fichier",
@@ -78,9 +90,14 @@ export const useExcelImport = () => {
       setStep(2);
     } catch (error) {
       console.error("Erreur lors de l'importation du fichier:", error);
+      const errorMsg = error instanceof Error 
+        ? error.message 
+        : "Impossible de lire le fichier. Vérifiez le format et réessayez.";
+      
+      setErrorMessage(errorMsg);
       toast({
         title: "Erreur lors de l'importation",
-        description: error instanceof Error ? error.message : "Impossible de lire le fichier. Vérifiez le format et réessayez.",
+        description: errorMsg,
         variant: "destructive",
       });
     } finally {
@@ -180,6 +197,7 @@ export const useExcelImport = () => {
     step,
     isImporting,
     isProcessing,
+    errorMessage,
     handleFileChange,
     handleMappingChange,
     processMappingAndImport,
