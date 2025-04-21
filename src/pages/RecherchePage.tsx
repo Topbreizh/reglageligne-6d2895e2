@@ -30,17 +30,67 @@ const RecherchePage = () => {
             const data = doc.data() as ReglageFirebase;
             
             if (data.codeArticle && data.numeroLigne) {
-              // Construire un objet Produit à partir des données Firebase
+              // Créer un objet Produit avec toutes les propriétés requises
+              // d'abord initialisées avec des valeurs vides
               const produit: Produit = {
                 id: doc.id,
                 codeArticle: data.codeArticle || "",
                 numeroLigne: data.numeroLigne || "",
                 designation: data.designation || "Sans designation",
+                programme: "",
+                facteur: "",
+                regleLaminage: "",
+                quick: "",
+                calibreur1: "",
+                calibreur2: "",
+                calibreur3: "",
+                laminoir: "",
+                vitesseLaminage: "",
+                farineurHaut1: "",
+                farineurHaut2: "",
+                farineurHaut3: "",
+                farineurBas1: "",
+                farineurBas2: "",
+                farineurBas3: "",
+                queueDeCarpe: "",
+                numeroDecoupe: "",
+                buse: "",
+                distributeurChocoRaisin: "",
+                humidificateur146: "",
+                vitesseDoreuse: "",
+                p1LongueurDecoupe: "",
+                p2Centrage: "",
+                bielle: "",
+                lameRacleur: "",
+                rademaker: "",
+                aera: "",
+                fritch: "",
+                retourneur: "",
+                aligneur: "",
+                humidificateur25: "",
+                pushPlaque: "",
+                rouleauInferieur: "",
+                rouleauSuperieur: "",
+                tapisFaconneuse: "",
+                reperePoignee: "",
+                rouleauPression: "",
+                tapisAvantEtuveSurgel: "",
+                etuveSurgel: "",
+                cadence: "",
+                lamineur: "",
+                surveillant: "",
+                distributeurRaisinChoco: "",
+                pose: "",
+                pliageTriage: "",
+                topping: "",
+                sortieEtuve: "",
+                ouvertureMP: "",
+                commentaire: ""
               };
               
-              // Ajouter dynamiquement toutes les autres propriétés disponibles
+              // Ajouter dynamiquement toutes les propriétés disponibles
               Object.entries(data).forEach(([key, value]) => {
-                if (key !== 'id' && key !== 'codeArticle' && key !== 'numeroLigne' && key !== 'designation') {
+                if (key !== 'id') {
                   (produit as any)[key] = value || "";
                 }
               });
