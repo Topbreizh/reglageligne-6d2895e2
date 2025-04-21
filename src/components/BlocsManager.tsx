@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { BlocConfiguration, ChampConfiguration } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,33 @@ import {
 } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 import { sauvegarderBlocsConfiguration } from "@/lib/firebaseReglage";
+import { Pencil, Trash2, X } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 function uniqueId(prefix: string) {
   return `${prefix}_${Math.floor(Date.now() * Math.random())}`;
@@ -30,19 +58,80 @@ interface BlocsManagerProps {
   onConfigurationChange?: (blocs: BlocConfiguration[]) => void;
 }
 
+// Validation schemas
+const blocSchema = z.object({
+  nom: z.string().min(1, "Le nom du bloc est requis"),
+  nomTechnique: z.string().min(1, "Le nom technique est requis")
+    .regex(/^[a-zA-Z0-9_]+$/, "Le nom technique ne doit contenir que des lettres, chiffres et underscore"),
+  lignesApplicables: z.string()
+    .min(1, "Les lignes applicables sont requises"),
+});
+
+const champSchema = z.object({
+  nom: z.string().min(1, "Le nom du champ est requis"),
+  nomTechnique: z.string().min(1, "Le nom technique est requis")
+    .regex(/^[a-zA-Z0-9_]+$/, "Le nom technique ne doit contenir que des lettres, chiffres et underscore"),
+  lignesApplicables: z.string()
+    .min(1, "Les lignes applicables sont requises"),
+});
+
 const BlocsManager = ({ 
   initialConfiguration, 
   onConfigurationChange 
 }: BlocsManagerProps) => {
   const [blocs, setBlocs] = useState<BlocConfiguration[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [editingBloc, setEditingBloc] = useState<BlocConfiguration | null>(null);
+  const [editingChamp, setEditingChamp] = useState<{champ: ChampConfiguration, blocId: string} | null>(null);
   const { toast } = useToast();
+
+  // Form pour l'édition d'un bloc
+  const blocForm = useForm<z.infer<typeof blocSchema>>({
+    resolver: zodResolver(blocSchema),
+    defaultValues: {
+      nom: "",
+      nomTechnique: "",
+      lignesApplicables: "",
+    },
+  });
+
+  // Form pour l'édition d'un champ
+  const champForm = useForm<z.infer<typeof champSchema>>({
+    resolver: zodResolver(champSchema),
+    defaultValues: {
+      nom: "",
+      nomTechnique: "",
+      lignesApplicables: "",
+    },
+  });
 
   useEffect(() => {
     if (initialConfiguration && initialConfiguration.length > 0) {
       setBlocs(JSON.parse(JSON.stringify(initialConfiguration)));
     }
   }, [initialConfiguration]);
+
+  // Pré-remplir le formulaire d'édition de bloc
+  useEffect(() => {
+    if (editingBloc) {
+      blocForm.reset({
+        nom: editingBloc.nom,
+        nomTechnique: editingBloc.id,
+        lignesApplicables: editingBloc.lignesApplicables.join(", "),
+      });
+    }
+  }, [editingBloc, blocForm]);
+
+  // Pré-remplir le formulaire d'édition de champ
+  useEffect(() => {
+    if (editingChamp) {
+      champForm.reset({
+        nom: editingChamp.champ.nom,
+        nomTechnique: editingChamp.champ.nomTechnique,
+        lignesApplicables: editingChamp.champ.lignesApplicables.join(", "),
+      });
+    }
+  }, [editingChamp, champForm]);
 
   const handleBlocChange = (id: string, field: keyof BlocConfiguration, value: any) => {
     const updatedBlocs = blocs.map((bloc) =>
@@ -166,6 +255,9 @@ const BlocsManager = ({
     setBlocs(newBlocs);
     if (onConfigurationChange) onConfigurationChange(newBlocs);
 
+    // Ouvrir immédiatement le modal d'édition pour ce nouveau bloc
+    setEditingBloc(newBloc);
+
     toast({
       title: "Bloc ajouté",
       description: "Un bloc vierge a été ajouté. Complétez ses informations.",
@@ -191,9 +283,52 @@ const BlocsManager = ({
     setBlocs(updatedBlocs);
     if (onConfigurationChange) onConfigurationChange(updatedBlocs);
 
+    // Ouvrir immédiatement le modal d'édition pour ce nouveau champ
+    setEditingChamp({champ: newChamp, blocId});
+
     toast({
       title: "Champ ajouté",
       description: "Un nouveau champ a été ajouté au bloc.",
+      duration: 3000
+    });
+  };
+
+  const handleDeleteBloc = (blocId: string) => {
+    const updatedBlocs = blocs.filter(bloc => bloc.id !== blocId);
+    // Réorganiser les ordres
+    updatedBlocs.forEach((bloc, index) => {
+      bloc.ordre = index + 1;
+    });
+    
+    setBlocs(updatedBlocs);
+    if (onConfigurationChange) onConfigurationChange(updatedBlocs);
+
+    toast({
+      title: "Bloc supprimé",
+      description: "Le bloc a été supprimé avec succès.",
+      duration: 3000
+    });
+  };
+
+  const handleDeleteChamp = (blocId: string, champId: string) => {
+    const updatedBlocs = blocs.map(bloc => {
+      if (bloc.id === blocId) {
+        const filteredChamps = bloc.champs.filter(champ => champ.id !== champId);
+        // Réorganiser les ordres
+        filteredChamps.forEach((champ, index) => {
+          champ.ordre = index + 1;
+        });
+        return { ...bloc, champs: filteredChamps };
+      }
+      return bloc;
+    });
+    
+    setBlocs(updatedBlocs);
+    if (onConfigurationChange) onConfigurationChange(updatedBlocs);
+
+    toast({
+      title: "Champ supprimé",
+      description: "Le champ a été supprimé avec succès.",
       duration: 3000
     });
   };
@@ -219,6 +354,80 @@ const BlocsManager = ({
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const onSubmitBlocEdit = (values: z.infer<typeof blocSchema>) => {
+    if (!editingBloc) return;
+
+    // Préparer les lignes applicables
+    const lignesApplicables = values.lignesApplicables
+      .split(",")
+      .map(line => line.trim())
+      .filter(line => line);
+
+    // Mettre à jour le bloc
+    const updatedBlocs = blocs.map(bloc => {
+      if (bloc.id === editingBloc.id) {
+        return {
+          ...bloc,
+          nom: values.nom,
+          id: values.nomTechnique, // Mise à jour de l'ID avec le nom technique
+          lignesApplicables
+        };
+      }
+      return bloc;
+    });
+
+    setBlocs(updatedBlocs);
+    if (onConfigurationChange) onConfigurationChange(updatedBlocs);
+    setEditingBloc(null);
+
+    toast({
+      title: "Bloc modifié",
+      description: "Les modifications du bloc ont été appliquées.",
+      duration: 3000
+    });
+  };
+
+  const onSubmitChampEdit = (values: z.infer<typeof champSchema>) => {
+    if (!editingChamp) return;
+
+    // Préparer les lignes applicables
+    const lignesApplicables = values.lignesApplicables
+      .split(",")
+      .map(line => line.trim())
+      .filter(line => line);
+
+    // Mettre à jour le champ
+    const updatedBlocs = blocs.map(bloc => {
+      if (bloc.id === editingChamp.blocId) {
+        return {
+          ...bloc,
+          champs: bloc.champs.map(champ => {
+            if (champ.id === editingChamp.champ.id) {
+              return {
+                ...champ,
+                nom: values.nom,
+                nomTechnique: values.nomTechnique,
+                lignesApplicables
+              };
+            }
+            return champ;
+          })
+        };
+      }
+      return bloc;
+    });
+
+    setBlocs(updatedBlocs);
+    if (onConfigurationChange) onConfigurationChange(updatedBlocs);
+    setEditingChamp(null);
+
+    toast({
+      title: "Champ modifié",
+      description: "Les modifications du champ ont été appliquées.",
+      duration: 3000
+    });
   };
 
   if (blocs.length === 0) {
@@ -314,6 +523,112 @@ const BlocsManager = ({
                     </div>
                   </div>
 
+                  <div className="flex justify-end gap-2 mt-2">
+                    {/* Boutons d'édition et de suppression de bloc */}
+                    <Dialog open={editingBloc?.id === bloc.id} onOpenChange={(open) => !open && setEditingBloc(null)}>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setEditingBloc(bloc)}
+                        >
+                          <Pencil className="h-4 w-4 mr-1" /> Modifier
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Modifier le bloc</DialogTitle>
+                          <DialogDescription>
+                            Modifiez les propriétés du bloc ci-dessous.
+                          </DialogDescription>
+                        </DialogHeader>
+                        
+                        <Form {...blocForm}>
+                          <form onSubmit={blocForm.handleSubmit(onSubmitBlocEdit)} className="space-y-4">
+                            <FormField
+                              control={blocForm.control}
+                              name="nom"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Nom du bloc</FormLabel>
+                                  <FormControl>
+                                    <Input {...field} placeholder="Ex: Article, Laminage..." />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            
+                            <FormField
+                              control={blocForm.control}
+                              name="nomTechnique"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Identifiant technique</FormLabel>
+                                  <FormControl>
+                                    <Input {...field} placeholder="Ex: article, laminage..." />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            
+                            <FormField
+                              control={blocForm.control}
+                              name="lignesApplicables"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Lignes applicables</FormLabel>
+                                  <FormControl>
+                                    <Input {...field} placeholder="Ex: 1, 2, * (pour toutes)" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            
+                            <DialogFooter>
+                              <DialogClose asChild>
+                                <Button type="button" variant="outline">Annuler</Button>
+                              </DialogClose>
+                              <Button type="submit">Enregistrer</Button>
+                            </DialogFooter>
+                          </form>
+                        </Form>
+                      </DialogContent>
+                    </Dialog>
+                    
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="border-destructive text-destructive hover:bg-destructive/10"
+                        >
+                          <Trash2 className="h-4 w-4 mr-1" /> Supprimer
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Supprimer le bloc</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Êtes-vous sûr de vouloir supprimer le bloc "{bloc.nom}" ?
+                            Cette action supprimera également tous les champs associés et ne peut pas être annulée.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Annuler</AlertDialogCancel>
+                          <AlertDialogAction 
+                            onClick={() => handleDeleteBloc(bloc.id)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Supprimer
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+
                   <div className="mt-6">
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-semibold text-noir-700">Champs du bloc</h3>
@@ -331,9 +646,10 @@ const BlocsManager = ({
                         <TableRow>
                           <TableHead className="w-12">Ordre</TableHead>
                           <TableHead>Nom</TableHead>
+                          <TableHead>Nom technique</TableHead>
                           <TableHead>Lignes applicables</TableHead>
                           <TableHead>Visible</TableHead>
-                          <TableHead className="w-24">Actions</TableHead>
+                          <TableHead className="w-32">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -379,6 +695,7 @@ const BlocsManager = ({
                               </div>
                             </TableCell>
                             <TableCell>{champ.nom}</TableCell>
+                            <TableCell>{champ.nomTechnique}</TableCell>
                             <TableCell>
                               <Input
                                 value={champ.lignesApplicables.join(", ")}
@@ -407,8 +724,114 @@ const BlocsManager = ({
                               />
                             </TableCell>
                             <TableCell>
-                              <div className="flex justify-center">
-                                {/* Boutons d'action à ajouter si suppression demandée */}
+                              <div className="flex justify-center gap-2">
+                                {/* Dialog d'édition de champ */}
+                                <Dialog 
+                                  open={editingChamp?.champ.id === champ.id && editingChamp.blocId === bloc.id} 
+                                  onOpenChange={(open) => !open && setEditingChamp(null)}
+                                >
+                                  <DialogTrigger asChild>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      onClick={() => setEditingChamp({champ, blocId: bloc.id})}
+                                    >
+                                      <Pencil className="h-4 w-4" />
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent>
+                                    <DialogHeader>
+                                      <DialogTitle>Modifier le champ</DialogTitle>
+                                      <DialogDescription>
+                                        Modifiez les propriétés du champ ci-dessous.
+                                      </DialogDescription>
+                                    </DialogHeader>
+                                    
+                                    <Form {...champForm}>
+                                      <form onSubmit={champForm.handleSubmit(onSubmitChampEdit)} className="space-y-4">
+                                        <FormField
+                                          control={champForm.control}
+                                          name="nom"
+                                          render={({ field }) => (
+                                            <FormItem>
+                                              <FormLabel>Nom du champ</FormLabel>
+                                              <FormControl>
+                                                <Input {...field} placeholder="Ex: Code article, Programme..." />
+                                              </FormControl>
+                                              <FormMessage />
+                                            </FormItem>
+                                          )}
+                                        />
+                                        
+                                        <FormField
+                                          control={champForm.control}
+                                          name="nomTechnique"
+                                          render={({ field }) => (
+                                            <FormItem>
+                                              <FormLabel>Nom technique</FormLabel>
+                                              <FormControl>
+                                                <Input {...field} placeholder="Ex: codeArticle, programme..." />
+                                              </FormControl>
+                                              <FormMessage />
+                                            </FormItem>
+                                          )}
+                                        />
+                                        
+                                        <FormField
+                                          control={champForm.control}
+                                          name="lignesApplicables"
+                                          render={({ field }) => (
+                                            <FormItem>
+                                              <FormLabel>Lignes applicables</FormLabel>
+                                              <FormControl>
+                                                <Input {...field} placeholder="Ex: 1, 2, * (pour toutes)" />
+                                              </FormControl>
+                                              <FormMessage />
+                                            </FormItem>
+                                          )}
+                                        />
+                                        
+                                        <DialogFooter>
+                                          <DialogClose asChild>
+                                            <Button type="button" variant="outline">Annuler</Button>
+                                          </DialogClose>
+                                          <Button type="submit">Enregistrer</Button>
+                                        </DialogFooter>
+                                      </form>
+                                    </Form>
+                                  </DialogContent>
+                                </Dialog>
+                                
+                                {/* AlertDialog de suppression de champ */}
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm"
+                                      className="text-destructive hover:bg-destructive/10"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Supprimer le champ</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Êtes-vous sûr de vouloir supprimer le champ "{champ.nom}" ?
+                                        Cette action ne peut pas être annulée.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                      <AlertDialogAction 
+                                        onClick={() => handleDeleteChamp(bloc.id, champ.id)}
+                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                      >
+                                        Supprimer
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
                               </div>
                             </TableCell>
                           </TableRow>
