@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import PageLayout from "@/components/layout/PageLayout";
@@ -27,12 +28,14 @@ const ModifierProduitPage = () => {
       try {
         setLoading(true);
         
+        // Récupération du document depuis Firestore
         const docRef = doc(db, "reglages", id);
         const docSnap = await getDoc(docRef);
         
         if (docSnap.exists()) {
           const data = docSnap.data();
           
+          // Conversion des données en objet Produit
           const produitData: Produit = {
             id: docSnap.id,
             codeArticle: data.codeArticle || "",
@@ -124,15 +127,20 @@ const ModifierProduitPage = () => {
         throw new Error("Le code article et le numéro de ligne sont requis pour enregistrer un produit");
       }
       
-      const { id, ...produitSansId } = produitModifie;
+      // Utilisation de la fonction sauvegarderProduitComplet pour enregistrer tous les champs d'un coup
+      const produitToSave = {
+        ...produitModifie,
+        id: undefined // On supprime l'id de l'objet avant de l'envoyer à Firebase
+      };
       
-      await sauvegarderProduitComplet(produitSansId);
+      await sauvegarderProduitComplet(produitToSave);
       
       toast({
         title: "Produit modifié",
         description: `Le produit ${produitModifie.designation} a été modifié avec succès et enregistré dans la base de données.`,
       });
       
+      // Redirection vers la fiche produit
       navigate(`/fiche/${id}`);
     } catch (error) {
       console.error("Erreur lors de l'enregistrement dans Firebase:", error);
