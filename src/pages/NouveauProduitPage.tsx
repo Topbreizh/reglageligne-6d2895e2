@@ -4,7 +4,7 @@ import PageLayout from "@/components/layout/PageLayout";
 import ProduitForm from "@/components/ProduitForm";
 import { Produit } from "@/types";
 import { useToast } from "@/hooks/use-toast";
-import { setReglage } from "@/lib/firebaseReglage";
+import { sauvegarderProduitComplet } from "@/lib/firebaseReglage";
 
 const NouveauProduitPage = () => {
   const navigate = useNavigate();
@@ -18,42 +18,29 @@ const NouveauProduitPage = () => {
         throw new Error("Le code article et le numéro de ligne sont requis pour enregistrer un produit");
       }
       
-      // Sauvegarde chaque champ du produit dans Firebase
-      const champsProduit = Object.entries(produit);
-      let enregistrementReussi = true;
+      // Convertir le produit en objet simple (Record<string, string>)
+      const produitSimple: Record<string, string> = {};
       
-      for (const [champ, valeur] of champsProduit) {
-        // Skip id field
-        if (champ === 'id') continue;
+      // Copier toutes les propriétés
+      Object.entries(produit).forEach(([key, value]) => {
+        // Skip id field si présent
+        if (key === 'id') return;
         
         // Assurer que les valeurs sont des strings
-        const valeurString = String(valeur);
-        
-        try {
-          // Enregistrer chaque champ dans Firebase
-          await setReglage(
-            produit.codeArticle,
-            produit.numeroLigne,
-            champ,
-            valeurString
-          );
-        } catch (errChamp) {
-          console.error(`Erreur lors de l'enregistrement du champ ${champ}:`, errChamp);
-          enregistrementReussi = false;
-        }
-      }
-
-      if (enregistrementReussi) {
-        toast({
-          title: "Produit créé",
-          description: `Le produit ${produit.designation} a été créé avec succès et enregistré dans la base de données.`,
-        });
-        
-        // Redirection vers la page de recherche
-        navigate("/recherche");
-      } else {
-        throw new Error("Certains champs n'ont pas pu être enregistrés");
-      }
+        produitSimple[key] = String(value);
+      });
+      
+      // Sauvegarder le produit complet
+      await sauvegarderProduitComplet(produitSimple);
+      
+      toast({
+        title: "Produit créé",
+        description: `Le produit ${produit.designation} a été créé avec succès et enregistré dans la base de données.`,
+      });
+      
+      // Redirection vers la page de recherche
+      navigate("/recherche");
+      
     } catch (error) {
       console.error("Erreur lors de l'enregistrement dans Firebase:", error);
       toast({

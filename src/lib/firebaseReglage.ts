@@ -29,8 +29,24 @@ export async function setReglage(
     console.log(`Firebase: setReglage - Enregistrement de ${champReglage}=${valeur} pour ${id}`);
     
     const ref = doc(db, REGLES_COLLECTION, id);
+    
+    // Vérifier si le document existe déjà
+    const docSnap = await getDoc(ref);
+    
+    // Si le document existe, on fait une mise à jour, sinon on le crée
+    if (docSnap.exists()) {
+      console.log(`Firebase: setReglage - Le document ${id} existe déjà, mise à jour`);
+    } else {
+      console.log(`Firebase: setReglage - Création d'un nouveau document pour ${id}`);
+    }
+    
     // Utilise setDoc avec merge:true pour ne MAJ qu'un champ et garder les autres intacts
-    await setDoc(ref, { codeArticle, numeroLigne, [champReglage]: valeur }, { merge: true });
+    await setDoc(ref, { 
+      codeArticle, 
+      numeroLigne, 
+      [champReglage]: valeur 
+    }, { merge: true });
+    
     console.log(`Firebase: setReglage - Succès pour ${champReglage}=${valeur}`);
     return true;
   } catch (error) {
@@ -87,5 +103,27 @@ export async function rechercheParCodeArticle(codeArticle: string): Promise<Regl
   } catch (error) {
     console.error("Firebase: Erreur lors de la recherche par codeArticle:", error);
     return [];
+  }
+}
+
+// Sauvegarde complète d'un produit (tous les champs d'un coup)
+export async function sauvegarderProduitComplet(produit: Record<string, string>) {
+  try {
+    if (!produit.codeArticle || !produit.numeroLigne) {
+      console.error("Firebase sauvegarderProduitComplet: codeArticle ou numeroLigne manquant", { produit });
+      throw new Error("codeArticle et numeroLigne sont requis pour enregistrer un produit");
+    }
+    
+    const id = `${produit.codeArticle}_${produit.numeroLigne}`;
+    console.log(`Firebase: sauvegarderProduitComplet - Enregistrement complet pour ${id}`);
+    
+    const ref = doc(db, REGLES_COLLECTION, id);
+    await setDoc(ref, produit, { merge: true });
+    
+    console.log(`Firebase: sauvegarderProduitComplet - Succès pour ${id}`);
+    return true;
+  } catch (error) {
+    console.error("Firebase: Erreur lors de l'enregistrement complet du produit:", error);
+    throw error;
   }
 }
