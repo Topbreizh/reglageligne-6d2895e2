@@ -3,10 +3,9 @@ import PageLayout from "@/components/layout/PageLayout";
 import SearchBox from "@/components/SearchBox";
 import ProduitsList from "@/components/ProduitsList";
 import { Produit } from "@/types";
-import { produitsInitiaux } from "@/data/mockData";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { ReglageFirebase } from "@/lib/firebaseReglage";
+import { ReglageFirebase, getReglage } from "@/lib/firebaseReglage";
 import { useToast } from "@/hooks/use-toast";
 
 const RecherchePage = () => {
@@ -18,8 +17,7 @@ const RecherchePage = () => {
   useEffect(() => {
     const fetchProduits = async () => {
       try {
-        setProduits(produitsInitiaux);
-        setFilteredProduits(produitsInitiaux);
+        setIsSearching(true);
         
         const reglagesCollection = collection(db, "reglages");
         const querySnapshot = await getDocs(reglagesCollection);
@@ -30,70 +28,79 @@ const RecherchePage = () => {
           querySnapshot.forEach((doc) => {
             const data = doc.data() as ReglageFirebase;
             
-            const produit: Produit = {
-              id: doc.id,
-              codeArticle: data.codeArticle,
-              numeroLigne: data.numeroLigne,
-              designation: data.designation || "Sans designation",
-              programme: data.programme || "",
-              facteur: data.facteur || "",
-              regleLaminage: data.regleLaminage || "",
-              quick: data.quick || "",
-              calibreur1: data.calibreur1 || "",
-              calibreur2: data.calibreur2 || "",
-              calibreur3: data.calibreur3 || "",
-              laminoir: data.laminoir || "",
-              vitesseLaminage: data.vitesseLaminage || "",
-              farineurHaut1: data.farineurHaut1 || "",
-              farineurHaut2: data.farineurHaut2 || "",
-              farineurHaut3: data.farineurHaut3 || "",
-              farineurBas1: data.farineurBas1 || "",
-              farineurBas2: data.farineurBas2 || "",
-              farineurBas3: data.farineurBas3 || "",
-              queueDeCarpe: data.queueDeCarpe || "",
-              numeroDecoupe: data.numeroDecoupe || "",
-              buse: data.buse || "",
-              distributeurChocoRaisin: data.distributeurChocoRaisin || "",
-              humidificateur146: data.humidificateur146 || "",
-              vitesseDoreuse: data.vitesseDoreuse || "",
-              p1LongueurDecoupe: data.p1LongueurDecoupe || "",
-              p2Centrage: data.p2Centrage || "",
-              bielle: data.bielle || "",
-              lameRacleur: data.lameRacleur || "",
-              rademaker: data.rademaker || "",
-              aera: data.aera || "",
-              fritch: data.fritch || "",
-              retourneur: data.retourneur || "",
-              aligneur: data.aligneur || "",
-              humidificateur25: data.humidificateur25 || "",
-              pushPlaque: data.pushPlaque || "",
-              rouleauInferieur: data.rouleauInferieur || "",
-              rouleauSuperieur: data.rouleauSuperieur || "",
-              tapisFaconneuse: data.tapisFaconneuse || "",
-              reperePoignee: data.reperePoignee || "",
-              rouleauPression: data.rouleauPression || "",
-              tapisAvantEtuveSurgel: data.tapisAvantEtuveSurgel || "",
-              etuveSurgel: data.etuveSurgel || "",
-              cadence: data.cadence || "",
-              lamineur: data.lamineur || "",
-              surveillant: data.surveillant || "",
-              distributeurRaisinChoco: data.distributeurRaisinChoco || "",
-              pose: data.pose || "",
-              pliageTriage: data.pliageTriage || "",
-              topping: data.topping || "",
-              sortieEtuve: data.sortieEtuve || "",
-              ouvertureMP: data.ouvertureMP || "",
-              commentaire: data.commentaire || "",
-            };
-            
-            produitsFirebase.push(produit);
+            if (data.codeArticle && data.numeroLigne) {
+              const produit: Produit = {
+                id: doc.id,
+                codeArticle: data.codeArticle,
+                numeroLigne: data.numeroLigne,
+                designation: data.designation || "Sans designation",
+                programme: data.programme || "",
+                facteur: data.facteur || "",
+                regleLaminage: data.regleLaminage || "",
+                quick: data.quick || "",
+                calibreur1: data.calibreur1 || "",
+                calibreur2: data.calibreur2 || "",
+                calibreur3: data.calibreur3 || "",
+                laminoir: data.laminoir || "",
+                vitesseLaminage: data.vitesseLaminage || "",
+                farineurHaut1: data.farineurHaut1 || "",
+                farineurHaut2: data.farineurHaut2 || "",
+                farineurHaut3: data.farineurHaut3 || "",
+                farineurBas1: data.farineurBas1 || "",
+                farineurBas2: data.farineurBas2 || "",
+                farineurBas3: data.farineurBas3 || "",
+                queueDeCarpe: data.queueDeCarpe || "",
+                numeroDecoupe: data.numeroDecoupe || "",
+                buse: data.buse || "",
+                distributeurChocoRaisin: data.distributeurChocoRaisin || "",
+                humidificateur146: data.humidificateur146 || "",
+                vitesseDoreuse: data.vitesseDoreuse || "",
+                p1LongueurDecoupe: data.p1LongueurDecoupe || "",
+                p2Centrage: data.p2Centrage || "",
+                bielle: data.bielle || "",
+                lameRacleur: data.lameRacleur || "",
+                rademaker: data.rademaker || "",
+                aera: data.aera || "",
+                fritch: data.fritch || "",
+                retourneur: data.retourneur || "",
+                aligneur: data.aligneur || "",
+                humidificateur25: data.humidificateur25 || "",
+                pushPlaque: data.pushPlaque || "",
+                rouleauInferieur: data.rouleauInferieur || "",
+                rouleauSuperieur: data.rouleauSuperieur || "",
+                tapisFaconneuse: data.tapisFaconneuse || "",
+                reperePoignee: data.reperePoignee || "",
+                rouleauPression: data.rouleauPression || "",
+                tapisAvantEtuveSurgel: data.tapisAvantEtuveSurgel || "",
+                etuveSurgel: data.etuveSurgel || "",
+                cadence: data.cadence || "",
+                lamineur: data.lamineur || "",
+                surveillant: data.surveillant || "",
+                distributeurRaisinChoco: data.distributeurRaisinChoco || "",
+                pose: data.pose || "",
+                pliageTriage: data.pliageTriage || "",
+                topping: data.topping || "",
+                sortieEtuve: data.sortieEtuve || "",
+                ouvertureMP: data.ouvertureMP || "",
+                commentaire: data.commentaire || "",
+              };
+              
+              produitsFirebase.push(produit);
+            }
           });
           
-          if (produitsFirebase.length > 0) {
-            setProduits(produitsFirebase);
-            setFilteredProduits(produitsFirebase);
-            console.log("Produits chargés depuis Firebase:", produitsFirebase);
-          }
+          setProduits(produitsFirebase);
+          setFilteredProduits(produitsFirebase);
+          console.log("Produits chargés depuis Firebase:", produitsFirebase);
+        } else {
+          console.log("Aucun produit trouvé dans Firebase");
+          toast({
+            variant: "destructive",
+            title: "Aucun produit",
+            description: "Aucun produit n'a été trouvé dans la base de données.",
+          });
+          setProduits([]);
+          setFilteredProduits([]);
         }
       } catch (error) {
         console.error("Erreur lors du chargement des produits:", error);
@@ -102,6 +109,10 @@ const RecherchePage = () => {
           title: "Erreur de chargement",
           description: "Impossible de charger les données depuis Firebase.",
         });
+        setProduits([]);
+        setFilteredProduits([]);
+      } finally {
+        setIsSearching(false);
       }
     };
 
@@ -112,121 +123,41 @@ const RecherchePage = () => {
     setIsSearching(true);
 
     try {
-      if (codeArticle || numeroLigne || designation) {
-        const reglagesCollection = collection(db, "reglages");
-        let firebaseQuery = query(reglagesCollection);
-        
-        if (codeArticle) {
-          firebaseQuery = query(firebaseQuery, where("codeArticle", "==", codeArticle));
-        }
-        
-        if (numeroLigne) {
-          firebaseQuery = query(firebaseQuery, where("numeroLigne", "==", numeroLigne));
-        }
-        
-        try {
-          const querySnapshot = await getDocs(firebaseQuery);
-          const produitsFirebase: Produit[] = [];
-          
-          querySnapshot.forEach((doc) => {
-            const data = doc.data() as ReglageFirebase;
-            
-            if (designation && !data.designation?.toLowerCase().includes(designation.toLowerCase())) {
-              return;
-            }
-            
-            const produit: Produit = {
-              id: doc.id,
-              codeArticle: data.codeArticle,
-              numeroLigne: data.numeroLigne,
-              designation: data.designation || "Sans designation",
-              programme: data.programme || "",
-              facteur: data.facteur || "",
-              regleLaminage: data.regleLaminage || "",
-              quick: data.quick || "",
-              calibreur1: data.calibreur1 || "",
-              calibreur2: data.calibreur2 || "",
-              calibreur3: data.calibreur3 || "",
-              laminoir: data.laminoir || "",
-              vitesseLaminage: data.vitesseLaminage || "",
-              farineurHaut1: data.farineurHaut1 || "",
-              farineurHaut2: data.farineurHaut2 || "",
-              farineurHaut3: data.farineurHaut3 || "",
-              farineurBas1: data.farineurBas1 || "",
-              farineurBas2: data.farineurBas2 || "",
-              farineurBas3: data.farineurBas3 || "",
-              queueDeCarpe: data.queueDeCarpe || "",
-              numeroDecoupe: data.numeroDecoupe || "",
-              buse: data.buse || "",
-              distributeurChocoRaisin: data.distributeurChocoRaisin || "",
-              humidificateur146: data.humidificateur146 || "",
-              vitesseDoreuse: data.vitesseDoreuse || "",
-              p1LongueurDecoupe: data.p1LongueurDecoupe || "",
-              p2Centrage: data.p2Centrage || "",
-              bielle: data.bielle || "",
-              lameRacleur: data.lameRacleur || "",
-              rademaker: data.rademaker || "",
-              aera: data.aera || "",
-              fritch: data.fritch || "",
-              retourneur: data.retourneur || "",
-              aligneur: data.aligneur || "",
-              humidificateur25: data.humidificateur25 || "",
-              pushPlaque: data.pushPlaque || "",
-              rouleauInferieur: data.rouleauInferieur || "",
-              rouleauSuperieur: data.rouleauSuperieur || "",
-              tapisFaconneuse: data.tapisFaconneuse || "",
-              reperePoignee: data.reperePoignee || "",
-              rouleauPression: data.rouleauPression || "",
-              tapisAvantEtuveSurgel: data.tapisAvantEtuveSurgel || "",
-              etuveSurgel: data.etuveSurgel || "",
-              cadence: data.cadence || "",
-              lamineur: data.lamineur || "",
-              surveillant: data.surveillant || "",
-              distributeurRaisinChoco: data.distributeurRaisinChoco || "",
-              pose: data.pose || "",
-              pliageTriage: data.pliageTriage || "",
-              topping: data.topping || "",
-              sortieEtuve: data.sortieEtuve || "",
-              ouvertureMP: data.ouvertureMP || "",
-              commentaire: data.commentaire || "",
-            };
-            
-            produitsFirebase.push(produit);
-          });
-          
-          setFilteredProduits(produitsFirebase);
-          console.log("Résultats de recherche Firebase:", produitsFirebase);
-        } catch (error) {
-          console.error("Erreur lors de la recherche Firebase:", error);
-          filterLocalProducts(codeArticle, numeroLigne, designation);
-        }
-      } else {
+      if (!codeArticle && !numeroLigne && !designation) {
         setFilteredProduits(produits);
+        setIsSearching(false);
+        return;
       }
+
+      const reglagesCollection = collection(db, "reglages");
+      
+      const results = produits.filter((produit) => {
+        const matchCodeArticle = codeArticle
+          ? produit.codeArticle.toLowerCase().includes(codeArticle.toLowerCase())
+          : true;
+        const matchNumeroLigne = numeroLigne
+          ? produit.numeroLigne.toLowerCase().includes(numeroLigne.toLowerCase())
+          : true;
+        const matchDesignation = designation
+          ? produit.designation.toLowerCase().includes(designation.toLowerCase())
+          : true;
+
+        return matchCodeArticle && matchNumeroLigne && matchDesignation;
+      });
+      
+      console.log("Résultats de recherche:", results);
+      setFilteredProduits(results);
+      
     } catch (error) {
       console.error("Erreur lors de la recherche:", error);
-      filterLocalProducts(codeArticle, numeroLigne, designation);
+      toast({
+        variant: "destructive",
+        title: "Erreur de recherche",
+        description: "Une erreur est survenue lors de la recherche.",
+      });
     } finally {
       setIsSearching(false);
     }
-  };
-  
-  const filterLocalProducts = (codeArticle: string, numeroLigne: string, designation: string) => {
-    const filtered = produits.filter((produit) => {
-      const matchCodeArticle = codeArticle
-        ? produit.codeArticle.toLowerCase().includes(codeArticle.toLowerCase())
-        : true;
-      const matchNumeroLigne = numeroLigne
-        ? produit.numeroLigne.toLowerCase().includes(numeroLigne.toLowerCase())
-        : true;
-      const matchDesignation = designation
-        ? produit.designation.toLowerCase().includes(designation.toLowerCase())
-        : true;
-
-      return matchCodeArticle && matchNumeroLigne && matchDesignation;
-    });
-
-    setFilteredProduits(filtered);
   };
 
   return (
@@ -240,7 +171,9 @@ const RecherchePage = () => {
           <SearchBox onSearch={handleSearch} />
 
           {isSearching ? (
-            <div className="text-center p-4">Recherche en cours...</div>
+            <div className="flex justify-center p-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-jaune-300"></div>
+            </div>
           ) : (
             <ProduitsList produits={filteredProduits} />
           )}
