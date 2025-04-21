@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/table";
 import { blocsConfiguration } from "@/data/blocConfig";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Import } from "lucide-react";
+import { Import, Table as TableIcon } from "lucide-react";
 
 const ExcelImport = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -54,6 +54,7 @@ const ExcelImport = () => {
       
       // Simuler l'extraction des en-têtes et des données
       setTimeout(() => {
+        // Exemple d'entêtes plus complet pour démonstration
         const mockHeaders = [
           "Code Article",
           "Numéro de ligne",
@@ -61,7 +62,16 @@ const ExcelImport = () => {
           "Programme",
           "Facteur",
           "Calibrage",
-          "Vitesse"
+          "Vitesse",
+          "Laminoir",
+          "Farineur Haut",
+          "Farineur Bas",
+          "Queue de Carpe",
+          "Numéro Découpe",
+          "Buse",
+          "Humidificateur",
+          "Distributeur",
+          "Commentaire"
         ];
         
         const mockData = [
@@ -72,7 +82,16 @@ const ExcelImport = () => {
             "Programme": "P40",
             "Facteur": "1.2",
             "Calibrage": "2.5",
-            "Vitesse": "45"
+            "Vitesse": "45",
+            "Laminoir": "L1",
+            "Farineur Haut": "3.2",
+            "Farineur Bas": "2.1",
+            "Queue de Carpe": "Oui",
+            "Numéro Découpe": "7",
+            "Buse": "B3",
+            "Humidificateur": "H2",
+            "Distributeur": "D1",
+            "Commentaire": "RAS"
           },
           {
             "Code Article": "P005",
@@ -81,15 +100,23 @@ const ExcelImport = () => {
             "Programme": "P32",
             "Facteur": "1.3",
             "Calibrage": "2.3",
-            "Vitesse": "50"
+            "Vitesse": "50",
+            "Laminoir": "L2",
+            "Farineur Haut": "3.0",
+            "Farineur Bas": "2.0",
+            "Queue de Carpe": "Non",
+            "Numéro Découpe": "5",
+            "Buse": "B2",
+            "Humidificateur": "H1",
+            "Distributeur": "D2",
+            "Commentaire": "Ajuster température"
           }
         ];
 
         setHeaders(mockHeaders);
         setPreviewData(mockData);
 
-        // Initialiser le mapping pour chaque champ de l'appli : 
-        // pour rendre l'expérience agréable on essaye de faire le mapping auto si possible
+        // Initialiser le mapping pour chaque champ de l'appli 
         const initialMappings = champsCibles.map(champApp => {
           // Chercher une entête qui "matche" ce champ
           const foundHeader = mockHeaders.find(header => {
@@ -99,31 +126,35 @@ const ExcelImport = () => {
             const champTechNorm = champApp.nomTechnique.toLowerCase();
             return hNorm === champNomNorm || hNorm === champTechNorm;
           });
+          
           let champSource = "none";
+          
           // Matching spécial, autoriser les correspondances spécifiques
-          if (champApp.nomTechnique === "codeArticle") {
+          if (champApp.nomTechnique === "codeArticle" && mockHeaders.find(h=> h.toLowerCase().includes("code"))) {
             champSource = mockHeaders.find(h=> h.toLowerCase().includes("code")) || "none";
           }
-          else if (champApp.nomTechnique === "numeroLigne") {
+          else if (champApp.nomTechnique === "numeroLigne" && mockHeaders.find(h=> h.toLowerCase().includes("numéro"))) {
             champSource = mockHeaders.find(h=> h.toLowerCase().includes("numéro")) || "none";
           }
-          else if (champApp.nomTechnique === "designation") {
+          else if (champApp.nomTechnique === "designation" && mockHeaders.find(h=> h.toLowerCase().includes("désignation"))) {
             champSource = mockHeaders.find(h=> h.toLowerCase().includes("désignation")) || "none";
           }
-          else if (champApp.nomTechnique === "calibreur1" && mockHeaders.includes("Calibrage")) {
-            champSource = "Calibrage";
+          else if (champApp.nomTechnique === "calibreur1" && mockHeaders.find(h=> h.toLowerCase().includes("calibrage"))) {
+            champSource = mockHeaders.find(h=> h.toLowerCase().includes("calibrage")) || "none";
           }
-          else if (champApp.nomTechnique === "vitesseLaminage" && mockHeaders.includes("Vitesse")) {
-            champSource = "Vitesse";
+          else if (champApp.nomTechnique === "vitesseLaminage" && mockHeaders.find(h=> h.toLowerCase().includes("vitesse"))) {
+            champSource = mockHeaders.find(h=> h.toLowerCase().includes("vitesse")) || "none";
           }
           else if (foundHeader) {
             champSource = foundHeader;
           }
+          
           return {
             champSource,
             champDestination: champApp.nomTechnique
           };
         });
+        
         setMappings(initialMappings);
         setStep(2);
       }, 1000);
@@ -242,50 +273,53 @@ const ExcelImport = () => {
               <p className="mb-4 text-sm text-noir-600">
                 Associez chaque champ de l'application à une colonne de votre fichier Excel (ou choisissez "ne pas importer").
               </p>
-              <Table>
-                <TableHeader className="bg-noir-100">
-                  <TableRow>
-                    <TableHead>Champ destination (Application)</TableHead>
-                    <TableHead>Colonne source (Excel)</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {champsCibles.map((champ, index) => {
-                    const mapping = mappings.find(m => m.champDestination === champ.nomTechnique) || {
-                      champDestination: champ.nomTechnique,
-                      champSource: "none"
-                    };
-                    return (
-                      <TableRow key={champ.id}>
-                        <TableCell>
-                          <div className="font-semibold">{champ.nom}</div>
-                          <div className="text-xs text-noir-400">{champ.blocNom}</div>
-                        </TableCell>
-                        <TableCell>
-                          <Select
-                            value={mapping.champSource}
-                            onValueChange={(value) =>
-                              handleMappingChange(champ.nomTechnique, value)
-                            }
-                          >
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Sélectionner une colonne" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="none">Ne pas importer</SelectItem>
-                              {headers.map(header => (
-                                <SelectItem value={header} key={header}>
-                                  {header}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader className="bg-noir-100">
+                    <TableRow>
+                      <TableHead>Bloc</TableHead>
+                      <TableHead>Champ destination (Application)</TableHead>
+                      <TableHead>Colonne source (Excel)</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {champsCibles.map((champ, index) => {
+                      const mapping = mappings.find(m => m.champDestination === champ.nomTechnique) || {
+                        champDestination: champ.nomTechnique,
+                        champSource: "none"
+                      };
+                      return (
+                        <TableRow key={champ.id}>
+                          <TableCell>{champ.blocNom}</TableCell>
+                          <TableCell>
+                            <div className="font-semibold">{champ.nom}</div>
+                          </TableCell>
+                          <TableCell>
+                            <Select
+                              value={mapping.champSource}
+                              onValueChange={(value) =>
+                                handleMappingChange(champ.nomTechnique, value)
+                              }
+                            >
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Sélectionner une colonne" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="none">Ne pas importer</SelectItem>
+                                {headers.map(header => (
+                                  <SelectItem value={header} key={header}>
+                                    {header}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
 
             <div className="flex justify-end space-x-2">
