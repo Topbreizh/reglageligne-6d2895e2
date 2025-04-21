@@ -179,8 +179,8 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
 
   return (
     <div className="printable-page">
-      <div className="printable-header mb-4">
-        <h1 className="text-xl md:text-2xl font-bold">
+      <div className="printable-header mb-6">
+        <h1 className="text-2xl font-bold">
           Fiche Produit: {produit.designation} ({produit.codeArticle})
         </h1>
         <div className="no-print flex gap-2 mt-2">
@@ -197,11 +197,9 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 print:gap-2">
-        {renderBlocs()}
-      </div>
+      {renderBlocs()}
 
-      <div className="mt-4 text-center text-xs text-gray-500 no-print">
+      <div className="mt-6 text-center text-sm text-gray-500 no-print">
         Document généré le {new Date().toLocaleDateString('fr-FR')}
       </div>
     </div>
