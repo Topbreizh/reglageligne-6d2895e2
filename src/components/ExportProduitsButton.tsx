@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { FileExport } from "lucide-react";
+import { FileSpreadsheet } from "lucide-react";
 import { getAllProduits } from "@/lib/firebaseReglage";
 import { exportProduitsAsCsv } from "@/lib/exportCsv";
 import { useToast } from "@/hooks/use-toast";
@@ -47,7 +47,7 @@ const ExportProduitsButton = () => {
       className="border-jaune-300 text-noir-800 flex items-center gap-2"
       title="Exporter tous les produits"
     >
-      <FileExport className="w-4 h-4" />
+      <FileSpreadsheet className="w-4 h-4" />
       {isExporting ? "Exportation..." : "Exporter les produits"}
     </Button>
   );
