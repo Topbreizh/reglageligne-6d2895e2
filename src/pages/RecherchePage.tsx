@@ -1,9 +1,10 @@
+
 import { useState, useEffect } from "react";
 import PageLayout from "@/components/layout/PageLayout";
 import SearchBox from "@/components/SearchBox";
 import ProduitsList from "@/components/ProduitsList";
 import { Produit } from "@/types";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { ReglageFirebase, getReglage } from "@/lib/firebaseReglage";
 import { useToast } from "@/hooks/use-toast";
@@ -29,61 +30,20 @@ const RecherchePage = () => {
             const data = doc.data() as ReglageFirebase;
             
             if (data.codeArticle && data.numeroLigne) {
+              // Construire un objet Produit à partir des données Firebase
               const produit: Produit = {
                 id: doc.id,
-                codeArticle: data.codeArticle,
-                numeroLigne: data.numeroLigne,
+                codeArticle: data.codeArticle || "",
+                numeroLigne: data.numeroLigne || "",
                 designation: data.designation || "Sans designation",
-                programme: data.programme || "",
-                facteur: data.facteur || "",
-                regleLaminage: data.regleLaminage || "",
-                quick: data.quick || "",
-                calibreur1: data.calibreur1 || "",
-                calibreur2: data.calibreur2 || "",
-                calibreur3: data.calibreur3 || "",
-                laminoir: data.laminoir || "",
-                vitesseLaminage: data.vitesseLaminage || "",
-                farineurHaut1: data.farineurHaut1 || "",
-                farineurHaut2: data.farineurHaut2 || "",
-                farineurHaut3: data.farineurHaut3 || "",
-                farineurBas1: data.farineurBas1 || "",
-                farineurBas2: data.farineurBas2 || "",
-                farineurBas3: data.farineurBas3 || "",
-                queueDeCarpe: data.queueDeCarpe || "",
-                numeroDecoupe: data.numeroDecoupe || "",
-                buse: data.buse || "",
-                distributeurChocoRaisin: data.distributeurChocoRaisin || "",
-                humidificateur146: data.humidificateur146 || "",
-                vitesseDoreuse: data.vitesseDoreuse || "",
-                p1LongueurDecoupe: data.p1LongueurDecoupe || "",
-                p2Centrage: data.p2Centrage || "",
-                bielle: data.bielle || "",
-                lameRacleur: data.lameRacleur || "",
-                rademaker: data.rademaker || "",
-                aera: data.aera || "",
-                fritch: data.fritch || "",
-                retourneur: data.retourneur || "",
-                aligneur: data.aligneur || "",
-                humidificateur25: data.humidificateur25 || "",
-                pushPlaque: data.pushPlaque || "",
-                rouleauInferieur: data.rouleauInferieur || "",
-                rouleauSuperieur: data.rouleauSuperieur || "",
-                tapisFaconneuse: data.tapisFaconneuse || "",
-                reperePoignee: data.reperePoignee || "",
-                rouleauPression: data.rouleauPression || "",
-                tapisAvantEtuveSurgel: data.tapisAvantEtuveSurgel || "",
-                etuveSurgel: data.etuveSurgel || "",
-                cadence: data.cadence || "",
-                lamineur: data.lamineur || "",
-                surveillant: data.surveillant || "",
-                distributeurRaisinChoco: data.distributeurRaisinChoco || "",
-                pose: data.pose || "",
-                pliageTriage: data.pliageTriage || "",
-                topping: data.topping || "",
-                sortieEtuve: data.sortieEtuve || "",
-                ouvertureMP: data.ouvertureMP || "",
-                commentaire: data.commentaire || "",
               };
+              
+              // Ajouter dynamiquement toutes les autres propriétés disponibles
+              Object.entries(data).forEach(([key, value]) => {
+                if (key !== 'id' && key !== 'codeArticle' && key !== 'numeroLigne' && key !== 'designation') {
+                  (produit as any)[key] = value || "";
+                }
+              });
               
               produitsFirebase.push(produit);
             }
@@ -129,8 +89,6 @@ const RecherchePage = () => {
         return;
       }
 
-      const reglagesCollection = collection(db, "reglages");
-      
       const results = produits.filter((produit) => {
         const matchCodeArticle = codeArticle
           ? produit.codeArticle.toLowerCase().includes(codeArticle.toLowerCase())
