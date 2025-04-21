@@ -2,6 +2,7 @@
 // Utilitaires pour lire/écrire des réglages dans Firestore
 import { doc, setDoc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "./firebase";
+import { BlocConfiguration } from "@/types";
 
 export interface ReglageFirebase {
   codeArticle: string;
@@ -11,6 +12,7 @@ export interface ReglageFirebase {
 }
 
 const REGLES_COLLECTION = "reglages";
+const BLOCS_COLLECTION = "blocsConfig";
 
 // Sauvegarde ou mise à jour d'un champ réglage pour un codeArticle/numeroLigne
 export async function setReglage(
@@ -125,5 +127,42 @@ export async function sauvegarderProduitComplet(produit: Record<string, string>)
   } catch (error) {
     console.error("Firebase: Erreur lors de l'enregistrement complet du produit:", error);
     throw error;
+  }
+}
+
+// Sauvegarde la configuration des blocs
+export async function sauvegarderBlocsConfiguration(blocs: BlocConfiguration[]) {
+  try {
+    console.log(`Firebase: sauvegarderBlocsConfiguration - Enregistrement de ${blocs.length} blocs`);
+    
+    const ref = doc(db, BLOCS_COLLECTION, "configuration");
+    await setDoc(ref, { blocs }, { merge: true });
+    
+    console.log(`Firebase: sauvegarderBlocsConfiguration - Succès`);
+    return true;
+  } catch (error) {
+    console.error("Firebase: Erreur lors de l'enregistrement de la configuration des blocs:", error);
+    throw error;
+  }
+}
+
+// Récupère la configuration des blocs
+export async function getBlocsConfiguration(): Promise<BlocConfiguration[] | null> {
+  try {
+    console.log(`Firebase: getBlocsConfiguration - Récupération de la configuration des blocs`);
+    
+    const ref = doc(db, BLOCS_COLLECTION, "configuration");
+    const snap = await getDoc(ref);
+    
+    if (snap.exists() && snap.data().blocs) {
+      console.log(`Firebase: getBlocsConfiguration - Configuration trouvée`, snap.data().blocs);
+      return snap.data().blocs as BlocConfiguration[];
+    }
+    
+    console.log(`Firebase: getBlocsConfiguration - Aucune configuration trouvée`);
+    return null;
+  } catch (error) {
+    console.error("Firebase: Erreur lors de la récupération de la configuration des blocs:", error);
+    return null;
   }
 }

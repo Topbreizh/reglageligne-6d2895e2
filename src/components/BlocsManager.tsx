@@ -1,7 +1,6 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BlocConfiguration, ChampConfiguration } from "@/types";
-import { blocsConfiguration } from "@/data/blocConfig";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,19 +20,36 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
+import { sauvegarderBlocsConfiguration } from "@/lib/firebaseReglage";
 
-const BlocsManager = () => {
-  const [blocs, setBlocs] = useState<BlocConfiguration[]>(
-    JSON.parse(JSON.stringify(blocsConfiguration))
-  );
+interface BlocsManagerProps {
+  initialConfiguration: BlocConfiguration[];
+  onConfigurationChange?: (blocs: BlocConfiguration[]) => void;
+}
+
+const BlocsManager = ({ 
+  initialConfiguration, 
+  onConfigurationChange 
+}: BlocsManagerProps) => {
+  const [blocs, setBlocs] = useState<BlocConfiguration[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
+  useEffect(() => {
+    if (initialConfiguration && initialConfiguration.length > 0) {
+      setBlocs(JSON.parse(JSON.stringify(initialConfiguration)));
+    }
+  }, [initialConfiguration]);
+
   const handleBlocChange = (id: string, field: keyof BlocConfiguration, value: any) => {
-    setBlocs(
-      blocs.map((bloc) =>
-        bloc.id === id ? { ...bloc, [field]: value } : bloc
-      )
+    const updatedBlocs = blocs.map((bloc) =>
+      bloc.id === id ? { ...bloc, [field]: value } : bloc
     );
+    setBlocs(updatedBlocs);
+    
+    if (onConfigurationChange) {
+      onConfigurationChange(updatedBlocs);
+    }
   };
 
   const handleChampChange = (
@@ -42,19 +58,23 @@ const BlocsManager = () => {
     field: keyof ChampConfiguration,
     value: any
   ) => {
-    setBlocs(
-      blocs.map((bloc) => {
-        if (bloc.id === blocId) {
-          return {
-            ...bloc,
-            champs: bloc.champs.map((champ) =>
-              champ.id === champId ? { ...champ, [field]: value } : champ
-            ),
-          };
-        }
-        return bloc;
-      })
-    );
+    const updatedBlocs = blocs.map((bloc) => {
+      if (bloc.id === blocId) {
+        return {
+          ...bloc,
+          champs: bloc.champs.map((champ) =>
+            champ.id === champId ? { ...champ, [field]: value } : champ
+          ),
+        };
+      }
+      return bloc;
+    });
+    
+    setBlocs(updatedBlocs);
+    
+    if (onConfigurationChange) {
+      onConfigurationChange(updatedBlocs);
+    }
   };
 
   const handleLignesApplicablesChange = (
@@ -98,6 +118,10 @@ const BlocsManager = () => {
     [newBlocs[blocIndex], newBlocs[targetIndex]] = [newBlocs[targetIndex], newBlocs[blocIndex]];
     
     setBlocs(newBlocs);
+    
+    if (onConfigurationChange) {
+      onConfigurationChange(newBlocs);
+    }
   };
 
   const moveChamp = (blocId: string, champId: string, direction: "up" | "down") => {
@@ -122,19 +146,43 @@ const BlocsManager = () => {
     // Swap positions in array
     [champs[champIndex], champs[targetIndex]] = [champs[targetIndex], champs[champIndex]];
     
-    handleBlocChange(blocId, "champs", champs);
+    const updatedBlocs = [...blocs];
+    updatedBlocs[blocIndex].champs = champs;
+    
+    setBlocs(updatedBlocs);
+    
+    if (onConfigurationChange) {
+      onConfigurationChange(updatedBlocs);
+    }
   };
 
-  const saveConfiguration = () => {
-    // Dans un vrai système, nous sauvegarderions en base de données
-    // Pour cette démo, nous affichons juste un message toast
-    console.log("Configuration sauvegardée:", blocs);
-    
-    toast({
-      title: "Configuration sauvegardée",
-      description: "Les modifications des blocs et champs ont été enregistrées.",
-    });
+  const saveConfiguration = async () => {
+    try {
+      setIsSaving(true);
+      console.log("Configuration à sauvegarder:", blocs);
+      
+      // Sauvegarde dans Firebase
+      await sauvegarderBlocsConfiguration(blocs);
+      
+      toast({
+        title: "Configuration sauvegardée",
+        description: "Les modifications des blocs et champs ont été enregistrées dans la base de données.",
+      });
+    } catch (error) {
+      console.error("Erreur lors de la sauvegarde de la configuration:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Impossible de sauvegarder la configuration. Veuillez réessayer.",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
+
+  if (blocs.length === 0) {
+    return <div className="p-8 text-center">Chargement de la configuration...</div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -317,9 +365,17 @@ const BlocsManager = () => {
         <div className="flex justify-end mt-6">
           <Button
             onClick={saveConfiguration}
+            disabled={isSaving}
             className="bg-jaune-300 text-noir-800 hover:bg-jaune-400"
           >
-            Enregistrer la configuration
+            {isSaving ? (
+              <>
+                <span className="animate-spin mr-2">⟳</span>
+                Enregistrement...
+              </>
+            ) : (
+              "Enregistrer la configuration"
+            )}
           </Button>
         </div>
       </div>
