@@ -269,7 +269,7 @@ const ExcelImport = () => {
                             <SelectValue placeholder="Sélectionner un champ" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">Ne pas importer</SelectItem>
+                            <SelectItem value="none">Ne pas importer</SelectItem>
                             {blocsConfiguration.map((bloc) => (
                               <div key={bloc.id}>
                                 <div className="px-2 py-1.5 text-xs font-semibold bg-noir-100">
