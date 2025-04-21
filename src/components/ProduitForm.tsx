@@ -199,8 +199,8 @@ const ProduitForm = ({ produit, onSubmit, mode }: ProduitFormProps) => {
                   <div key={champ.id} className={isFullWidth ? "md:col-span-3" : ""}>
                     <Label htmlFor={champ.nomTechnique} className="field-label">
                       {champ.nom}
-                      {/* Fix: Compare nomTechnique with string literals correctly */}
-                      {champ.nomTechnique === "codeArticle" || champ.nomTechnique === "numeroLigne" || champ.nomTechnique === "designation" ? " *" : ""}
+                      {/* Correction de la comparaison : utiliser une série de conditions plutôt qu'une comparaison directe */}
+                      {(champ.nomTechnique === "codeArticle" || champ.nomTechnique === "numeroLigne" || champ.nomTechnique === "designation") ? " *" : ""}
                     </Label>
                     {champ.nomTechnique === "commentaire" ? (
                       <Textarea

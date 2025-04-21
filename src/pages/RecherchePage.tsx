@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import PageLayout from "@/components/layout/PageLayout";
 import SearchBox from "@/components/SearchBox";
@@ -30,8 +29,6 @@ const RecherchePage = () => {
             const data = doc.data() as ReglageFirebase;
             
             if (data.codeArticle && data.numeroLigne) {
-              // Créer un objet Produit avec toutes les propriétés requises
-              // d'abord initialisées avec des valeurs vides
               const produit: Produit = {
                 id: doc.id,
                 codeArticle: data.codeArticle || "",
@@ -88,7 +85,6 @@ const RecherchePage = () => {
                 commentaire: ""
               };
               
-              // Ajouter dynamiquement toutes les propriétés disponibles
               Object.entries(data).forEach(([key, value]) => {
                 if (key !== 'id') {
                   (produit as any)[key] = value || "";
