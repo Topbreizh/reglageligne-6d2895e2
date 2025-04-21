@@ -37,7 +37,9 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
     
     // Vérifier si le bloc est applicable pour la ligne courante
     if (produit.numeroLigne && bloc.lignesApplicables.length > 0) {
+      // Si le bloc est applicable à toutes les lignes
       if (bloc.lignesApplicables.includes("*")) return true;
+      // Si le bloc est spécifiquement applicable à cette ligne
       if (bloc.lignesApplicables.includes(produit.numeroLigne)) return true;
       return false;
     }
@@ -59,7 +61,7 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
     if (!estChampVisible(blocId, champId)) return null;
     
     return (
-      <div className="flex flex-col md:flex-row md:items-center mb-2">
+      <div key={champ.id} className="flex flex-col md:flex-row md:items-center mb-2">
         <div className="font-semibold w-40">{champ.nom}:</div>
         <div>{getChampValeur(champ.nomTechnique)}</div>
       </div>
@@ -71,29 +73,34 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
       .filter(bloc => estBlocVisible(bloc.id))
       .sort((a, b) => a.ordre - b.ordre)
       .map(bloc => {
-        // Pour les blocs spécifiques aux lignes, vérifier explicitement
-        if (bloc.id === "faconnage146" && 
-            !["1", "4", "6"].includes(produit.numeroLigne)) {
+        // Gestion spéciale des blocs spécifiques aux lignes
+        // Ne pas afficher les blocs spécifiques à certaines lignes si la ligne actuelle ne correspond pas
+        if (bloc.id === "faconnage146" && produit.numeroLigne && !["1", "4", "6"].includes(produit.numeroLigne)) {
           return null;
         }
         
-        if (bloc.id === "faconnage25" && 
-            !["2", "5"].includes(produit.numeroLigne)) {
+        if (bloc.id === "faconnage25" && produit.numeroLigne && !["2", "5"].includes(produit.numeroLigne)) {
           return null;
         }
         
         return (
-          <div key={bloc.id} className="printable-block">
+          <div key={bloc.id} className="printable-block mb-6 p-4 border border-gray-200 rounded-lg">
             <h2 className="text-lg font-bold mb-3 text-jaune-500">{bloc.nom}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
               {bloc.champs
                 .filter(champ => {
-                  // Filtrer les champs applicables à la ligne courante
+                  // Si le champ est applicable à toutes les lignes
+                  if (champ.lignesApplicables.includes("*")) return true;
+                  
+                  // Si aucune ligne n'est spécifiée pour le produit, afficher tous les champs
+                  if (!produit.numeroLigne) return true;
+                  
+                  // Si le champ a des lignes applicables, vérifier si la ligne actuelle est incluse
                   if (champ.lignesApplicables.length > 0) {
-                    if (champ.lignesApplicables.includes("*")) return true;
-                    if (champ.lignesApplicables.includes(produit.numeroLigne)) return true;
-                    return false;
+                    return champ.lignesApplicables.includes(produit.numeroLigne);
                   }
+                  
+                  // Par défaut, afficher le champ
                   return true;
                 })
                 .sort((a, b) => a.ordre - b.ordre)
@@ -115,11 +122,11 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
 
   return (
     <div className="printable-page">
-      <div className="printable-header">
+      <div className="printable-header mb-6">
         <h1 className="text-2xl font-bold">
           Fiche Produit: {produit.designation} ({produit.codeArticle})
         </h1>
-        <div className="no-print flex gap-2">
+        <div className="no-print flex gap-2 mt-2">
           <Link to={`/modifier/${produit.id}`}>
             <Button className="bg-jaune-300 text-noir-800 hover:bg-jaune-400">
               <Pencil className="h-4 w-4 mr-2" />
