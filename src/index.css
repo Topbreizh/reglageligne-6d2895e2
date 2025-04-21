@@ -95,6 +95,11 @@
     @apply text-noir-800 bg-white p-4;
     max-width: 21cm;
     min-height: 29.7cm;
+    width: 21cm;
+    box-sizing: border-box;
+    margin: 0 auto;
+    /* Pour éviter tout débordement à l'impression */
+    overflow: hidden;
   }
 
   .printable-header {
@@ -105,17 +110,42 @@
     @apply mb-4 border border-noir-200 rounded p-3;
   }
 
-  /* Override for print mode */
+  /* Optimisation impression au format A4 */
   @media print {
-    body, .printable-page {
+    /* Orienter la page en portrait, taille A4 */
+    @page {
+      size: A4 portrait;
       margin: 0;
-      padding: 0;
-      box-shadow: none;
-      font-size: 12px;
     }
-    
+
+    html, body {
+      width: 210mm;
+      height: 297mm;
+      background: white !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    .printable-page {
+      max-width: 210mm;
+      min-height: 297mm;
+      width: 210mm !important;
+      height: auto !important;
+      box-sizing: border-box;
+      page-break-after: avoid;
+      page-break-inside: avoid;
+    }
+
+    /* Empêcher la coupure des blocs au mauvais endroit */
+    .printable-block {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
     .no-print {
       display: none !important;
     }
   }
 }
+
