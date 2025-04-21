@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { FilePdf } from "lucide-react";
+import { File } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
@@ -58,7 +58,7 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
 
   return (
     <Button onClick={handleExportPDF} variant="outline">
-      <FilePdf className="h-4 w-4 mr-2" />
+      <File className="h-4 w-4 mr-2" />
       Export PDF
     </Button>
   );
