@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ImportMapping, Produit } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -91,171 +90,170 @@ const ExcelImport = () => {
           "Quick"
         ];
 
-        const generateMockData = (count: number) => {
-          const baseData = [
-            {
-              "Code Article": "P004",
-              "Numéro de ligne": "3",
-              "Désignation": "Chausson aux pommes",
-              "Programme": "P40",
-              "Facteur": "1.2",
-              "Calibrage": "2.5",
-              "Vitesse": "45",
-              "Laminoir": "L1",
-              "Farineur Haut 1": "3.2",
-              "Farineur Haut 2": "2.2",
-              "Farineur Haut 3": "1.2",
-              "Farineur Bas 1": "2.4",
-              "Farineur Bas 2": "2.1",
-              "Farineur Bas 3": "1.9",
-              "Queue de Carpe": "Oui",
-              "Numéro Découpe": "7",
-              "Buse": "B3",
-              "Humidificateur 1-4-6": "H2",
-              "Distributeur Choco/Raisin": "D1",
-              "Vitesse Doreuse": "35",
-              "P1 Longueur Découpe": "15",
-              "P2 Centrage": "Centre",
-              "Bielle": "B2",
-              "Lame Racleur": "L3",
-              "Rademaker": "R1",
-              "Aera": "A2",
-              "Fritch": "F3",
-              "Retourneur": "On",
-              "Aligneur": "3",
-              "Humidificateur 2-5": "H1",
-              "Push Plaque": "P2",
-              "Rouleau Inférieur": "4",
-              "Rouleau Supérieur": "5",
-              "Tapis Façonneuse": "T3",
-              "Repère Poignée": "2",
-              "Rouleau Pression": "3",
-              "Tapis Avant Étuve Surgel": "On",
-              "Étuve Surgel": "220°C",
-              "Cadence": "60",
-              "Lamineur": "Dupont",
-              "Surveillant": "Martin",
-              "Distributeur Raisin/Choco": "Durand",
-              "Pose": "Laurent",
-              "Pliage/Triage": "Robert",
-              "Topping": "Petit",
-              "Sortie Étuve": "Simon",
-              "Ouverture MP": "Bernard",
-              "Commentaire": "RAS",
-              "Règle Laminage": "Standard",
-              "Quick": "Non"
-            },
-            {
-              "Code Article": "P005",
-              "Numéro de ligne": "1",
-              "Désignation": "Croissant aux amandes",
-              "Programme": "P32",
-              "Facteur": "1.3",
-              "Calibrage": "2.3",
-              "Vitesse": "50",
-              "Laminoir": "L2",
-              "Farineur Haut 1": "3.0",
-              "Farineur Haut 2": "2.0",
-              "Farineur Haut 3": "1.0",
-              "Farineur Bas 1": "2.5",
-              "Farineur Bas 2": "2.0",
-              "Farineur Bas 3": "1.5",
-              "Queue de Carpe": "Non",
-              "Numéro Découpe": "5",
-              "Buse": "B2",
-              "Humidificateur 1-4-6": "H1",
-              "Distributeur Choco/Raisin": "D2",
-              "Vitesse Doreuse": "40",
-              "P1 Longueur Découpe": "12",
-              "P2 Centrage": "Gauche",
-              "Bielle": "B1",
-              "Lame Racleur": "L2",
-              "Rademaker": "R2",
-              "Aera": "A1",
-              "Fritch": "F2",
-              "Retourneur": "Off",
-              "Aligneur": "2",
-              "Humidificateur 2-5": "H2",
-              "Push Plaque": "P1",
-              "Rouleau Inférieur": "3",
-              "Rouleau Supérieur": "4",
-              "Tapis Façonneuse": "T2",
-              "Repère Poignée": "1",
-              "Rouleau Pression": "2",
-              "Tapis Avant Étuve Surgel": "Off",
-              "Étuve Surgel": "200°C",
-              "Cadence": "55",
-              "Lamineur": "Lefèvre",
-              "Surveillant": "Moreau",
-              "Distributeur Raisin/Choco": "Dubois",
-              "Pose": "Richard",
-              "Pliage/Triage": "Thomas",
-              "Topping": "Girard",
-              "Sortie Étuve": "Morel",
-              "Ouverture MP": "David",
-              "Commentaire": "Ajuster température",
-              "Règle Laminage": "Spécial",
-              "Quick": "Oui"
+        const baseData = [
+          {
+            "Code Article": "P004",
+            "Numéro de ligne": "3",
+            "Désignation": "Chausson aux pommes",
+            "Programme": "P40",
+            "Facteur": "1.2",
+            "Calibrage": "2.5",
+            "Vitesse": "45",
+            "Laminoir": "L1",
+            "Farineur Haut 1": "3.2",
+            "Farineur Haut 2": "2.2",
+            "Farineur Haut 3": "1.2",
+            "Farineur Bas 1": "2.4",
+            "Farineur Bas 2": "2.1",
+            "Farineur Bas 3": "1.9",
+            "Queue de Carpe": "Oui",
+            "Numéro Découpe": "7",
+            "Buse": "B3",
+            "Humidificateur 1-4-6": "H2",
+            "Distributeur Choco/Raisin": "D1",
+            "Vitesse Doreuse": "35",
+            "P1 Longueur Découpe": "15",
+            "P2 Centrage": "Centre",
+            "Bielle": "B2",
+            "Lame Racleur": "L3",
+            "Rademaker": "R1",
+            "Aera": "A2",
+            "Fritch": "F3",
+            "Retourneur": "On",
+            "Aligneur": "3",
+            "Humidificateur 2-5": "H1",
+            "Push Plaque": "P2",
+            "Rouleau Inférieur": "4",
+            "Rouleau Supérieur": "5",
+            "Tapis Façonneuse": "T3",
+            "Repère Poignée": "2",
+            "Rouleau Pression": "3",
+            "Tapis Avant Étuve Surgel": "On",
+            "Étuve Surgel": "220°C",
+            "Cadence": "60",
+            "Lamineur": "Dupont",
+            "Surveillant": "Martin",
+            "Distributeur Raisin/Choco": "Durand",
+            "Pose": "Laurent",
+            "Pliage/Triage": "Robert",
+            "Topping": "Petit",
+            "Sortie Étuve": "Simon",
+            "Ouverture MP": "Bernard",
+            "Commentaire": "RAS",
+            "Règle Laminage": "Standard",
+            "Quick": "Non"
+          },
+          {
+            "Code Article": "P005",
+            "Numéro de ligne": "1",
+            "Désignation": "Croissant aux amandes",
+            "Programme": "P32",
+            "Facteur": "1.3",
+            "Calibrage": "2.3",
+            "Vitesse": "50",
+            "Laminoir": "L2",
+            "Farineur Haut 1": "3.0",
+            "Farineur Haut 2": "2.0",
+            "Farineur Haut 3": "1.0",
+            "Farineur Bas 1": "2.5",
+            "Farineur Bas 2": "2.0",
+            "Farineur Bas 3": "1.5",
+            "Queue de Carpe": "Non",
+            "Numéro Découpe": "5",
+            "Buse": "B2",
+            "Humidificateur 1-4-6": "H1",
+            "Distributeur Choco/Raisin": "D2",
+            "Vitesse Doreuse": "40",
+            "P1 Longueur Découpe": "12",
+            "P2 Centrage": "Gauche",
+            "Bielle": "B1",
+            "Lame Racleur": "L2",
+            "Rademaker": "R2",
+            "Aera": "A1",
+            "Fritch": "F2",
+            "Retourneur": "Off",
+            "Aligneur": "2",
+            "Humidificateur 2-5": "H2",
+            "Push Plaque": "P1",
+            "Rouleau Inférieur": "3",
+            "Rouleau Supérieur": "4",
+            "Tapis Façonneuse": "T2",
+            "Repère Poignée": "1",
+            "Rouleau Pression": "2",
+            "Tapis Avant Étuve Surgel": "Off",
+            "Étuve Surgel": "200°C",
+            "Cadence": "55",
+            "Lamineur": "Lefèvre",
+            "Surveillant": "Moreau",
+            "Distributeur Raisin/Choco": "Dubois",
+            "Pose": "Richard",
+            "Pliage/Triage": "Thomas",
+            "Topping": "Girard",
+            "Sortie Étuve": "Morel",
+            "Ouverture MP": "David",
+            "Commentaire": "Ajuster température",
+            "Règle Laminage": "Spécial",
+            "Quick": "Oui"
+          }
+        ];
+
+        const mockData = baseData;
+        
+        setHeaders(mockHeaders);
+        setPreviewData(mockData);
+
+        const champsCibles = blocsConfiguration.flatMap((bloc) =>
+          bloc.champs.map((champ) => ({
+            id: champ.id,
+            nom: champ.nom,
+            blocNom: bloc.nom,
+            nomTechnique: champ.nomTechnique,
+          }))
+        );
+        
+        const initialMappings = champsCibles.map(champApp => {
+          const normalize = (str: string) => str.toLowerCase()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .replace(/[\s-/]+/g, "");
+          
+          const findMatchingHeader = () => {
+            const champNomNorm = normalize(champApp.nom);
+            const champTechNorm = normalize(champApp.nomTechnique);
+            
+            let foundHeader = mockHeaders.find(header => normalize(header) === champNomNorm || normalize(header) === champTechNorm);
+            if (foundHeader) return foundHeader;
+            
+            foundHeader = mockHeaders.find(header => {
+              const headerNorm = normalize(header);
+              return headerNorm.includes(champNomNorm) || champNomNorm.includes(headerNorm) ||
+                     headerNorm.includes(champTechNorm) || champTechNorm.includes(headerNorm);
+            });
+            if (foundHeader) return foundHeader;
+            
+            switch(champApp.nomTechnique) {
+              case "codeArticle":
+                return mockHeaders.find(h => normalize(h).includes("code") && normalize(h).includes("article"));
+              case "numeroLigne":
+                return mockHeaders.find(h => normalize(h).includes("numero") && normalize(h).includes("ligne"));
+              case "designation":
+                return mockHeaders.find(h => normalize(h).includes("designation") || normalize(h).includes("nom"));
+              case "farineurHaut1":
+                return mockHeaders.find(h => normalize(h).includes("farineur") && normalize(h).includes("haut") && normalize(h).includes("1"));
             }
-          ];
-
-          const mockData = baseData; // direct use baseData as mockData since you generate baseData only
-
-          setHeaders(mockHeaders);
-          setPreviewData(mockData);
-
-          const champsCibles = blocsConfiguration.flatMap((bloc) =>
-            bloc.champs.map((champ) => ({
-              id: champ.id,
-              nom: champ.nom,
-              blocNom: bloc.nom,
-              nomTechnique: champ.nomTechnique,
-            }))
-          );
-
-          const initialMappings = champsCibles.map(champApp => {
-            const normalize = (str: string) => str.toLowerCase()
-              .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-              .replace(/[\s-/]+/g, "");
-
-            const findMatchingHeader = () => {
-              const champNomNorm = normalize(champApp.nom);
-              const champTechNorm = normalize(champApp.nomTechnique);
-
-              let foundHeader = mockHeaders.find(header => normalize(header) === champNomNorm || normalize(header) === champTechNorm);
-              if (foundHeader) return foundHeader;
-
-              foundHeader = mockHeaders.find(header => {
-                const headerNorm = normalize(header);
-                return headerNorm.includes(champNomNorm) || champNomNorm.includes(headerNorm) ||
-                       headerNorm.includes(champTechNorm) || champTechNorm.includes(headerNorm);
-              });
-              if (foundHeader) return foundHeader;
-
-              switch(champApp.nomTechnique) {
-                case "codeArticle":
-                  return mockHeaders.find(h => normalize(h).includes("code") && normalize(h).includes("article"));
-                case "numeroLigne":
-                  return mockHeaders.find(h => normalize(h).includes("numero") && normalize(h).includes("ligne"));
-                case "designation":
-                  return mockHeaders.find(h => normalize(h).includes("designation") || normalize(h).includes("nom"));
-                case "farineurHaut1":
-                  return mockHeaders.find(h => normalize(h).includes("farineur") && normalize(h).includes("haut") && normalize(h).includes("1"));
-              }
-
-              return null;
-            };
-
-            const matchedHeader = findMatchingHeader();
-
-            return {
-              champSource: matchedHeader || "none",
-              champDestination: champApp.nomTechnique
-            };
-          });
-
-          setMappings(initialMappings);
-          setStep(2);
+            
+            return null;
+          };
+          
+          const matchedHeader = findMatchingHeader();
+          
+          return {
+            champSource: matchedHeader || "none",
+            champDestination: champApp.nomTechnique
+          };
+        });
+        
+        setMappings(initialMappings);
+        setStep(2);
       }, 500);
     }
   };
