@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ImportMapping, Produit } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -10,6 +9,7 @@ import DataPreviewTable from "./DataPreviewTable";
 import MappingTable from "./MappingTable";
 import ImportActions from "./ImportActions";
 import { sauvegarderProduitComplet } from "@/lib/firebaseReglage";
+import { blocsConfiguration } from "@/data/blocConfig";
 
 const ExcelImport = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -36,8 +36,6 @@ const ExcelImport = () => {
       
       setFile(selectedFile);
       
-      // Simulation d'analyse du fichier Excel
-      // Dans une application réelle, nous utiliserions une bibliothèque comme xlsx pour lire le contenu du fichier
       setTimeout(() => {
         const mockHeaders = [
           "Code Article",
@@ -92,7 +90,6 @@ const ExcelImport = () => {
           "Quick"
         ];
         
-        // Augmentons le nombre de lignes dans les données d'exemple
         const generateMockData = (count: number) => {
           const baseData = [
             {
@@ -203,89 +200,65 @@ const ExcelImport = () => {
           
           const result = [...baseData];
           
-          // Générer des données supplémentaires
-          for (let i = 0; i < count - baseData.length; i++) {
-            const baseItem = baseData[i % 2]; // Alternez entre les deux modèles
-            const newItem = { ...baseItem };
-            
-            // Modifier quelques propriétés pour créer des variations
-            newItem["Code Article"] = `P${1000 + i}`;
-            newItem["Numéro de ligne"] = `${i + 5}`;
-            newItem["Désignation"] = `Produit ${i + 5}`;
-            newItem["Programme"] = `P${30 + i}`;
-            
-            result.push(newItem);
-          }
+          const mockData = generateMockData(10);
           
-          return result;
-        };
-        
-        const mockData = generateMockData(10); // Générer 10 lignes de données
-        
-        setHeaders(mockHeaders);
-        setPreviewData(mockData);
+          setHeaders(mockHeaders);
+          setPreviewData(mockData);
 
-        // Logique pour suggérer des mappings automatiques basée sur le nom des colonnes
-        const champsCibles = blocsConfiguration.flatMap((bloc) =>
-          bloc.champs.map((champ) => ({
-            id: champ.id,
-            nom: champ.nom,
-            blocNom: bloc.nom,
-            nomTechnique: champ.nomTechnique,
-          }))
-        );
-        
-        const initialMappings = champsCibles.map(champApp => {
-          // Fonction pour normaliser les noms (suppression des accents, espaces, etc.)
-          const normalize = (str: string) => str.toLowerCase()
-            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-            .replace(/[\s-/]+/g, "");
-            
-          // Logique avancée pour matcher les colonnes
-          const findMatchingHeader = () => {
-            // Normalisation des noms pour la comparaison
-            const champNomNorm = normalize(champApp.nom);
-            const champTechNorm = normalize(champApp.nomTechnique);
-            
-            // Recherche exacte
-            let foundHeader = mockHeaders.find(header => normalize(header) === champNomNorm || normalize(header) === champTechNorm);
-            if (foundHeader) return foundHeader;
-            
-            // Recherche par contenance
-            foundHeader = mockHeaders.find(header => {
-              const headerNorm = normalize(header);
-              return headerNorm.includes(champNomNorm) || champNomNorm.includes(headerNorm) ||
-                     headerNorm.includes(champTechNorm) || champTechNorm.includes(headerNorm);
-            });
-            if (foundHeader) return foundHeader;
-            
-            // Cas spécifiques basés sur la logique métier
-            switch(champApp.nomTechnique) {
-              case "codeArticle":
-                return mockHeaders.find(h => normalize(h).includes("code") && normalize(h).includes("article"));
-              case "numeroLigne":
-                return mockHeaders.find(h => normalize(h).includes("numero") && normalize(h).includes("ligne"));
-              case "designation":
-                return mockHeaders.find(h => normalize(h).includes("designation") || normalize(h).includes("nom"));
-              case "farineurHaut1":
-                return mockHeaders.find(h => normalize(h).includes("farineur") && normalize(h).includes("haut") && normalize(h).includes("1"));
-              // ... autres cas spécifiques
-            }
-            
-            return null;
-          };
+          const champsCibles = blocsConfiguration.flatMap((bloc) =>
+            bloc.champs.map((champ) => ({
+              id: champ.id,
+              nom: champ.nom,
+              blocNom: bloc.nom,
+              nomTechnique: champ.nomTechnique,
+            }))
+          );
           
-          const matchedHeader = findMatchingHeader();
+          const initialMappings = champsCibles.map(champApp => {
+            const normalize = (str: string) => str.toLowerCase()
+              .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+              .replace(/[\s-/]+/g, "");
+            
+            const findMatchingHeader = () => {
+              const champNomNorm = normalize(champApp.nom);
+              const champTechNorm = normalize(champApp.nomTechnique);
+              
+              let foundHeader = mockHeaders.find(header => normalize(header) === champNomNorm || normalize(header) === champTechNorm);
+              if (foundHeader) return foundHeader;
+              
+              foundHeader = mockHeaders.find(header => {
+                const headerNorm = normalize(header);
+                return headerNorm.includes(champNomNorm) || champNomNorm.includes(headerNorm) ||
+                       headerNorm.includes(champTechNorm) || champTechNorm.includes(headerNorm);
+              });
+              if (foundHeader) return foundHeader;
+              
+              switch(champApp.nomTechnique) {
+                case "codeArticle":
+                  return mockHeaders.find(h => normalize(h).includes("code") && normalize(h).includes("article"));
+                case "numeroLigne":
+                  return mockHeaders.find(h => normalize(h).includes("numero") && normalize(h).includes("ligne"));
+                case "designation":
+                  return mockHeaders.find(h => normalize(h).includes("designation") || normalize(h).includes("nom"));
+                case "farineurHaut1":
+                  return mockHeaders.find(h => normalize(h).includes("farineur") && normalize(h).includes("haut") && normalize(h).includes("1"));
+              }
+              
+              return null;
+            };
+            
+            const matchedHeader = findMatchingHeader();
+            
+            return {
+              champSource: matchedHeader || "none",
+              champDestination: champApp.nomTechnique
+            };
+          });
           
-          return {
-            champSource: matchedHeader || "none",
-            champDestination: champApp.nomTechnique
-          };
+          setMappings(initialMappings);
+          setStep(2);
         });
-        
-        setMappings(initialMappings);
-        setStep(2);
-      }, 500); // Réduit le délai pour une meilleure UX
+      }, 500);
     }
   };
 
@@ -303,7 +276,6 @@ const ExcelImport = () => {
     try {
       setIsImporting(true);
       
-      // Vérifier les champs obligatoires
       const requiredFields = ["codeArticle", "numeroLigne", "designation"];
       const missingRequired = requiredFields.filter(field =>
         !mappings.find(m => m.champDestination === field && m.champSource !== "none")
@@ -319,11 +291,9 @@ const ExcelImport = () => {
         return;
       }
 
-      // Transformer les données pour enregistrement
       const produitsToSave = previewData.map(row => {
         const produit: Record<string, string> = {};
         
-        // Pour chaque mapping actif, copier les valeurs
         mappings.forEach(mapping => {
           if (mapping.champSource !== "none") {
             produit[mapping.champDestination] = row[mapping.champSource] || "";
@@ -333,15 +303,12 @@ const ExcelImport = () => {
         return produit;
       });
 
-      // Enregistrer les produits dans Firebase
       const savePromises = produitsToSave.map(produit => {
-        // S'assurer que l'ID du produit est bien formé
         if (!produit.codeArticle || !produit.numeroLigne) {
           console.error("Produit sans identifiant complet", produit);
           return Promise.resolve(false);
         }
         
-        // Appel à la fonction d'enregistrement
         return sauvegarderProduitComplet(produit)
           .then(() => true)
           .catch(err => {
@@ -350,11 +317,9 @@ const ExcelImport = () => {
           });
       });
       
-      // Attendre que tous les enregistrements soient terminés
       const results = await Promise.all(savePromises);
       const successCount = results.filter(r => r).length;
       
-      // Notifier l'utilisateur du résultat
       if (successCount === produitsToSave.length) {
         toast({
           title: "Importation réussie",
@@ -368,13 +333,11 @@ const ExcelImport = () => {
         });
       }
 
-      // Réinitialiser l'interface
       setFile(null);
       setHeaders([]);
       setPreviewData([]);
       setMappings([]);
       setStep(1);
-      
     } catch (error) {
       console.error("Erreur lors de l'importation", error);
       toast({
