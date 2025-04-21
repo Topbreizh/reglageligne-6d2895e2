@@ -25,7 +25,7 @@ const ExcelImport = () => {
   const [step, setStep] = useState(1);
   const { toast } = useToast();
 
-  // Liste de tous les champs disponibles pour le mapping
+  // Liste de tous les champs disponibles pour le mapping (dans l'ordre des blocs + champs)
   const champsCibles = blocsConfiguration.flatMap((bloc) =>
     bloc.champs.map((champ) => ({
       id: champ.id,
@@ -52,8 +52,7 @@ const ExcelImport = () => {
       
       setFile(selectedFile);
       
-      // Dans un scénario réel, on utiliserait une bibliothèque comme xlsx ou papaparse
-      // Pour cette démo, nous simulons l'extraction des en-têtes et des données
+      // Simuler l'extraction des en-têtes et des données
       setTimeout(() => {
         const mockHeaders = [
           "Code Article",
@@ -85,75 +84,70 @@ const ExcelImport = () => {
             "Vitesse": "50"
           }
         ];
-        
+
         setHeaders(mockHeaders);
         setPreviewData(mockData);
-        
-        // Initialiser les mappings avec "none" au lieu de chaîne vide pour les champs non mappés
-        const initialMappings = mockHeaders.map(header => ({
-          champSource: header,
-          champDestination: "none"  // Utiliser "none" au lieu de chaîne vide
-        }));
-        
-        // Tenter d'identifier des correspondances évidentes
-        const updatedMappings = initialMappings.map(mapping => {
-          const sourceNormalized = mapping.champSource.toLowerCase().replace(/\s+/g, "");
-          
-          // Chercher une correspondance par nom
-          const match = champsCibles.find(
-            champ => champ.nom.toLowerCase().replace(/\s+/g, "") === sourceNormalized ||
-                    champ.nomTechnique.toLowerCase() === sourceNormalized
-          );
-          
-          if (match) {
-            return { ...mapping, champDestination: match.nomTechnique };
+
+        // Initialiser le mapping pour chaque champ de l'appli : 
+        // pour rendre l'expérience agréable on essaye de faire le mapping auto si possible
+        const initialMappings = champsCibles.map(champApp => {
+          // Chercher une entête qui "matche" ce champ
+          const foundHeader = mockHeaders.find(header => {
+            // Normalisation simple
+            const hNorm = header.toLowerCase().replace(/\s+/g, "");
+            const champNomNorm = champApp.nom.toLowerCase().replace(/\s+/g, "");
+            const champTechNorm = champApp.nomTechnique.toLowerCase();
+            return hNorm === champNomNorm || hNorm === champTechNorm;
+          });
+          let champSource = "none";
+          // Matching spécial, autoriser les correspondances spécifiques
+          if (champApp.nomTechnique === "codeArticle") {
+            champSource = mockHeaders.find(h=> h.toLowerCase().includes("code")) || "none";
           }
-          
-          // Correspondances spécifiques
-          if (sourceNormalized === "codearticle") {
-            return { ...mapping, champDestination: "codeArticle" };
+          else if (champApp.nomTechnique === "numeroLigne") {
+            champSource = mockHeaders.find(h=> h.toLowerCase().includes("numéro")) || "none";
           }
-          if (sourceNormalized === "numérodeligne") {
-            return { ...mapping, champDestination: "numeroLigne" };
+          else if (champApp.nomTechnique === "designation") {
+            champSource = mockHeaders.find(h=> h.toLowerCase().includes("désignation")) || "none";
           }
-          if (sourceNormalized === "calibrage") {
-            return { ...mapping, champDestination: "calibreur1" };
+          else if (champApp.nomTechnique === "calibreur1" && mockHeaders.includes("Calibrage")) {
+            champSource = "Calibrage";
           }
-          if (sourceNormalized === "vitesse") {
-            return { ...mapping, champDestination: "vitesseLaminage" };
+          else if (champApp.nomTechnique === "vitesseLaminage" && mockHeaders.includes("Vitesse")) {
+            champSource = "Vitesse";
           }
-          
-          return mapping;
+          else if (foundHeader) {
+            champSource = foundHeader;
+          }
+          return {
+            champSource,
+            champDestination: champApp.nomTechnique
+          };
         });
-        
-        setMappings(updatedMappings);
+        setMappings(initialMappings);
         setStep(2);
       }, 1000);
     }
   };
 
-  const handleMappingChange = (sourceField: string, destinationField: string) => {
+  // Quand user change le mapping d'un champ appli
+  const handleMappingChange = (champDestination: string, champSource: string) => {
     setMappings(
       mappings.map((mapping) =>
-        mapping.champSource === sourceField
-          ? { ...mapping, champDestination: destinationField }
+        mapping.champDestination === champDestination
+          ? { ...mapping, champSource }
           : mapping
       )
     );
   };
 
   const processMappingAndImport = () => {
-    // Dans un scénario réel, on traiterait les données et on les importerait
-    // Pour cette démo, nous simulons l'importation
-    
-    // Vérifier qu'au moins les champs obligatoires sont mappés
+    // Vérifier qu'au moins les champs obligatoires sont mappés à une entête
     const requiredFields = ["codeArticle", "numeroLigne", "designation"];
-    const mappedFields = mappings
-      .filter(m => m.champDestination !== "none") // Filtrer les champs non mappés ("none")
-      .map(m => m.champDestination);
-    
-    const missingRequired = requiredFields.filter(field => !mappedFields.includes(field));
-    
+    const missingRequired = requiredFields.filter(field =>
+      !mappings.find(m => m.champDestination === field && m.champSource !== "none")
+    );
+
     if (missingRequired.length > 0) {
       toast({
         title: "Mapping incomplet",
@@ -162,13 +156,14 @@ const ExcelImport = () => {
       });
       return;
     }
-    
-    // Simuler l'importation
+
+    // Ici, on pourrait construire/projeter les données importées pour push en base
+    // Pour démo, toast OK
     toast({
       title: "Importation réussie",
       description: `${previewData.length} produits ont été importés avec succès.`,
     });
-    
+
     // Réinitialiser l'état
     setFile(null);
     setHeaders([]);
@@ -245,51 +240,50 @@ const ExcelImport = () => {
             <div>
               <h3 className="font-semibold mb-3">Mapping des champs</h3>
               <p className="mb-4 text-sm text-noir-600">
-                Associez chaque colonne de votre fichier Excel à un champ dans l'application.
+                Associez chaque champ de l'application à une colonne de votre fichier Excel (ou choisissez "ne pas importer").
               </p>
               <Table>
                 <TableHeader className="bg-noir-100">
                   <TableRow>
-                    <TableHead>Colonne source (Excel)</TableHead>
                     <TableHead>Champ destination (Application)</TableHead>
+                    <TableHead>Colonne source (Excel)</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {mappings.map((mapping, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{mapping.champSource}</TableCell>
-                      <TableCell>
-                        <Select
-                          value={mapping.champDestination}
-                          onValueChange={(value) =>
-                            handleMappingChange(mapping.champSource, value)
-                          }
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Sélectionner un champ" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="none">Ne pas importer</SelectItem>
-                            {blocsConfiguration.map((bloc) => (
-                              <div key={bloc.id}>
-                                <div className="px-2 py-1.5 text-xs font-semibold bg-noir-100">
-                                  {bloc.nom}
-                                </div>
-                                {bloc.champs.map((champ) => (
-                                  <SelectItem
-                                    key={champ.id}
-                                    value={champ.nomTechnique}
-                                  >
-                                    {champ.nom}
-                                  </SelectItem>
-                                ))}
-                              </div>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {champsCibles.map((champ, index) => {
+                    const mapping = mappings.find(m => m.champDestination === champ.nomTechnique) || {
+                      champDestination: champ.nomTechnique,
+                      champSource: "none"
+                    };
+                    return (
+                      <TableRow key={champ.id}>
+                        <TableCell>
+                          <div className="font-semibold">{champ.nom}</div>
+                          <div className="text-xs text-noir-400">{champ.blocNom}</div>
+                        </TableCell>
+                        <TableCell>
+                          <Select
+                            value={mapping.champSource}
+                            onValueChange={(value) =>
+                              handleMappingChange(champ.nomTechnique, value)
+                            }
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Sélectionner une colonne" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">Ne pas importer</SelectItem>
+                              {headers.map(header => (
+                                <SelectItem value={header} key={header}>
+                                  {header}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>
