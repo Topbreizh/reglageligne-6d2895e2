@@ -1,0 +1,230 @@
+
+import { useState, useEffect } from "react";
+import { BlocConfiguration, ChampConfiguration } from "@/types";
+import { useToast } from "@/hooks/use-toast";
+import { sauvegarderBlocsConfiguration } from "@/lib/firebaseReglage";
+
+function uniqueId(prefix: string) {
+  return `${prefix}_${Math.floor(Date.now() * Math.random())}`;
+}
+
+export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onConfigurationChange?: (blocs: BlocConfiguration[]) => void) => {
+  const [blocs, setBlocs] = useState<BlocConfiguration[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [editingBloc, setEditingBloc] = useState<BlocConfiguration | null>(null);
+  const [editingChamp, setEditingChamp] = useState<{champ: ChampConfiguration, blocId: string} | null>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (initialConfiguration && initialConfiguration.length > 0) {
+      setBlocs(JSON.parse(JSON.stringify(initialConfiguration)));
+    }
+  }, [initialConfiguration]);
+
+  const handleBlocChange = (id: string, field: keyof BlocConfiguration, value: any) => {
+    const updatedBlocs = blocs.map((bloc) =>
+      bloc.id === id ? { ...bloc, [field]: value } : bloc
+    );
+    setBlocs(updatedBlocs);
+    if (onConfigurationChange) onConfigurationChange(updatedBlocs);
+  };
+
+  const handleChampChange = (
+    blocId: string,
+    champId: string,
+    field: keyof ChampConfiguration,
+    value: any
+  ) => {
+    const updatedBlocs = blocs.map((bloc) => {
+      if (bloc.id === blocId) {
+        return {
+          ...bloc,
+          champs: bloc.champs.map((champ) =>
+            champ.id === champId ? { ...champ, [field]: value } : champ
+          ),
+        };
+      }
+      return bloc;
+    });
+    setBlocs(updatedBlocs);
+    if (onConfigurationChange) onConfigurationChange(updatedBlocs);
+  };
+
+  const handleLignesApplicablesChange = (
+    blocId: string,
+    champId: string | null,
+    value: string
+  ) => {
+    const lignesArray = value
+      .split(",")
+      .map((ligne) => ligne.trim())
+      .filter((ligne) => ligne);
+
+    if (champId) {
+      handleChampChange(blocId, champId, "lignesApplicables", lignesArray);
+    } else {
+      handleBlocChange(blocId, "lignesApplicables", lignesArray);
+    }
+  };
+
+  const moveBloc = (blocId: string, direction: "up" | "down") => {
+    const blocIndex = blocs.findIndex((bloc) => bloc.id === blocId);
+    if (
+      (direction === "up" && blocIndex === 0) ||
+      (direction === "down" && blocIndex === blocs.length - 1)
+    ) {
+      return;
+    }
+    const newBlocs = [...blocs];
+    const targetIndex = direction === "up" ? blocIndex - 1 : blocIndex + 1;
+    const tempOrdre = newBlocs[blocIndex].ordre;
+    newBlocs[blocIndex].ordre = newBlocs[targetIndex].ordre;
+    newBlocs[targetIndex].ordre = tempOrdre;
+    [newBlocs[blocIndex], newBlocs[targetIndex]] = [newBlocs[targetIndex], newBlocs[blocIndex]];
+    setBlocs(newBlocs);
+    if (onConfigurationChange) {
+      onConfigurationChange(newBlocs);
+    }
+  };
+
+  const moveChamp = (blocId: string, champId: string, direction: "up" | "down") => {
+    const blocIndex = blocs.findIndex((bloc) => bloc.id === blocId);
+    const champs = [...blocs[blocIndex].champs];
+    const champIndex = champs.findIndex((champ) => champ.id === champId);
+    if (
+      (direction === "up" && champIndex === 0) ||
+      (direction === "down" && champIndex === champs.length - 1)
+    ) {
+      return;
+    }
+    const targetIndex = direction === "up" ? champIndex - 1 : champIndex + 1;
+    const tempOrdre = champs[champIndex].ordre;
+    champs[champIndex].ordre = champs[targetIndex].ordre;
+    champs[targetIndex].ordre = tempOrdre;
+    [champs[champIndex], champs[targetIndex]] = [champs[targetIndex], champs[champIndex]];
+    const updatedBlocs = [...blocs];
+    updatedBlocs[blocIndex].champs = champs;
+    setBlocs(updatedBlocs);
+    if (onConfigurationChange) {
+      onConfigurationChange(updatedBlocs);
+    }
+  };
+
+  const handleAddBloc = () => {
+    const newOrder = blocs.length > 0 ? Math.max(...blocs.map(b => b.ordre)) + 1 : 1;
+    const newBloc: BlocConfiguration = {
+      id: uniqueId("bloc"),
+      nom: "Nouveau bloc",
+      ordre: newOrder,
+      lignesApplicables: ["*"],
+      visible: true,
+      champs: []
+    };
+    const newBlocs = [...blocs, newBloc];
+    setBlocs(newBlocs);
+    if (onConfigurationChange) onConfigurationChange(newBlocs);
+    setEditingBloc(newBloc);
+    toast({
+      title: "Bloc ajouté",
+      description: "Un bloc vierge a été ajouté. Complétez ses informations.",
+      duration: 3000
+    });
+  };
+
+  const handleAddChamp = (blocId: string) => {
+    const newChampsOrder = (blocs.find(b => b.id === blocId)?.champs.length || 0) + 1;
+    const newChamp: ChampConfiguration = {
+      id: uniqueId("champ"),
+      nom: "Nouveau champ",
+      nomTechnique: "nouveauChamp",
+      ordre: newChampsOrder,
+      visible: true,
+      lignesApplicables: ["*"]
+    };
+    const updatedBlocs = blocs.map(bloc =>
+      bloc.id === blocId
+        ? { ...bloc, champs: [...bloc.champs, newChamp] }
+        : bloc
+    );
+    setBlocs(updatedBlocs);
+    if (onConfigurationChange) onConfigurationChange(updatedBlocs);
+    setEditingChamp({champ: newChamp, blocId});
+    toast({
+      title: "Champ ajouté",
+      description: "Un nouveau champ a été ajouté au bloc.",
+      duration: 3000
+    });
+  };
+
+  const handleDeleteBloc = (blocId: string) => {
+    const updatedBlocs = blocs.filter(bloc => bloc.id !== blocId);
+    updatedBlocs.forEach((bloc, index) => {
+      bloc.ordre = index + 1;
+    });
+    setBlocs(updatedBlocs);
+    if (onConfigurationChange) onConfigurationChange(updatedBlocs);
+    toast({
+      title: "Bloc supprimé",
+      description: "Le bloc a été supprimé avec succès.",
+      duration: 3000
+    });
+  };
+
+  const handleDeleteChamp = (blocId: string, champId: string) => {
+    const updatedBlocs = blocs.map(bloc => {
+      if (bloc.id === blocId) {
+        const filteredChamps = bloc.champs.filter(champ => champ.id !== champId);
+        filteredChamps.forEach((champ, index) => {
+          champ.ordre = index + 1;
+        });
+        return { ...bloc, champs: filteredChamps };
+      }
+      return bloc;
+    });
+    setBlocs(updatedBlocs);
+    if (onConfigurationChange) onConfigurationChange(updatedBlocs);
+    toast({
+      title: "Champ supprimé",
+      description: "Le champ a été supprimé avec succès.",
+      duration: 3000
+    });
+  };
+
+  const saveConfiguration = async () => {
+    try {
+      setIsSaving(true);
+      await sauvegarderBlocsConfiguration(blocs);
+      toast({
+        title: "Configuration sauvegardée",
+        description: "Les modifications des blocs et champs ont été enregistrées dans la base de données.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Impossible de sauvegarder la configuration. Veuillez réessayer.",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return {
+    blocs,
+    isSaving,
+    editingBloc,
+    editingChamp,
+    setEditingBloc,
+    setEditingChamp,
+    handleBlocChange,
+    handleChampChange,
+    handleLignesApplicablesChange,
+    moveBloc,
+    moveChamp,
+    handleAddBloc,
+    handleAddChamp,
+    handleDeleteBloc,
+    handleDeleteChamp,
+    saveConfiguration
+  };
+};
