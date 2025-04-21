@@ -96,16 +96,16 @@
     width: 21cm;
     box-sizing: border-box;
     margin: 0 auto;
-    /* Pour éviter tout débordement à l'impression */
     overflow: hidden;
   }
 
   .printable-header {
-    @apply flex justify-between items-center mb-4 border-b-2 border-jaune-300 pb-2;
+    @apply flex justify-between items-center mb-2 border-b border-jaune-300 pb-2;
   }
 
   .printable-block {
-    @apply mb-4 border border-noir-200 rounded p-3;
+    @apply mb-2 border border-noir-200 rounded p-2;
+    break-inside: avoid;
   }
 
   @media print {
@@ -121,44 +121,51 @@
       box-shadow: none !important;
       padding: 0 !important;
       margin: 0 !important;
-      font-size: 11px !important; /* plus petit pour tenir sur une page */
+      font-size: 9px !important;
     }
 
     .printable-page {
       max-width: 210mm;
       min-height: 297mm;
       width: 210mm !important;
-      height: 297mm !important;   /* Fixer la hauteur à A4 */
+      height: 297mm !important;
       box-sizing: border-box;
       page-break-after: avoid;
       page-break-inside: avoid;
-      padding: 12mm !important;   /* marges réduites */
+      padding: 10mm !important;
       overflow: hidden !important;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
-      align-items: stretch;
     }
 
     .printable-header,
     .printable-block {
-      margin-bottom: 10px !important;
-      padding: 8px !important;
-      border-width: 1px !important;
-      font-size: 1em !important;
+      margin-bottom: 6px !important;
+      padding: 4px !important;
+      border-width: 0.5px !important;
     }
 
     .printable-header h1 {
-      font-size: 1.25em !important;
+      font-size: 1.2em !important;
+      margin-bottom: 4px !important;
     }
 
     .printable-block h2 {
-      font-size: 1.1em !important;
+      font-size: 1em !important;
+      margin-bottom: 2px !important;
     }
 
-    .printable-block > div,
-    .printable-block > .grid {
-      gap: 6px !important;
+    .printable-block > div > div {
+      gap: 4px !important;
+      margin-bottom: 2px !important;
+    }
+
+    .printable-block h2.text-lg {
+      @apply text-sm font-semibold mb-1;
+    }
+
+    .grid {
+      gap: 4px !important;
     }
 
     * {
