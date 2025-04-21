@@ -5,7 +5,7 @@ import { BlocConfiguration, Produit } from "@/types";
 
 interface ProduitFormSectionProps {
   bloc: BlocConfiguration;
-  champsVisibles: typeof bloc.champs;
+  champsVisibles: BlocConfiguration['champs'];
   formData: Produit;
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }
