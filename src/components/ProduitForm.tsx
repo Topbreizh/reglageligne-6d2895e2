@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Produit, BlocConfiguration } from "@/types";
 import { blocsConfiguration as defaultBlocsConfig } from "@/data/blocConfig";
@@ -77,7 +76,6 @@ const ProduitForm = ({ produit, onSubmit, mode }: ProduitFormProps) => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  // Charger la configuration des blocs personnalisés
   useEffect(() => {
     const fetchBlocsConfig = async () => {
       try {
@@ -116,7 +114,6 @@ const ProduitForm = ({ produit, onSubmit, mode }: ProduitFormProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validation basique
     if (!formData.codeArticle || !formData.numeroLigne || !formData.designation) {
       toast({
         title: "Erreur de validation",
@@ -136,7 +133,6 @@ const ProduitForm = ({ produit, onSubmit, mode }: ProduitFormProps) => {
     const champ = bloc.champs.find(c => c.id === champId);
     if (!champ || !champ.visible) return false;
     
-    // Vérifier si le champ est applicable pour la ligne courante
     if (formData.numeroLigne && champ.lignesApplicables.length > 0) {
       if (champ.lignesApplicables.includes("*")) return true;
       if (champ.lignesApplicables.includes(formData.numeroLigne)) return true;
@@ -150,7 +146,6 @@ const ProduitForm = ({ produit, onSubmit, mode }: ProduitFormProps) => {
     const bloc = blocsConfig.find(b => b.id === blocId);
     if (!bloc || !bloc.visible) return false;
     
-    // Vérifier si le bloc est applicable pour la ligne courante
     if (formData.numeroLigne && bloc.lignesApplicables.length > 0) {
       if (bloc.lignesApplicables.includes("*")) return true;
       if (bloc.lignesApplicables.includes(formData.numeroLigne)) return true;
@@ -168,16 +163,13 @@ const ProduitForm = ({ produit, onSubmit, mode }: ProduitFormProps) => {
     );
   }
 
-  // Trier les blocs par ordre d'affichage
   const blocsTries = [...blocsConfig].sort((a, b) => a.ordre - b.ordre);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {blocsTries.map(bloc => {
-        // Ne pas afficher le bloc s'il n'est pas visible pour cette ligne
         if (!estBlocVisible(bloc.id)) return null;
         
-        // Trier les champs par ordre d'affichage
         const champsTries = [...bloc.champs].sort((a, b) => a.ordre - b.ordre);
         
         return (
@@ -189,18 +181,15 @@ const ProduitForm = ({ produit, onSubmit, mode }: ProduitFormProps) => {
             </CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {champsTries.map(champ => {
-                // Ne pas afficher le champ s'il n'est pas visible pour cette ligne
                 if (!estChampVisible(bloc.id, champ.id)) return null;
                 
-                // Déterminer si le champ doit occuper toute la largeur
                 const isFullWidth = champ.nomTechnique === "designation" || champ.nomTechnique === "commentaire";
                 
                 return (
                   <div key={champ.id} className={isFullWidth ? "md:col-span-3" : ""}>
                     <Label htmlFor={champ.nomTechnique} className="field-label">
                       {champ.nom}
-                      {/* Correction de la comparaison : utiliser une série de conditions plutôt qu'une comparaison directe */}
-                      {(champ.nomTechnique === "codeArticle" || champ.nomTechnique === "numeroLigne" || champ.nomTechnique === "designation") ? " *" : ""}
+                      {isRequiredField(champ.nomTechnique) ? " *" : ""}
                     </Label>
                     {champ.nomTechnique === "commentaire" ? (
                       <Textarea
@@ -209,7 +198,7 @@ const ProduitForm = ({ produit, onSubmit, mode }: ProduitFormProps) => {
                         value={formData[champ.nomTechnique as keyof Produit] as string}
                         onChange={handleChange}
                         className="min-h-20 border-noir-300"
-                        required={champ.nomTechnique === "codeArticle" || champ.nomTechnique === "numeroLigne" || champ.nomTechnique === "designation"}
+                        required={isRequiredField(champ.nomTechnique)}
                       />
                     ) : (
                       <Input
@@ -218,7 +207,7 @@ const ProduitForm = ({ produit, onSubmit, mode }: ProduitFormProps) => {
                         value={formData[champ.nomTechnique as keyof Produit] as string}
                         onChange={handleChange}
                         className="border-noir-300"
-                        required={champ.nomTechnique === "codeArticle" || champ.nomTechnique === "numeroLigne" || champ.nomTechnique === "designation"}
+                        required={isRequiredField(champ.nomTechnique)}
                       />
                     )}
                   </div>
@@ -240,5 +229,9 @@ const ProduitForm = ({ produit, onSubmit, mode }: ProduitFormProps) => {
     </form>
   );
 };
+
+function isRequiredField(fieldName: string): boolean {
+  return fieldName === "codeArticle" || fieldName === "numeroLigne" || fieldName === "designation";
+}
 
 export default ProduitForm;
