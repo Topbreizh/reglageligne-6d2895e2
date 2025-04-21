@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { getBlocsConfiguration } from "@/lib/firebaseReglage";
+import ProduitFormSection from "./ProduitFormSection";
+import { isRequiredField } from "@/utils/produitFormUtils";
 
 interface ProduitFormProps {
   produit?: Produit;
@@ -129,29 +131,24 @@ const ProduitForm = ({ produit, onSubmit, mode }: ProduitFormProps) => {
   const estChampVisible = (blocId: string, champId: string) => {
     const bloc = blocsConfig.find(b => b.id === blocId);
     if (!bloc || !bloc.visible) return false;
-    
     const champ = bloc.champs.find(c => c.id === champId);
     if (!champ || !champ.visible) return false;
-    
     if (formData.numeroLigne && champ.lignesApplicables.length > 0) {
       if (champ.lignesApplicables.includes("*")) return true;
       if (champ.lignesApplicables.includes(formData.numeroLigne)) return true;
       return false;
     }
-    
     return true;
   };
 
   const estBlocVisible = (blocId: string) => {
     const bloc = blocsConfig.find(b => b.id === blocId);
     if (!bloc || !bloc.visible) return false;
-    
     if (formData.numeroLigne && bloc.lignesApplicables.length > 0) {
       if (bloc.lignesApplicables.includes("*")) return true;
       if (bloc.lignesApplicables.includes(formData.numeroLigne)) return true;
       return false;
     }
-    
     return true;
   };
 
@@ -167,54 +164,21 @@ const ProduitForm = ({ produit, onSubmit, mode }: ProduitFormProps) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {blocsTries.map(bloc => {
+      {blocsTries.map((bloc) => {
         if (!estBlocVisible(bloc.id)) return null;
-        
         const champsTries = [...bloc.champs].sort((a, b) => a.ordre - b.ordre);
-        
+        const champsVisibles = champsTries.filter((champ) =>
+          estChampVisible(bloc.id, champ.id)
+        );
+        if (champsVisibles.length === 0) return null;
         return (
-          <Card key={bloc.id}>
-            <CardHeader>
-              <CardTitle className="text-lg font-bold text-noir-800 border-b-2 border-jaune-300 pb-2">
-                {bloc.nom}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {champsTries.map(champ => {
-                if (!estChampVisible(bloc.id, champ.id)) return null;
-                
-                const isFullWidth = champ.nomTechnique === "designation" || champ.nomTechnique === "commentaire";
-                
-                return (
-                  <div key={champ.id} className={isFullWidth ? "md:col-span-3" : ""}>
-                    <Label htmlFor={champ.nomTechnique} className="field-label">
-                      {champ.nom}
-                      {isRequiredField(champ.nomTechnique) ? " *" : ""}
-                    </Label>
-                    {champ.nomTechnique === "commentaire" ? (
-                      <Textarea
-                        id={champ.nomTechnique}
-                        name={champ.nomTechnique}
-                        value={formData[champ.nomTechnique as keyof Produit] as string}
-                        onChange={handleChange}
-                        className="min-h-20 border-noir-300"
-                        required={isRequiredField(champ.nomTechnique)}
-                      />
-                    ) : (
-                      <Input
-                        id={champ.nomTechnique}
-                        name={champ.nomTechnique}
-                        value={formData[champ.nomTechnique as keyof Produit] as string}
-                        onChange={handleChange}
-                        className="border-noir-300"
-                        required={isRequiredField(champ.nomTechnique)}
-                      />
-                    )}
-                  </div>
-                );
-              })}
-            </CardContent>
-          </Card>
+          <ProduitFormSection
+            key={bloc.id}
+            bloc={bloc}
+            champsVisibles={champsVisibles}
+            formData={formData}
+            onChange={handleChange}
+          />
         );
       })}
 
@@ -229,9 +193,5 @@ const ProduitForm = ({ produit, onSubmit, mode }: ProduitFormProps) => {
     </form>
   );
 };
-
-function isRequiredField(fieldName: string): boolean {
-  return fieldName === "codeArticle" || fieldName === "numeroLigne" || fieldName === "designation";
-}
 
 export default ProduitForm;
