@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { BlocConfiguration, ChampConfiguration } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -21,6 +20,10 @@ import {
 } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 import { sauvegarderBlocsConfiguration } from "@/lib/firebaseReglage";
+
+function uniqueId(prefix: string) {
+  return `${prefix}_${Math.floor(Date.now() * Math.random())}`;
+}
 
 interface BlocsManagerProps {
   initialConfiguration: BlocConfiguration[];
@@ -82,17 +85,14 @@ const BlocsManager = ({
     champId: string | null,
     value: string
   ) => {
-    // Convertir la chaîne d'entrée en tableau
     const lignesArray = value
       .split(",")
       .map((ligne) => ligne.trim())
       .filter((ligne) => ligne);
 
     if (champId) {
-      // Mise à jour des lignes applicables pour un champ
       handleChampChange(blocId, champId, "lignesApplicables", lignesArray);
     } else {
-      // Mise à jour des lignes applicables pour un bloc
       handleBlocChange(blocId, "lignesApplicables", lignesArray);
     }
   };
@@ -109,12 +109,10 @@ const BlocsManager = ({
     const newBlocs = [...blocs];
     const targetIndex = direction === "up" ? blocIndex - 1 : blocIndex + 1;
     
-    // Swap order values
     const tempOrdre = newBlocs[blocIndex].ordre;
     newBlocs[blocIndex].ordre = newBlocs[targetIndex].ordre;
     newBlocs[targetIndex].ordre = tempOrdre;
     
-    // Swap positions in array
     [newBlocs[blocIndex], newBlocs[targetIndex]] = [newBlocs[targetIndex], newBlocs[blocIndex]];
     
     setBlocs(newBlocs);
@@ -138,12 +136,10 @@ const BlocsManager = ({
 
     const targetIndex = direction === "up" ? champIndex - 1 : champIndex + 1;
     
-    // Swap order values
     const tempOrdre = champs[champIndex].ordre;
     champs[champIndex].ordre = champs[targetIndex].ordre;
     champs[targetIndex].ordre = tempOrdre;
     
-    // Swap positions in array
     [champs[champIndex], champs[targetIndex]] = [champs[targetIndex], champs[champIndex]];
     
     const updatedBlocs = [...blocs];
@@ -156,12 +152,57 @@ const BlocsManager = ({
     }
   };
 
+  const handleAddBloc = () => {
+    const newOrder = blocs.length > 0 ? Math.max(...blocs.map(b => b.ordre)) + 1 : 1;
+    const newBloc: BlocConfiguration = {
+      id: uniqueId("bloc"),
+      nom: "Nouveau bloc",
+      ordre: newOrder,
+      lignesApplicables: ["*"],
+      visible: true,
+      champs: []
+    };
+    const newBlocs = [...blocs, newBloc];
+    setBlocs(newBlocs);
+    if (onConfigurationChange) onConfigurationChange(newBlocs);
+
+    toast({
+      title: "Bloc ajouté",
+      description: "Un bloc vierge a été ajouté. Complétez ses informations.",
+      duration: 3000
+    });
+  };
+
+  const handleAddChamp = (blocId: string) => {
+    const newChampsOrder = (blocs.find(b => b.id === blocId)?.champs.length || 0) + 1;
+    const newChamp: ChampConfiguration = {
+      id: uniqueId("champ"),
+      nom: "Nouveau champ",
+      nomTechnique: "nouveauChamp",
+      ordre: newChampsOrder,
+      visible: true,
+      lignesApplicables: ["*"]
+    };
+    const updatedBlocs = blocs.map(bloc => 
+      bloc.id === blocId
+        ? { ...bloc, champs: [...bloc.champs, newChamp] }
+        : bloc
+    );
+    setBlocs(updatedBlocs);
+    if (onConfigurationChange) onConfigurationChange(updatedBlocs);
+
+    toast({
+      title: "Champ ajouté",
+      description: "Un nouveau champ a été ajouté au bloc.",
+      duration: 3000
+    });
+  };
+
   const saveConfiguration = async () => {
     try {
       setIsSaving(true);
       console.log("Configuration à sauvegarder:", blocs);
       
-      // Sauvegarde dans Firebase
       await sauvegarderBlocsConfiguration(blocs);
       
       toast({
@@ -186,8 +227,17 @@ const BlocsManager = ({
 
   return (
     <div className="space-y-6">
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-noir-200">
+      <div className="flex justify-between items-center mb-4">
         <h2 className="section-title">Configuration des blocs</h2>
+        <Button
+          variant="outline"
+          className="text-noir-800 border-jaune-300"
+          onClick={handleAddBloc}
+        >
+          + Ajouter un bloc
+        </Button>
+      </div>
+      <div className="bg-white p-6 rounded-lg shadow-sm border border-noir-200">
         <p className="mb-4 text-noir-600">
           Gérez l'ordre d'affichage des blocs et des champs, ainsi que leur visibilité selon le numéro de ligne.
         </p>
@@ -265,7 +315,17 @@ const BlocsManager = ({
                   </div>
 
                   <div className="mt-6">
-                    <h3 className="font-semibold mb-2 text-noir-700">Champs du bloc</h3>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-semibold text-noir-700">Champs du bloc</h3>
+                      <Button
+                        onClick={() => handleAddChamp(bloc.id)}
+                        size="sm"
+                        variant="outline"
+                        className="border-jaune-300"
+                      >
+                        + Ajouter un champ
+                      </Button>
+                    </div>
                     <Table>
                       <TableHeader className="bg-noir-100">
                         <TableRow>
@@ -348,7 +408,7 @@ const BlocsManager = ({
                             </TableCell>
                             <TableCell>
                               <div className="flex justify-center">
-                                {/* Pas d'actions supplémentaires pour les champs */}
+                                {/* Boutons d'action à ajouter si suppression demandée */}
                               </div>
                             </TableCell>
                           </TableRow>
