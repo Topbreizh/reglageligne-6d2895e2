@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { ImportMapping, Produit } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -89,7 +90,7 @@ const ExcelImport = () => {
           "Règle Laminage",
           "Quick"
         ];
-        
+
         const generateMockData = (count: number) => {
           const baseData = [
             {
@@ -197,11 +198,9 @@ const ExcelImport = () => {
               "Quick": "Oui"
             }
           ];
-          
-          const result = [...baseData];
-          
-          const mockData = generateMockData(10);
-          
+
+          const mockData = baseData; // direct use baseData as mockData since you generate baseData only
+
           setHeaders(mockHeaders);
           setPreviewData(mockData);
 
@@ -213,26 +212,26 @@ const ExcelImport = () => {
               nomTechnique: champ.nomTechnique,
             }))
           );
-          
+
           const initialMappings = champsCibles.map(champApp => {
             const normalize = (str: string) => str.toLowerCase()
               .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
               .replace(/[\s-/]+/g, "");
-            
+
             const findMatchingHeader = () => {
               const champNomNorm = normalize(champApp.nom);
               const champTechNorm = normalize(champApp.nomTechnique);
-              
+
               let foundHeader = mockHeaders.find(header => normalize(header) === champNomNorm || normalize(header) === champTechNorm);
               if (foundHeader) return foundHeader;
-              
+
               foundHeader = mockHeaders.find(header => {
                 const headerNorm = normalize(header);
                 return headerNorm.includes(champNomNorm) || champNomNorm.includes(headerNorm) ||
                        headerNorm.includes(champTechNorm) || champTechNorm.includes(headerNorm);
               });
               if (foundHeader) return foundHeader;
-              
+
               switch(champApp.nomTechnique) {
                 case "codeArticle":
                   return mockHeaders.find(h => normalize(h).includes("code") && normalize(h).includes("article"));
@@ -243,21 +242,20 @@ const ExcelImport = () => {
                 case "farineurHaut1":
                   return mockHeaders.find(h => normalize(h).includes("farineur") && normalize(h).includes("haut") && normalize(h).includes("1"));
               }
-              
+
               return null;
             };
-            
+
             const matchedHeader = findMatchingHeader();
-            
+
             return {
               champSource: matchedHeader || "none",
               champDestination: champApp.nomTechnique
             };
           });
-          
+
           setMappings(initialMappings);
           setStep(2);
-        });
       }, 500);
     }
   };
@@ -275,7 +273,7 @@ const ExcelImport = () => {
   const processMappingAndImport = async () => {
     try {
       setIsImporting(true);
-      
+
       const requiredFields = ["codeArticle", "numeroLigne", "designation"];
       const missingRequired = requiredFields.filter(field =>
         !mappings.find(m => m.champDestination === field && m.champSource !== "none")
@@ -293,13 +291,13 @@ const ExcelImport = () => {
 
       const produitsToSave = previewData.map(row => {
         const produit: Record<string, string> = {};
-        
+
         mappings.forEach(mapping => {
           if (mapping.champSource !== "none") {
             produit[mapping.champDestination] = row[mapping.champSource] || "";
           }
         });
-        
+
         return produit;
       });
 
@@ -308,7 +306,7 @@ const ExcelImport = () => {
           console.error("Produit sans identifiant complet", produit);
           return Promise.resolve(false);
         }
-        
+
         return sauvegarderProduitComplet(produit)
           .then(() => true)
           .catch(err => {
@@ -316,10 +314,10 @@ const ExcelImport = () => {
             return false;
           });
       });
-      
+
       const results = await Promise.all(savePromises);
       const successCount = results.filter(r => r).length;
-      
+
       if (successCount === produitsToSave.length) {
         toast({
           title: "Importation réussie",
