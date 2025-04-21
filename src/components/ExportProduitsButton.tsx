@@ -22,7 +22,10 @@ const ExportProduitsButton = () => {
         });
         return;
       }
+      
+      // Exporter les produits avec la fonction mise à jour
       exportProduitsAsCsv(produits);
+      
       toast({
         title: "Exportation réussie",
         description: `${produits.length} produits exportés au format CSV.`,
