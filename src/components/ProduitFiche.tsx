@@ -66,6 +66,53 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
     );
   };
 
+  const renderBlocs = () => {
+    return blocsConfiguration
+      .filter(bloc => estBlocVisible(bloc.id))
+      .sort((a, b) => a.ordre - b.ordre)
+      .map(bloc => {
+        // Pour les blocs spécifiques aux lignes, vérifier explicitement
+        if (bloc.id === "faconnage146" && 
+            !["1", "4", "6"].includes(produit.numeroLigne)) {
+          return null;
+        }
+        
+        if (bloc.id === "faconnage25" && 
+            !["2", "5"].includes(produit.numeroLigne)) {
+          return null;
+        }
+        
+        return (
+          <div key={bloc.id} className="printable-block">
+            <h2 className="text-lg font-bold mb-3 text-jaune-500">{bloc.nom}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+              {bloc.champs
+                .filter(champ => {
+                  // Filtrer les champs applicables à la ligne courante
+                  if (champ.lignesApplicables.length > 0) {
+                    if (champ.lignesApplicables.includes("*")) return true;
+                    if (champ.lignesApplicables.includes(produit.numeroLigne)) return true;
+                    return false;
+                  }
+                  return true;
+                })
+                .sort((a, b) => a.ordre - b.ordre)
+                .map(champ => renderChamp(bloc.id, champ.id))
+              }
+            </div>
+            
+            {/* Cas spécial pour le commentaire dans le bloc cadencePersonnel */}
+            {bloc.id === "cadencePersonnel" && estChampVisible("cadencePersonnel", "commentaire") && (
+              <div className="mt-4">
+                <h3 className="font-semibold">Commentaire:</h3>
+                <p className="whitespace-pre-line">{produit.commentaire || "-"}</p>
+              </div>
+            )}
+          </div>
+        );
+      });
+  };
+
   return (
     <div className="printable-page">
       <div className="printable-header">
@@ -86,135 +133,7 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
         </div>
       </div>
 
-      {/* Bloc Article */}
-      {estBlocVisible("article") && (
-        <div className="printable-block">
-          <h2 className="text-lg font-bold mb-3 text-jaune-500">Article</h2>
-          {renderChamp("article", "codeArticle")}
-          {renderChamp("article", "numeroLigne")}
-          {renderChamp("article", "designation")}
-        </div>
-      )}
-
-      {/* Bloc Laminage */}
-      {estBlocVisible("laminage") && (
-        <div className="printable-block">
-          <h2 className="text-lg font-bold mb-3 text-jaune-500">Laminage</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
-            {renderChamp("laminage", "programme")}
-            {renderChamp("laminage", "facteur")}
-            {renderChamp("laminage", "regleLaminage")}
-            {renderChamp("laminage", "quick")}
-            {renderChamp("laminage", "calibreur1")}
-            {renderChamp("laminage", "calibreur2")}
-            {renderChamp("laminage", "calibreur3")}
-            {renderChamp("laminage", "laminoir")}
-            {renderChamp("laminage", "vitesseLaminage")}
-            {renderChamp("laminage", "farineurHaut1")}
-            {renderChamp("laminage", "farineurHaut2")}
-            {renderChamp("laminage", "farineurHaut3")}
-            {renderChamp("laminage", "farineurBas1")}
-            {renderChamp("laminage", "farineurBas2")}
-            {renderChamp("laminage", "farineurBas3")}
-          </div>
-        </div>
-      )}
-
-      {/* Bloc Façonnage 1-4-6 */}
-      {estBlocVisible("faconnage146") && 
-       (produit.numeroLigne === "1" || produit.numeroLigne === "4" || produit.numeroLigne === "6") && (
-        <div className="printable-block">
-          <h2 className="text-lg font-bold mb-3 text-jaune-500">Façonnage 1-4-6</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
-            {renderChamp("faconnage146", "queueDeCarpe")}
-            {renderChamp("faconnage146", "numeroDecoupe")}
-            {renderChamp("faconnage146", "buse")}
-            {renderChamp("faconnage146", "distributeurChocoRaisin")}
-            {renderChamp("faconnage146", "humidificateur146")}
-            {renderChamp("faconnage146", "vitesseDoreuse")}
-          </div>
-        </div>
-      )}
-
-      {/* Bloc Guillotine */}
-      {estBlocVisible("guillotine") && (
-        <div className="printable-block">
-          <h2 className="text-lg font-bold mb-3 text-jaune-500">Guillotine</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
-            {renderChamp("guillotine", "p1LongueurDecoupe")}
-            {renderChamp("guillotine", "p2Centrage")}
-            {renderChamp("guillotine", "bielle")}
-            {renderChamp("guillotine", "lameRacleur")}
-          </div>
-        </div>
-      )}
-
-      {/* Bloc Distributeur crème */}
-      {estBlocVisible("distributeurCreme") && (
-        <div className="printable-block">
-          <h2 className="text-lg font-bold mb-3 text-jaune-500">Distributeur crème</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
-            {renderChamp("distributeurCreme", "rademaker")}
-            {renderChamp("distributeurCreme", "aera")}
-            {renderChamp("distributeurCreme", "fritch")}
-          </div>
-        </div>
-      )}
-
-      {/* Bloc Façonnage 2-5 */}
-      {estBlocVisible("faconnage25") && 
-       (produit.numeroLigne === "2" || produit.numeroLigne === "5") && (
-        <div className="printable-block">
-          <h2 className="text-lg font-bold mb-3 text-jaune-500">Façonnage 2-5</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
-            {renderChamp("faconnage25", "retourneur")}
-            {renderChamp("faconnage25", "aligneur")}
-            {renderChamp("faconnage25", "humidificateur25")}
-            {renderChamp("faconnage25", "pushPlaque")}
-            {renderChamp("faconnage25", "rouleauInferieur")}
-            {renderChamp("faconnage25", "rouleauSuperieur")}
-            {renderChamp("faconnage25", "tapisFaconneuse")}
-            {renderChamp("faconnage25", "reperePoignee")}
-          </div>
-        </div>
-      )}
-
-      {/* Bloc Fin de ligne */}
-      {estBlocVisible("finDeLigne") && (
-        <div className="printable-block">
-          <h2 className="text-lg font-bold mb-3 text-jaune-500">Fin de ligne</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
-            {renderChamp("finDeLigne", "rouleauPression")}
-            {renderChamp("finDeLigne", "tapisAvantEtuveSurgel")}
-            {renderChamp("finDeLigne", "etuveSurgel")}
-          </div>
-        </div>
-      )}
-
-      {/* Bloc Cadence, Personnel */}
-      {estBlocVisible("cadencePersonnel") && (
-        <div className="printable-block">
-          <h2 className="text-lg font-bold mb-3 text-jaune-500">Cadence, Personnel</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
-            {renderChamp("cadencePersonnel", "cadence")}
-            {renderChamp("cadencePersonnel", "lamineur")}
-            {renderChamp("cadencePersonnel", "surveillant")}
-            {renderChamp("cadencePersonnel", "distributeurRaisinChoco")}
-            {renderChamp("cadencePersonnel", "pose")}
-            {renderChamp("cadencePersonnel", "pliageTriage")}
-            {renderChamp("cadencePersonnel", "topping")}
-            {renderChamp("cadencePersonnel", "sortieEtuve")}
-            {renderChamp("cadencePersonnel", "ouvertureMP")}
-          </div>
-
-          {estChampVisible("cadencePersonnel", "commentaire") && (
-            <div className="mt-4">
-              <h3 className="font-semibold">Commentaire:</h3>
-              <p className="whitespace-pre-line">{produit.commentaire || "-"}</p>
-            </div>
-          )}
-        </div>
-      )}
+      {renderBlocs()}
 
       <div className="mt-6 text-center text-sm text-gray-500 no-print">
         Document généré le {new Date().toLocaleDateString('fr-FR')}
