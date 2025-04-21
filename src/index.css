@@ -96,7 +96,6 @@
     width: 21cm;
     box-sizing: border-box;
     margin: 0 auto;
-    /* Pour éviter tout débordement à l'impression */
     overflow: hidden;
   }
 
@@ -106,12 +105,28 @@
 
   .printable-block {
     @apply mb-4 border border-noir-200 rounded p-3;
+    break-inside: avoid;
+  }
+
+  @media print, screen {
+    #printable-content {
+      columns: 2;
+      column-gap: 2rem;
+      orphans: 3;
+      widows: 3;
+    }
+
+    .printable-block {
+      display: inline-block;
+      width: 100%;
+      margin-bottom: 1rem;
+    }
   }
 
   @media print {
     @page {
       size: A4 portrait;
-      margin: 0;
+      margin: 12mm;
     }
 
     html, body {
@@ -121,48 +136,31 @@
       box-shadow: none !important;
       padding: 0 !important;
       margin: 0 !important;
-      font-size: 11px !important; /* plus petit pour tenir sur une page */
+      font-size: 9px !important;
     }
 
     .printable-page {
-      max-width: 210mm;
-      min-height: 297mm;
-      width: 210mm !important;
-      height: 297mm !important;   /* Fixer la hauteur à A4 */
-      box-sizing: border-box;
-      page-break-after: avoid;
-      page-break-inside: avoid;
-      padding: 12mm !important;   /* marges réduites */
-      overflow: hidden !important;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: stretch;
-    }
-
-    .printable-header,
-    .printable-block {
-      margin-bottom: 10px !important;
-      padding: 8px !important;
-      border-width: 1px !important;
-      font-size: 1em !important;
+      width: 100% !important;
+      height: auto !important;
+      padding: 0 !important;
     }
 
     .printable-header h1 {
-      font-size: 1.25em !important;
+      font-size: 14px !important;
+    }
+
+    .printable-block {
+      padding: 6px !important;
+      margin-bottom: 8px !important;
     }
 
     .printable-block h2 {
-      font-size: 1.1em !important;
+      font-size: 11px !important;
+      margin-bottom: 4px !important;
     }
 
-    .printable-block > div,
-    .printable-block > .grid {
-      gap: 6px !important;
-    }
-
-    * {
-      box-sizing: border-box !important;
+    .grid {
+      gap: 4px !important;
     }
 
     .no-print {
