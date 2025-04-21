@@ -44,6 +44,12 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
       }
     }
     
+    // Traitement spécifique pour les blocs "guillotine" et "distributeurCreme"
+    // Ces blocs ne doivent pas s'afficher pour les lignes 2 et 5
+    if ((blocId === "guillotine" || blocId === "distributeurCreme") && produit.numeroLigne) {
+      return !["2", "5"].includes(produit.numeroLigne);
+    }
+    
     return true;
   };
 
