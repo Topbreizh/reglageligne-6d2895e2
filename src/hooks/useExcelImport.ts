@@ -3,8 +3,6 @@ import { useImportState } from "./useImportState";
 import { parseExcelFile } from "@/utils/excelParser";
 import { generateInitialMappings } from "@/utils/fieldMapping";
 import { useToast } from "@/hooks/use-toast";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import { sauvegarderProduitComplet } from "@/lib/firebaseReglage";
 
 export const useExcelImport = () => {

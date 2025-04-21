@@ -13,7 +13,7 @@ export const parseExcelFile = (file: File): Promise<ParsedExcelData> => {
     reader.onload = (e) => {
       try {
         const data = e.target?.result;
-        const workbook = XLSX.read(data, { type: 'binary' });
+        const workbook = XLSX.read(data, { type: 'array' });
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
         
@@ -47,6 +47,6 @@ export const parseExcelFile = (file: File): Promise<ParsedExcelData> => {
       reject(new Error("Erreur lors de la lecture du fichier"));
     };
     
-    reader.readAsBinaryString(file);
+    reader.readAsArrayBuffer(file);
   });
 };
