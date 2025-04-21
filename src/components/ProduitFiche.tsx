@@ -1,21 +1,50 @@
 
-import { Produit } from "@/types";
-import { blocsConfiguration } from "@/data/blocConfig";
+import { useState, useEffect } from "react";
+import { Produit, BlocConfiguration } from "@/types";
+import { blocsConfiguration as defaultBlocsConfig } from "@/data/blocConfig";
 import { Button } from "@/components/ui/button";
 import { FileText, Pencil } from "lucide-react";
 import { Link } from "react-router-dom";
+import { getBlocsConfiguration } from "@/lib/firebaseReglage";
 
 interface ProduitFicheProps {
   produit: Produit;
 }
 
 const ProduitFiche = ({ produit }: ProduitFicheProps) => {
+  const [blocsConfig, setBlocsConfig] = useState<BlocConfiguration[]>(defaultBlocsConfig);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBlocsConfig = async () => {
+      try {
+        setLoading(true);
+        const savedConfig = await getBlocsConfiguration();
+        
+        if (savedConfig && savedConfig.length > 0) {
+          console.log("Configuration des blocs chargée pour la fiche:", savedConfig);
+          setBlocsConfig(savedConfig);
+        } else {
+          console.log("Aucune configuration personnalisée trouvée, utilisation de la configuration par défaut");
+          setBlocsConfig(defaultBlocsConfig);
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement de la configuration des blocs:", error);
+        setBlocsConfig(defaultBlocsConfig);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlocsConfig();
+  }, []);
+
   const printFiche = () => {
     window.print();
   };
 
   const estChampVisible = (blocId: string, champId: string) => {
-    const bloc = blocsConfiguration.find(b => b.id === blocId);
+    const bloc = blocsConfig.find(b => b.id === blocId);
     if (!bloc || !bloc.visible) return false;
     
     const champ = bloc.champs.find(c => c.id === champId);
@@ -32,7 +61,7 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
   };
 
   const estBlocVisible = (blocId: string) => {
-    const bloc = blocsConfiguration.find(b => b.id === blocId);
+    const bloc = blocsConfig.find(b => b.id === blocId);
     if (!bloc || !bloc.visible) return false;
     
     // Vérifier si le bloc est applicable pour la ligne courante
@@ -58,7 +87,7 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
   };
 
   const renderChamp = (blocId: string, champId: string) => {
-    const bloc = blocsConfiguration.find(b => b.id === blocId);
+    const bloc = blocsConfig.find(b => b.id === blocId);
     if (!bloc) return null;
     
     const champ = bloc.champs.find(c => c.id === champId);
@@ -75,7 +104,7 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
   };
 
   const renderBlocs = () => {
-    return blocsConfiguration
+    return blocsConfig
       .filter(bloc => {
         // Vérifier si le bloc doit être affiché selon sa configuration et la ligne du produit
         const blocVisible = estBlocVisible(bloc.id);
@@ -139,6 +168,14 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
         );
       });
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center p-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-jaune-300"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="printable-page">
