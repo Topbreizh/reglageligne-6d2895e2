@@ -26,6 +26,8 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
         scale: 2,
         useCORS: true,
         logging: false,
+        width: 794, // Largeur A4 en pixels à 96 DPI
+        height: 1123, // Hauteur A4 en pixels à 96 DPI
       });
 
       const imgData = canvas.toDataURL("image/jpeg", 1.0);
@@ -35,11 +37,7 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
         format: "a4",
       });
 
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-      pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
+      pdf.addImage(imgData, "JPEG", 0, 0, 210, 297); // Dimensions A4 en mm
       pdf.save(`fiche-produit-${new Date().toISOString().slice(0, 10)}.pdf`);
 
       toast({
@@ -65,3 +63,4 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
 };
 
 export default PDFExportButton;
+
