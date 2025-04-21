@@ -12,10 +12,16 @@ const NouveauProduitPage = () => {
 
   const handleSubmit = async (produit: Produit) => {
     try {
-      console.log("Nouveau produit ajouté:", produit);
+      console.log("Nouveau produit à ajouter:", produit);
+      
+      if (!produit.codeArticle || !produit.numeroLigne) {
+        throw new Error("Le code article et le numéro de ligne sont requis pour enregistrer un produit");
+      }
       
       // Sauvegarde chaque champ du produit dans Firebase
       const champsProduit = Object.entries(produit);
+      let enregistrementReussi = true;
+      
       for (const [champ, valeur] of champsProduit) {
         // Skip id field
         if (champ === 'id') continue;
@@ -23,28 +29,38 @@ const NouveauProduitPage = () => {
         // Assurer que les valeurs sont des strings
         const valeurString = String(valeur);
         
-        // Enregistrer chaque champ dans Firebase
-        await setReglage(
-          produit.codeArticle,
-          produit.numeroLigne,
-          champ,
-          valeurString
-        );
+        try {
+          // Enregistrer chaque champ dans Firebase
+          await setReglage(
+            produit.codeArticle,
+            produit.numeroLigne,
+            champ,
+            valeurString
+          );
+        } catch (errChamp) {
+          console.error(`Erreur lors de l'enregistrement du champ ${champ}:`, errChamp);
+          enregistrementReussi = false;
+        }
       }
 
-      toast({
-        title: "Produit créé",
-        description: `Le produit ${produit.designation} a été créé avec succès et enregistré dans la base de données.`,
-      });
-
-      // Redirection vers la page de recherche
-      navigate("/recherche");
+      if (enregistrementReussi) {
+        toast({
+          title: "Produit créé",
+          description: `Le produit ${produit.designation} a été créé avec succès et enregistré dans la base de données.`,
+        });
+        
+        // Redirection vers la page de recherche
+        navigate("/recherche");
+      } else {
+        throw new Error("Certains champs n'ont pas pu être enregistrés");
+      }
     } catch (error) {
       console.error("Erreur lors de l'enregistrement dans Firebase:", error);
       toast({
         variant: "destructive",
         title: "Erreur",
-        description: "Une erreur est survenue lors de l'enregistrement du produit.",
+        description: "Une erreur est survenue lors de l'enregistrement du produit: " + 
+          (error instanceof Error ? error.message : "Erreur inconnue"),
       });
     }
   };

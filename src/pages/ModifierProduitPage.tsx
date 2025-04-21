@@ -37,10 +37,16 @@ const ModifierProduitPage = () => {
 
   const handleSubmit = async (produitModifie: Produit) => {
     try {
-      console.log("Produit modifié:", produitModifie);
+      console.log("Produit à modifier:", produitModifie);
+      
+      if (!produitModifie.codeArticle || !produitModifie.numeroLigne) {
+        throw new Error("Le code article et le numéro de ligne sont requis pour enregistrer un produit");
+      }
       
       // Sauvegarde chaque champ du produit modifié dans Firebase
       const champsProduit = Object.entries(produitModifie);
+      let enregistrementReussi = true;
+      
       for (const [champ, valeur] of champsProduit) {
         // Skip id field
         if (champ === 'id') continue;
@@ -48,28 +54,39 @@ const ModifierProduitPage = () => {
         // Assurer que les valeurs sont des strings
         const valeurString = String(valeur);
         
-        // Enregistrer chaque champ dans Firebase
-        await setReglage(
-          produitModifie.codeArticle,
-          produitModifie.numeroLigne,
-          champ,
-          valeurString
-        );
+        try {
+          // Enregistrer chaque champ dans Firebase
+          await setReglage(
+            produitModifie.codeArticle,
+            produitModifie.numeroLigne,
+            champ,
+            valeurString
+          );
+          console.log(`Champ ${champ} enregistré avec succès.`);
+        } catch (errChamp) {
+          console.error(`Erreur lors de l'enregistrement du champ ${champ}:`, errChamp);
+          enregistrementReussi = false;
+        }
       }
 
-      toast({
-        title: "Produit modifié",
-        description: `Le produit ${produitModifie.designation} a été modifié avec succès et enregistré dans la base de données.`,
-      });
-
-      // Redirection vers la fiche produit
-      navigate(`/fiche/${id}`);
+      if (enregistrementReussi) {
+        toast({
+          title: "Produit modifié",
+          description: `Le produit ${produitModifie.designation} a été modifié avec succès et enregistré dans la base de données.`,
+        });
+        
+        // Redirection vers la fiche produit
+        navigate(`/fiche/${id}`);
+      } else {
+        throw new Error("Certains champs n'ont pas pu être enregistrés");
+      }
     } catch (error) {
       console.error("Erreur lors de l'enregistrement dans Firebase:", error);
       toast({
         variant: "destructive",
         title: "Erreur",
-        description: "Une erreur est survenue lors de l'enregistrement des modifications.",
+        description: "Une erreur est survenue lors de l'enregistrement des modifications: " + 
+          (error instanceof Error ? error.message : "Erreur inconnue"),
       });
     }
   };
@@ -111,7 +128,7 @@ const ModifierProduitPage = () => {
             Retour
           </Button>
           <h1 className="text-2xl md:text-3xl font-bold">
-            <span className="text-noir-800">Modifier</span> <span className="text-jaune-300">{produit.designation}</span>
+            <span className="text-noir-800">Modifier</span> <span className="text-jaune-300">{produit?.designation}</span>
           </h1>
         </div>
         
