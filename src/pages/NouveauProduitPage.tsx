@@ -4,22 +4,49 @@ import PageLayout from "@/components/layout/PageLayout";
 import ProduitForm from "@/components/ProduitForm";
 import { Produit } from "@/types";
 import { useToast } from "@/hooks/use-toast";
+import { setReglage } from "@/lib/firebaseReglage";
 
 const NouveauProduitPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = (produit: Produit) => {
-    // Dans un vrai système, on enverrait les données à une API
-    console.log("Nouveau produit ajouté:", produit);
+  const handleSubmit = async (produit: Produit) => {
+    try {
+      console.log("Nouveau produit ajouté:", produit);
+      
+      // Sauvegarde chaque champ du produit dans Firebase
+      const champsProduit = Object.entries(produit);
+      for (const [champ, valeur] of champsProduit) {
+        // Skip id field
+        if (champ === 'id') continue;
+        
+        // Assurer que les valeurs sont des strings
+        const valeurString = String(valeur);
+        
+        // Enregistrer chaque champ dans Firebase
+        await setReglage(
+          produit.codeArticle,
+          produit.numeroLigne,
+          champ,
+          valeurString
+        );
+      }
 
-    toast({
-      title: "Produit créé",
-      description: `Le produit ${produit.designation} a été créé avec succès.`,
-    });
+      toast({
+        title: "Produit créé",
+        description: `Le produit ${produit.designation} a été créé avec succès et enregistré dans la base de données.`,
+      });
 
-    // Redirection vers la page de recherche
-    navigate("/recherche");
+      // Redirection vers la page de recherche
+      navigate("/recherche");
+    } catch (error) {
+      console.error("Erreur lors de l'enregistrement dans Firebase:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Une erreur est survenue lors de l'enregistrement du produit.",
+      });
+    }
   };
 
   return (

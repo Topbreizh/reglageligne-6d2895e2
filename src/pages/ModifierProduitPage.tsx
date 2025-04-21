@@ -8,6 +8,7 @@ import { produitsInitiaux } from "@/data/mockData";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { setReglage, getReglage } from "@/lib/firebaseReglage";
 
 const ModifierProduitPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -34,17 +35,43 @@ const ModifierProduitPage = () => {
     fetchProduit();
   }, [id]);
 
-  const handleSubmit = (produitModifie: Produit) => {
-    // Dans un vrai système, on enverrait les données à une API
-    console.log("Produit modifié:", produitModifie);
+  const handleSubmit = async (produitModifie: Produit) => {
+    try {
+      console.log("Produit modifié:", produitModifie);
+      
+      // Sauvegarde chaque champ du produit modifié dans Firebase
+      const champsProduit = Object.entries(produitModifie);
+      for (const [champ, valeur] of champsProduit) {
+        // Skip id field
+        if (champ === 'id') continue;
+        
+        // Assurer que les valeurs sont des strings
+        const valeurString = String(valeur);
+        
+        // Enregistrer chaque champ dans Firebase
+        await setReglage(
+          produitModifie.codeArticle,
+          produitModifie.numeroLigne,
+          champ,
+          valeurString
+        );
+      }
 
-    toast({
-      title: "Produit modifié",
-      description: `Le produit ${produitModifie.designation} a été modifié avec succès.`,
-    });
+      toast({
+        title: "Produit modifié",
+        description: `Le produit ${produitModifie.designation} a été modifié avec succès et enregistré dans la base de données.`,
+      });
 
-    // Redirection vers la fiche produit
-    navigate(`/fiche/${id}`);
+      // Redirection vers la fiche produit
+      navigate(`/fiche/${id}`);
+    } catch (error) {
+      console.error("Erreur lors de l'enregistrement dans Firebase:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Une erreur est survenue lors de l'enregistrement des modifications.",
+      });
+    }
   };
 
   if (loading) {
