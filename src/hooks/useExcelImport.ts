@@ -5,6 +5,7 @@ import { generateInitialMappings } from "@/utils/fieldMapping";
 import { useToast } from "@/hooks/use-toast";
 import { sauvegarderProduitComplet } from "@/lib/firebaseReglage";
 import { useState } from "react";
+import { getBlocsConfiguration } from "@/lib/firebaseReglage";
 
 export const useExcelImport = () => {
   const {
@@ -124,25 +125,49 @@ export const useExcelImport = () => {
     try {
       setIsImporting(true);
 
-      const requiredFields = ["codeArticle", "numeroLigne", "designation"];
-      const missingRequired = requiredFields.filter(field =>
+      // Charger la configuration des blocs pour vérifier la visibilité
+      const blocsConfig = await getBlocsConfiguration();
+      if (!blocsConfig) {
+        throw new Error("Impossible de charger la configuration des blocs");
+      }
+
+      // Récupérer les champs requis qui sont visibles
+      const visibleRequiredFields = blocsConfig
+        .filter(bloc => bloc.visible)
+        .flatMap(bloc => 
+          bloc.champs
+            .filter(champ => champ.visible && ["codeArticle", "numeroLigne", "designation"].includes(champ.nomTechnique))
+            .map(champ => champ.nomTechnique)
+        );
+
+      const missingRequired = visibleRequiredFields.filter(field =>
         !mappings.find(m => m.champDestination === field && m.champSource !== "none")
       );
 
       if (missingRequired.length > 0) {
         toast({
           title: "Mapping incomplet",
-          description: `Veuillez mapper les champs obligatoires: ${missingRequired.join(", ")}`,
+          description: `Veuillez mapper les champs obligatoires visibles: ${missingRequired.join(", ")}`,
           variant: "destructive",
         });
         setIsImporting(false);
         return;
       }
 
+      // Filtrer les mappings pour ne garder que les champs visibles
+      const visibleMappings = mappings.filter(mapping => {
+        const [blocFound] = blocsConfig.filter(bloc => 
+          bloc.visible && bloc.champs.some(champ => 
+            champ.visible && champ.nomTechnique === mapping.champDestination
+          )
+        );
+        return blocFound !== undefined;
+      });
+
       const produitsToSave = previewData.map(row => {
         const produit: Record<string, string> = {};
 
-        mappings.forEach(mapping => {
+        visibleMappings.forEach(mapping => {
           if (mapping.champSource !== "none") {
             produit[mapping.champDestination] = row[mapping.champSource] || "";
           }
