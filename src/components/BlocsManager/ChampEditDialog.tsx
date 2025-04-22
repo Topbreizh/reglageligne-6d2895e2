@@ -19,18 +19,20 @@ const champSchema = z.object({
   lignesApplicables: z.string().min(1, "Les lignes applicables sont requises"),
 });
 
+type ChampFormValues = z.infer<typeof champSchema>;
+
 interface ChampEditDialogProps {
   open: boolean;
   champ: ChampConfiguration;
   blocId: string;
   onClose: () => void;
-  onSave: (values: { nom: string; nomTechnique: string; lignesApplicables: string }) => void;
+  onSave: (values: ChampFormValues) => void;
 }
 
 export const ChampEditDialog: React.FC<ChampEditDialogProps> = ({
   open, champ, blocId, onClose, onSave,
 }) => {
-  const champForm = useForm<z.infer<typeof champSchema>>({
+  const champForm = useForm<ChampFormValues>({
     resolver: zodResolver(champSchema),
     defaultValues: {
       nom: champ.nom,
@@ -47,7 +49,7 @@ export const ChampEditDialog: React.FC<ChampEditDialogProps> = ({
     });
   }, [champ, champForm]);
 
-  const onSubmit = (values: z.infer<typeof champSchema>) => {
+  const onSubmit = (values: ChampFormValues) => {
     onSave(values);
     onClose();
   };
