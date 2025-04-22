@@ -11,6 +11,7 @@ interface MappingTableProps {
   onChange: (champDestination: string, champSource: string) => void;
 }
 
+// Récupération de tous les champs, même ceux marqués comme non visibles
 const champsCibles = blocsConfiguration.flatMap((bloc) =>
   bloc.champs.map((champ) => ({
     id: champ.id,
