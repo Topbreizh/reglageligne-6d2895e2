@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Search, Settings, FileText, Plus, Import, Calendar } from "lucide-react";
+import { Search, Settings, FileText, Plus, Import, Calendar, Calculator } from "lucide-react";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -15,6 +15,7 @@ const Navbar = () => {
     { name: "Import Excel", path: "/import", icon: <Import className="h-5 w-5" /> },
     { name: "Relevés", path: "/releves", icon: <FileText className="h-5 w-5" /> },
     { name: "Gestion Blocs", path: "/gestion-blocs", icon: <Settings className="h-5 w-5" /> },
+    { name: "Calcul Matières", path: "/calcul-matieres", icon: <Calculator className="h-5 w-5" /> },
   ];
 
   return (

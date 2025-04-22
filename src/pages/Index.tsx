@@ -1,9 +1,8 @@
-
 import { Link } from "react-router-dom";
 import PageLayout from "@/components/layout/PageLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search, Plus, FileText, Import, Settings } from "lucide-react";
+import { Search, Plus, FileText, Import, Settings, Calculator } from "lucide-react";
 
 const Index = () => {
   return (
@@ -99,6 +98,23 @@ const Index = () => {
               <Link to="/gestion-blocs" className="mt-auto">
                 <Button className="bg-jaune-300 text-noir-800 hover:bg-jaune-400">
                   Gérer les blocs
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+          
+          <Card className="hover:shadow-md transition-shadow border-2 border-noir-200">
+            <CardContent className="p-6 flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-jaune-100 rounded-full flex items-center justify-center mb-4">
+                <Calculator className="h-8 w-8 text-jaune-500" />
+              </div>
+              <h2 className="text-xl font-bold mb-2">Calcul Matières</h2>
+              <p className="text-noir-600 mb-4">
+                Calculez les quantités de matières premières pour vos productions.
+              </p>
+              <Link to="/calcul-matieres" className="mt-auto">
+                <Button className="bg-jaune-300 text-noir-800 hover:bg-jaune-400">
+                  Calculer
                 </Button>
               </Link>
             </CardContent>
