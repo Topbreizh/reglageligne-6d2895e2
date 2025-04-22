@@ -21,14 +21,22 @@ const NouveauProduitPage = () => {
       // Convertir le produit en objet simple (Record<string, string>)
       const produitSimple: Record<string, string> = {};
       
-      // Copier toutes les propriétés
+      // Copier toutes les propriétés sauf id et photos
       Object.entries(produit).forEach(([key, value]) => {
         // Skip id field si présent
         if (key === 'id') return;
         
+        // Traiter les photos séparément
+        if (key === 'photos') return;
+        
         // Assurer que les valeurs sont des strings
         produitSimple[key] = String(value);
       });
+      
+      // Ajouter les photos comme JSON string si elles existent
+      if (produit.photos && produit.photos.length > 0) {
+        produitSimple.photos = JSON.stringify(produit.photos);
+      }
       
       // Sauvegarder le produit complet
       await sauvegarderProduitComplet(produitSimple);

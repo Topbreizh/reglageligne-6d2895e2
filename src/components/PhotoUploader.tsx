@@ -3,7 +3,7 @@ import { useState } from "react";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { image, images, fileImage } from "lucide-react";
+import { Image, Images, FileImage } from "lucide-react";
 
 interface PhotoUploaderProps {
   photos: string[];

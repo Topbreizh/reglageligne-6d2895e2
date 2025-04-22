@@ -35,6 +35,20 @@ const FicheProduitPage = () => {
           const data = docSnap.data();
           console.log("Données brutes du produit:", data);
           
+          // Parse photos from JSON string if it exists
+          let photos: string[] = [];
+          if (data.photos) {
+            try {
+              photos = JSON.parse(data.photos);
+              if (!Array.isArray(photos)) {
+                photos = [];
+              }
+            } catch (e) {
+              console.error("Erreur lors du parsing des photos:", e);
+              photos = [];
+            }
+          }
+          
           // Conversion en objet Produit avec support pour champs dynamiques
           const produitData = {
             id: docSnap.id,
@@ -43,6 +57,7 @@ const FicheProduitPage = () => {
             codeArticle: data.codeArticle || "",
             numeroLigne: data.numeroLigne || "",
             designation: data.designation || "Sans designation",
+            photos: photos // Use the parsed photos
           };
           
           console.log("Produit complet récupéré:", produitData);
