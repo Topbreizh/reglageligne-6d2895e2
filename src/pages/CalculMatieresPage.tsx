@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -226,10 +225,23 @@ const CalculMatieresPage = () => {
       const nbBandes = result.nbrDeBandes || result.nbrdebandes || "";
       console.log("Nombre de bandes récupéré:", nbBandes);
       
-      // Récupérer les poids - vérifier plusieurs champs possibles
-      const poidsPate = result.poidsPate || result.poidpatequalistat || "";
-      const poidsFourrage = result.poidsFourrage || result.poidfourragequalistat || "";
-      const poidsMarquant = result.poidsMarquant || result.poidmarquantqualistat || "";
+      // Récupérer les poids - vérifier tous les champs possibles pour les différents types de poids
+      // Pour la pâte
+      const poidsPate = result.poidsPate || result.poidpatequalistat || result.poidPatequalistat || "";
+      
+      // Pour le fourrage - vérifier toutes les variables possibles
+      const poidsFourrage = 
+        result.poidsFourrage || 
+        result.poidfourragequalistat || 
+        result.poidFourragequalistat || 
+        "";
+      
+      // Pour le marquant - vérifier toutes les variables possibles
+      const poidsMarquant = 
+        result.poidsMarquant || 
+        result.poidmarquantqualistat || 
+        result.poidMarquantqualistat || 
+        "";
       
       console.log("Poids récupérés:", {
         pate: poidsPate,
