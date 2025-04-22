@@ -57,8 +57,9 @@ export function champChange(
           if (champ.id === champId) {
             console.log(`Found champ to update:`, champ.nom);
             // Créer un nouveau champ avec le champ mis à jour
-            const updatedChamp = { ...champ };
-            updatedChamp[field] = value;
+            const updatedChamp = { ...champ } as ChampConfiguration;
+            // Use type assertion to handle the assignment properly
+            (updatedChamp[field] as any) = value;
             console.log(`Updated champ:`, updatedChamp);
             return updatedChamp;
           }
