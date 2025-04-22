@@ -118,6 +118,7 @@ export async function sauvegarderProduitComplet(produit: Record<string, string>)
     
     const id = `${produit.codeArticle}_${produit.numeroLigne}`;
     console.log(`Firebase: sauvegarderProduitComplet - Enregistrement complet pour ${id}`);
+    console.log("Données à enregistrer:", produit);
     
     const ref = doc(db, REGLES_COLLECTION, id);
     await setDoc(ref, produit, { merge: true });

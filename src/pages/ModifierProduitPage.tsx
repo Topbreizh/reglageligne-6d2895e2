@@ -34,14 +34,18 @@ const ModifierProduitPage = () => {
         if (docSnap.exists()) {
           const data = docSnap.data();
           
+          // S'assurer que tous les champs requis sont présents
           const produitData: Produit = {
             id: docSnap.id,
             codeArticle: data.codeArticle || "",
             numeroLigne: data.numeroLigne || "",
             designation: data.designation || "Sans designation",
+            
+            // Bloc Calcul de pâte - S'assurer que ces champs sont correctement récupérés
             poidsPate: data.poidsPate || "",
             poidsArticle: data.poidsArticle || "",
             quantitePate: data.quantitePate || "",
+            
             programme: data.programme || "",
             facteur: data.facteur || "",
             regleLaminage: data.regleLaminage || "",
@@ -93,7 +97,13 @@ const ModifierProduitPage = () => {
             commentaire: data.commentaire || "",
           };
           
-          console.log("Produit à modifier récupéré depuis Firebase:", produitData);
+          console.log("Produit récupéré depuis Firebase:", produitData);
+          console.log("Données du bloc calcul de pâte:", {
+            poidsPate: produitData.poidsPate,
+            poidsArticle: produitData.poidsArticle,
+            quantitePate: produitData.quantitePate
+          });
+          
           setProduit(produitData);
         } else {
           console.log("Aucun produit trouvé avec l'ID:", id);
@@ -128,9 +138,18 @@ const ModifierProduitPage = () => {
         throw new Error("Le code article et le numéro de ligne sont requis pour enregistrer un produit");
       }
       
-      const { id, ...produitSansId } = produitModifie;
+      // S'assurer de ne pas envoyer de tableaux au lieu de chaînes à Firestore
+      const produitAEnregistrer: Record<string, string> = {};
       
-      await sauvegarderProduitComplet(produitSansId);
+      // Convertir tous les champs en chaînes
+      Object.entries(produitModifie).forEach(([key, value]) => {
+        // Ignorer l'ID car il ne doit pas être modifié dans le document
+        if (key !== 'id') {
+          produitAEnregistrer[key] = String(value);
+        }
+      });
+      
+      await sauvegarderProduitComplet(produitAEnregistrer);
       
       toast({
         title: "Produit modifié",
