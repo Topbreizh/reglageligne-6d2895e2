@@ -5,27 +5,9 @@ import { Label } from "@/components/ui/label";
 import PageLayout from "@/components/layout/PageLayout";
 import { ReglageFirebase, getReglage } from "@/lib/firebaseReglage";
 import { toast } from "@/components/ui/use-toast";
+import { parseNumberFR, calculQuantite } from "@/lib/calculMatieresUtils";
 
-function parseNumberFR(value: string): number {
-  if (!value) return 0;
-  return parseFloat(value.replace(',', '.'));
-}
-
-function calculQuantite(
-  poids: number,
-  nbBandes: number,
-  cadence: number,
-  rognure: number | null = null
-) {
-  let principal = poids * nbBandes * cadence * 60 / 1000;
-  if (rognure !== null) {
-    let pourcentage = (isNaN(rognure) ? 0 : rognure) / 100;
-    principal = principal * (1 + pourcentage);
-  }
-  return isNaN(principal) ? "" : principal.toLocaleString("fr-FR", { maximumFractionDigits: 2 });
-}
-
-const BlocCalculMatieres = ({
+function BlocCalculMatieres({
   title,
   withRognure = false,
   formuleLabel,
@@ -42,7 +24,7 @@ const BlocCalculMatieres = ({
     rognure?: string;
   };
   onFieldChange: (field: string, value: string) => void;
-}) => {
+}) {
   const [localRognure, setLocalRognure] = React.useState(values.rognure ?? "");
 
   React.useEffect(() => {
