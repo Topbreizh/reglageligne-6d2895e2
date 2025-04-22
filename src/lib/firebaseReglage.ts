@@ -1,3 +1,4 @@
+
 // Utilitaires pour lire/écrire des réglages dans Firestore
 import { doc, setDoc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "./firebase";
@@ -133,6 +134,20 @@ export async function sauvegarderProduitComplet(produit: Record<string, string>)
 export async function sauvegarderBlocsConfiguration(blocs: BlocConfiguration[]) {
   try {
     console.log(`Firebase: sauvegarderBlocsConfiguration - Enregistrement de ${blocs.length} blocs`);
+    console.log(`Contenu des blocs à sauvegarder:`, JSON.stringify(blocs, null, 2));
+    
+    // Vérification de l'existence des propriétés importantes
+    blocs.forEach((bloc, i) => {
+      if (!bloc.nomTechnique) {
+        console.warn(`Attention: le bloc #${i} (${bloc.nom}) n'a pas de nomTechnique`);
+      }
+      
+      bloc.champs.forEach((champ, j) => {
+        if (!champ.nomTechnique) {
+          console.warn(`Attention: dans bloc "${bloc.nom}", le champ #${j} (${champ.nom}) n'a pas de nomTechnique`);
+        }
+      });
+    });
     
     const ref = doc(db, BLOCS_COLLECTION, "configuration");
     await setDoc(ref, { blocs }, { merge: true });

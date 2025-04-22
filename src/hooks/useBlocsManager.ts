@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { BlocConfiguration, ChampConfiguration } from "@/types";
 import { useToast } from "@/hooks/use-toast";
@@ -32,6 +31,7 @@ export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onCon
 
   useEffect(() => {
     if (initialConfiguration && initialConfiguration.length > 0) {
+      // Créer une copie profonde pour éviter les modifications par référence
       setBlocs(JSON.parse(JSON.stringify(initialConfiguration)));
     }
   }, [initialConfiguration]);
@@ -224,12 +224,39 @@ export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onCon
   const saveConfiguration = async () => {
     try {
       setIsSaving(true);
-      await sauvegarderBlocsConfiguration(blocs);
+      
+      // Vérification préalable: s'assurer que tous les blocs et champs ont les propriétés requises
+      const blocsToSave = blocs.map(bloc => {
+        // S'assurer que le bloc a un nomTechnique
+        if (!bloc.nomTechnique) {
+          console.warn(`Correction: Ajout d'un nomTechnique au bloc ${bloc.id} (${bloc.nom})`);
+          bloc.nomTechnique = generateUniqueTechnicalName(bloc.nom, blocs.filter(b => b.id !== bloc.id).map(b => b.nomTechnique || ''));
+        }
+        
+        // S'assurer que tous les champs ont un nomTechnique
+        const champsVerifies = bloc.champs.map(champ => {
+          if (!champ.nomTechnique) {
+            console.warn(`Correction: Ajout d'un nomTechnique au champ ${champ.id} (${champ.nom}) du bloc ${bloc.nom}`);
+            const existingNames = bloc.champs.filter(c => c.id !== champ.id).map(c => c.nomTechnique);
+            champ.nomTechnique = generateUniqueTechnicalName(champ.nom, existingNames);
+          }
+          return champ;
+        });
+        
+        return {
+          ...bloc,
+          champs: champsVerifies
+        };
+      });
+      
+      console.log('Blocs avant sauvegarde:', JSON.stringify(blocsToSave, null, 2));
+      await sauvegarderBlocsConfiguration(blocsToSave);
       toast({
         title: "Configuration sauvegardée",
         description: "Les modifications des blocs et champs ont été enregistrées dans la base de données.",
       });
     } catch (error) {
+      console.error('Erreur lors de la sauvegarde:', error);
       toast({
         variant: "destructive",
         title: "Erreur",
