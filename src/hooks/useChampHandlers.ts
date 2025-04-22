@@ -1,4 +1,3 @@
-
 import { BlocConfiguration, ChampConfiguration } from "@/types";
 
 export function moveChamp(blocs: BlocConfiguration[], blocId: string, champId: string, direction: "up" | "down") {
@@ -44,7 +43,7 @@ export function champChange(
   value: any
 ) {
   console.log(`champChange: Changing champ ${champId} in bloc ${blocId}, field ${String(field)} to:`, value);
-  
+
   // Créer une copie profonde des blocs pour éviter les problèmes de référence
   const blocsDeepCopy = JSON.parse(JSON.stringify(blocs));
   
@@ -57,9 +56,11 @@ export function champChange(
           if (champ.id === champId) {
             console.log(`Found champ to update:`, champ.nom);
             // Créer un nouveau champ avec le champ mis à jour
-            const updatedChamp = { ...champ } as ChampConfiguration;
-            // Use type assertion to handle the assignment properly
-            (updatedChamp[field] as any) = value;
+            const updatedChamp: ChampConfiguration = { ...champ };
+            if (field in updatedChamp) {
+              // Solution sûre pour assigner dynamiquement la propriété
+              (updatedChamp as any)[field] = value;
+            }
             console.log(`Updated champ:`, updatedChamp);
             return updatedChamp;
           }
@@ -69,13 +70,18 @@ export function champChange(
     }
     return bloc;
   });
-  
+
   console.log("Updated blocs:", updatedBlocs);
   return updatedBlocs;
 }
 
 // Handles changing lignesApplicables for a champ
-export function champLignesApplicables(blocs: BlocConfiguration[], blocId: string, champId: string, value: string) {
+export function champLignesApplicables(
+  blocs: BlocConfiguration[],
+  blocId: string,
+  champId: string,
+  value: string
+) {
   console.log(`Changing lignes applicables for champ ${champId} in bloc ${blocId} to:`, value);
   
   const lignesArray = value
