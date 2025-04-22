@@ -201,23 +201,106 @@ export async function getBlocsConfiguration(): Promise<BlocConfiguration[] | nul
 // Ajoute la fonction suivante à la fin du fichier :
 export async function getAllProduits(): Promise<Produit[]> {
   try {
+    console.log("Firebase: getAllProduits - Récupération de tous les produits");
     const snapshot = await getDocs(collection(db, "reglages"));
     const produits: Produit[] = [];
+    
     snapshot.forEach(docSnap => {
       const data = docSnap.data();
+      console.log(`Firebase: getAllProduits - Données brutes pour ${docSnap.id}:`, data);
       
-      // Assurez-vous que tous les champs sont définis, y compris ceux du bloc calcul de pâte
+      // Créer un objet Produit complet avec toutes les propriétés requises
       const produit: Produit = {
-        ...data,
         id: docSnap.id,
-        // S'assurer que ces champs sont toujours définis
+        
+        // Bloc Article
+        codeArticle: data.codeArticle || "",
+        numeroLigne: data.numeroLigne || "",
+        designation: data.designation || "",
+        
+        // Bloc Calcul de pâte - S'assurer que ces champs sont correctement récupérés
         poidsPate: data.poidsPate || "",
         poidsArticle: data.poidsArticle || "",
-        quantitePate: data.quantitePate || ""
+        quantitePate: data.quantitePate || "",
+        
+        // Bloc Laminage
+        programme: data.programme || "",
+        facteur: data.facteur || "",
+        regleLaminage: data.regleLaminage || "",
+        quick: data.quick || "",
+        calibreur1: data.calibreur1 || "",
+        calibreur2: data.calibreur2 || "",
+        calibreur3: data.calibreur3 || "",
+        laminoir: data.laminoir || "",
+        vitesseLaminage: data.vitesseLaminage || "",
+        farineurHaut1: data.farineurHaut1 || "",
+        farineurHaut2: data.farineurHaut2 || "",
+        farineurHaut3: data.farineurHaut3 || "",
+        farineurBas1: data.farineurBas1 || "",
+        farineurBas2: data.farineurBas2 || "",
+        farineurBas3: data.farineurBas3 || "",
+        
+        // Bloc Façonnage 1-4-6
+        queueDeCarpe: data.queueDeCarpe || "",
+        numeroDecoupe: data.numeroDecoupe || "",
+        buse: data.buse || "",
+        distributeurChocoRaisin: data.distributeurChocoRaisin || "",
+        humidificateur146: data.humidificateur146 || "",
+        vitesseDoreuse: data.vitesseDoreuse || "",
+        
+        // Bloc Guillotine
+        p1LongueurDecoupe: data.p1LongueurDecoupe || "",
+        p2Centrage: data.p2Centrage || "",
+        bielle: data.bielle || "",
+        lameRacleur: data.lameRacleur || "",
+        
+        // Bloc Distributeur crème
+        rademaker: data.rademaker || "",
+        aera: data.aera || "",
+        fritch: data.fritch || "",
+        
+        // Bloc Façonnage 2-5
+        retourneur: data.retourneur || "",
+        aligneur: data.aligneur || "",
+        humidificateur25: data.humidificateur25 || "",
+        pushPlaque: data.pushPlaque || "",
+        rouleauInferieur: data.rouleauInferieur || "",
+        rouleauSuperieur: data.rouleauSuperieur || "",
+        tapisFaconneuse: data.tapisFaconneuse || "",
+        reperePoignee: data.reperePoignee || "",
+        
+        // Bloc Fin de ligne
+        rouleauPression: data.rouleauPression || "",
+        tapisAvantEtuveSurgel: data.tapisAvantEtuveSurgel || "",
+        etuveSurgel: data.etuveSurgel || "",
+        
+        // Bloc Cadence, Personnel
+        cadence: data.cadence || "",
+        lamineur: data.lamineur || "",
+        surveillant: data.surveillant || "",
+        distributeurRaisinChoco: data.distributeurRaisinChoco || "",
+        pose: data.pose || "",
+        pliageTriage: data.pliageTriage || "",
+        topping: data.topping || "",
+        sortieEtuve: data.sortieEtuve || "",
+        ouvertureMP: data.ouvertureMP || "",
+        commentaire: data.commentaire || ""
       };
       
-      produits.push(produit as Produit);
+      console.log(`Firebase: getAllProduits - Produit formaté pour ${docSnap.id}:`, {
+        id: produit.id,
+        codeArticle: produit.codeArticle,
+        numeroLigne: produit.numeroLigne,
+        // Vérifier les champs du bloc calcul de pâte
+        poidsPate: produit.poidsPate,
+        poidsArticle: produit.poidsArticle,
+        quantitePate: produit.quantitePate
+      });
+      
+      produits.push(produit);
     });
+    
+    console.log(`Firebase: getAllProduits - ${produits.length} produits récupérés`);
     return produits;
   } catch (error) {
     console.error("Erreur lors de la récupération de tous les produits:", error);
