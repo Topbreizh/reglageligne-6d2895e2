@@ -5,31 +5,59 @@ import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { blocsConfiguration } from "@/data/blocConfig";
 
+const NB_BLOCS = 5;
 const DUMMY_RESULTS = [
   { champ: "Champ 1", valeur: "Valeur 1" },
   { champ: "Champ 2", valeur: "Valeur 2" },
   { champ: "Champ 3", valeur: "Valeur 3" },
 ];
 
-const blocs = [
-  { id: 1, title: "Bloc 1" },
-  { id: 2, title: "Bloc 2" },
-  { id: 3, title: "Bloc 3" },
-  { id: 4, title: "Bloc 4" },
-  { id: 5, title: "Bloc 5" },
-];
-
 const RelevesPage = () => {
-  const [codeArticle, setCodeArticle] = useState("");
-  const [numeroLigne, setNumeroLigne] = useState("");
+  // Données pour chaque bloc (1 à 5)
+  const [blocsData, setBlocsData] = useState(
+    Array.from({ length: NB_BLOCS }, () => ({
+      codeArticle: "",
+      numeroLigne: "",
+      champs: {} as Record<string, string>,
+    }))
+  );
   const [searchClicked, setSearchClicked] = useState(false);
 
-  // Simule la recherche
+  const handleInputChange = (blocIdx: number, field: string, value: string) => {
+    setBlocsData(prev => {
+      const updated = [...prev];
+      updated[blocIdx] = {
+        ...updated[blocIdx],
+        [field]: value,
+      };
+      return updated;
+    });
+  };
+
+  // Pour simplifier, on considère que les champs liés au code article sont ceux du bloc "Article"
+  const articleBloc = blocsConfiguration.find((b) => b.id === "article");
+  const articleChamps = articleBloc ? articleBloc.champs : [];
+
+  // Actions pour les champs dynamiques liés à codeArticle
+  const handleChampChange = (blocIdx: number, champId: string, value: string) => {
+    setBlocsData(prev => {
+      const updated = [...prev];
+      updated[blocIdx] = {
+        ...updated[blocIdx],
+        champs: {
+          ...updated[blocIdx].champs,
+          [champId]: value,
+        },
+      };
+      return updated;
+    });
+  };
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setSearchClicked(true);
-    // Ici on pourrait appeler une vraie API, en attendant juste flag pour affichage
   };
 
   return (
@@ -39,28 +67,64 @@ const RelevesPage = () => {
           <span className="text-noir-800">Relevés</span>{" "}
           <span className="text-jaune-300">réglages</span>
         </h1>
-        {/* Inputs de recherche */}
-        <form className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4" onSubmit={handleSearch}>
-          <div>
-            <Label htmlFor="codeArticle">Code Article</Label>
-            <Input
-              id="codeArticle"
-              value={codeArticle}
-              onChange={(e) => setCodeArticle(e.target.value)}
-              placeholder="Saisir le code article"
-            />
+        <form onSubmit={handleSearch}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            {Array.from({ length: NB_BLOCS }).map((_, blocIdx) => (
+              <Card key={blocIdx} className="flex flex-col justify-start">
+                <CardHeader>
+                  <CardTitle>Bloc {blocIdx + 1}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {/* Ligne codeArticle / numéroLigne */}
+                  <div className="flex flex-row gap-4 mb-4">
+                    <div className="flex-1">
+                      <Label htmlFor={`codeArticle-${blocIdx}`}>Code Article</Label>
+                      <Input
+                        id={`codeArticle-${blocIdx}`}
+                        value={blocsData[blocIdx].codeArticle}
+                        onChange={(e) =>
+                          handleInputChange(blocIdx, "codeArticle", e.target.value)
+                        }
+                        placeholder="Saisir le code article"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <Label htmlFor={`numeroLigne-${blocIdx}`}>Numéro de Ligne</Label>
+                      <Input
+                        id={`numeroLigne-${blocIdx}`}
+                        value={blocsData[blocIdx].numeroLigne}
+                        onChange={(e) =>
+                          handleInputChange(blocIdx, "numeroLigne", e.target.value)
+                        }
+                        placeholder="Saisir le numéro de ligne"
+                      />
+                    </div>
+                  </div>
+                  {/* Champs dynamiques */}
+                  {articleChamps
+                    .filter(
+                      (champ) =>
+                        champ.id !== "codeArticle" && champ.id !== "numeroLigne"
+                    )
+                    .map((champ) => (
+                      <div key={champ.id} className="mb-3">
+                        <Label htmlFor={`${champ.id}-${blocIdx}`}>{champ.nom}</Label>
+                        <Input
+                          id={`${champ.id}-${blocIdx}`}
+                          value={blocsData[blocIdx].champs[champ.id] || ""}
+                          onChange={(e) =>
+                            handleChampChange(blocIdx, champ.id, e.target.value)
+                          }
+                          placeholder={`Saisir ${champ.nom.toLowerCase()}`}
+                        />
+                      </div>
+                    ))}
+                </CardContent>
+              </Card>
+            ))}
           </div>
-          <div>
-            <Label htmlFor="numeroLigne">Numéro de Ligne</Label>
-            <Input
-              id="numeroLigne"
-              value={numeroLigne}
-              onChange={(e) => setNumeroLigne(e.target.value)}
-              placeholder="Saisir le numéro de ligne"
-            />
-          </div>
-          {/* Bouton rechercher sur une nouvelle ligne en mobile */}
-          <div className="md:col-span-2 flex justify-end mt-2">
+          {/* Bouton rechercher aligné à droite */}
+          <div className="flex justify-end mb-6">
             <button
               type="submit"
               className="bg-jaune-300 hover:bg-jaune-400 text-noir-800 font-medium py-2 px-4 rounded"
@@ -69,17 +133,18 @@ const RelevesPage = () => {
             </button>
           </div>
         </form>
-        {/* Résultats sous les inputs */}
-        <div className="mb-6">
+        {/* Résultats sous les blocs */}
+        <div className="mb-10">
           {searchClicked && (
             <Card>
               <CardHeader>
                 <CardTitle>Résultats de la recherche</CardTitle>
               </CardHeader>
               <CardContent>
-                {/* Affichage du tableau ou message si aucun résultat */}
                 {DUMMY_RESULTS.length === 0 ? (
-                  <div className="text-center text-muted-foreground">Aucun résultat trouvé.</div>
+                  <div className="text-center text-muted-foreground">
+                    Aucun résultat trouvé.
+                  </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <Table>
@@ -104,23 +169,9 @@ const RelevesPage = () => {
             </Card>
           )}
         </div>
-        {/* Les 5 blocs disposés en 2 colonnes (1 colonne mobile) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {blocs.map((bloc) => (
-            <Card key={bloc.id} className="h-40 flex flex-col justify-center items-center">
-              <CardHeader>
-                <CardTitle>{bloc.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-muted-foreground">Contenu du bloc {bloc.id}</div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
       </div>
     </PageLayout>
   );
 };
 
 export default RelevesPage;
-
