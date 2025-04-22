@@ -7,6 +7,13 @@ import PageLayout from "@/components/layout/PageLayout";
 import { ReglageFirebase, getReglage } from "@/lib/firebaseReglage";
 import { toast } from "@/components/ui/use-toast";
 
+// Fonction pour convertir les nombres avec virgule en format français
+function parseNumberFR(value: string): number {
+  if (!value) return 0;
+  // Remplacer la virgule par un point pour le calcul
+  return parseFloat(value.replace(',', '.'));
+}
+
 function calculQuantite(
   poids: number,
   nbBandes: number,
@@ -15,7 +22,8 @@ function calculQuantite(
 ) {
   let result = poids * nbBandes * cadence * 60 / 1000;
   if (rognure !== null) {
-    result = result * (rognure / 100);
+    // Appliquer le pourcentage de rognure (non pas multiplier par le %)
+    result = result * (100 - rognure) / 100;
   }
   return isNaN(result) ? "" : result.toLocaleString("fr-FR", { maximumFractionDigits: 2 });
 }
@@ -46,13 +54,13 @@ const BlocCalculMatieres = ({
 
   const quantite = withRognure
     ? calculQuantite(
-        parseFloat(values.poids || "0"),
+        parseNumberFR(values.poids || "0"),
         parseFloat(values.nbBandes || "0"),
         parseFloat(values.cadence || "0"),
         localRognure !== "" ? parseFloat(localRognure) : 0
       )
     : calculQuantite(
-        parseFloat(values.poids || "0"),
+        parseNumberFR(values.poids || "0"),
         parseFloat(values.nbBandes || "0"),
         parseFloat(values.cadence || "0"),
         null
@@ -72,11 +80,10 @@ const BlocCalculMatieres = ({
           <div>
             <Label>Poids (kg)</Label>
             <Input
-              type="number"
+              type="text"
               value={values.poids}
-              min="0"
               onChange={(e) => onFieldChange("poids", e.target.value)}
-              placeholder="ex: 5.0"
+              placeholder="ex: 5,0"
               required
             />
           </div>
@@ -273,7 +280,7 @@ const CalculMatieresPage = () => {
         <BlocCalculMatieres
           title="Calcul de pâte"
           withRognure
-          formuleLabel="Formule : Poids de pâte × Nombre de bandes × Cadence × 60 ÷ 1000 × % Rognure"
+          formuleLabel="Formule : Poids de pâte × Nombre de bandes × Cadence × 60 ÷ 1000 × (100 - % Rognure) ÷ 100"
           values={fields.pate}
           onFieldChange={(key, value) => handleFieldChange("pate", key, value)}
         />
