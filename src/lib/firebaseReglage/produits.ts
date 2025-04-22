@@ -23,8 +23,13 @@ export async function sauvegarderProduitComplet(produit: Record<string, string>)
       poidMarquantqualistat: produit.poidMarquantqualistat,
       nbrDeBandes: produit.nbrDeBandes
     });
+    
+    // S'assurer que tous les champs sont présents avec au moins une valeur vide
+    // Cela permet d'avoir un schéma cohérent, même pour les champs ajoutés par l'utilisateur
+    const produitComplet = {...produit};
+    
     const ref = doc(db, "reglages", id);
-    await setDoc(ref, produit, { merge: true });
+    await setDoc(ref, produitComplet, { merge: true });
     console.log(`Firebase: sauvegarderProduitComplet - Succès pour ${id}`);
     return true;
   } catch (error) {
@@ -43,7 +48,7 @@ export async function getAllProduits(): Promise<Produit[]> {
       const data = docSnap.data();
       console.log("Données brutes du produit:", data);
       
-      // Assurez-vous d'utiliser la bonne casse pour les propriétés de l'objet
+      // Créer l'objet produit avec les propriétés de base
       const produit: Produit = {
         id: docSnap.id,
         codeArticle: data.codeArticle || "",
@@ -106,6 +111,13 @@ export async function getAllProduits(): Promise<Produit[]> {
         ouvertureMP: data.ouvertureMP || "",
         commentaire: data.commentaire || ""
       };
+      
+      // Ajouter tous les autres champs personnalisés qui ne sont pas dans la définition standard
+      Object.keys(data).forEach(key => {
+        if (!(key in produit) && key !== 'id') {
+          (produit as any)[key] = data[key] || '';
+        }
+      });
       
       // Log pour vérifier les champs spécifiques qui nous intéressent
       console.log("Données du produit après mappage (bloc calcul pâte):", {

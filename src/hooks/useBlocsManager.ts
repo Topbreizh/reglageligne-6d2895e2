@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { BlocConfiguration, ChampConfiguration } from "@/types";
 import { useToast } from "@/hooks/use-toast";
@@ -154,10 +155,14 @@ export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onCon
   };
 
   const handleAddChamp = (blocId: string) => {
+    console.log("Ajout d'un champ dans le bloc ID:", blocId);
     const bloc = blocs.find(b => b.id === blocId);
-    if (!bloc) return;
+    if (!bloc) {
+      console.error("Bloc non trouvé:", blocId);
+      return;
+    }
     
-    const newChampsOrder = (bloc.champs.length || 0) + 1;
+    const newChampsOrder = bloc.champs.length > 0 ? Math.max(...bloc.champs.map(c => c.ordre)) + 1 : 1;
     const newId = uniqueId("champ");
     
     // Generate a unique technical name
@@ -172,11 +177,18 @@ export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onCon
       visible: true,
       lignesApplicables: ["*"]
     };
-    const updatedBlocs = blocs.map(bloc =>
-      bloc.id === blocId
-        ? { ...bloc, champs: [...bloc.champs, newChamp] }
-        : bloc
-    );
+    
+    console.log("Nouveau champ créé:", newChamp);
+    
+    const updatedBlocs = blocs.map(b => {
+      if (b.id === blocId) {
+        console.log("Ajout du champ au bloc:", b.nom);
+        return { ...b, champs: [...b.champs, newChamp] };
+      }
+      return b;
+    });
+    
+    console.log("Blocs mis à jour:", updatedBlocs);
     setBlocs(updatedBlocs);
     if (onConfigurationChange) onConfigurationChange(updatedBlocs);
     setEditingChamp({champ: newChamp, blocId});
@@ -224,6 +236,7 @@ export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onCon
   const saveConfiguration = async () => {
     try {
       setIsSaving(true);
+      console.log("Début sauvegarde de la configuration");
       
       // Vérification préalable: s'assurer que tous les blocs et champs ont les propriétés requises
       const blocsToSave = blocs.map(bloc => {
@@ -251,6 +264,8 @@ export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onCon
       
       console.log('Blocs avant sauvegarde:', JSON.stringify(blocsToSave, null, 2));
       await sauvegarderBlocsConfiguration(blocsToSave);
+      console.log("Configuration sauvegardée avec succès");
+      
       toast({
         title: "Configuration sauvegardée",
         description: "Les modifications des blocs et champs ont été enregistrées dans la base de données.",
