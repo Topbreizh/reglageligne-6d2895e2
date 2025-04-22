@@ -50,7 +50,12 @@ export const ChampEditDialog: React.FC<ChampEditDialogProps> = ({
   }, [champ, champForm]);
 
   const onSubmit = (values: ChampFormValues) => {
-    onSave(values);
+    // Make sure to pass all required properties
+    onSave({
+      nom: values.nom,
+      nomTechnique: values.nomTechnique,
+      lignesApplicables: values.lignesApplicables
+    });
     onClose();
   };
 
