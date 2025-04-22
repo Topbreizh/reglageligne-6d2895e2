@@ -46,10 +46,11 @@ const MappingTable = ({ headers, mappings, onChange }: MappingTableProps) => {
         }))
     );
 
-  // Logging pour déboguer
+  // Pour le débogage
   console.log("Mappings actuels:", mappings);
   console.log("Champs cibles disponibles:", champsCibles);
 
+  // Cette fonction permet de récupérer la valeur correcte pour chaque champ
   const getFieldValue = (fieldId: string) => {
     const mapping = mappings.find(m => m.champDestination === fieldId);
     return mapping ? mapping.champSource : "none";
@@ -73,10 +74,11 @@ const MappingTable = ({ headers, mappings, onChange }: MappingTableProps) => {
             </TableHeader>
             <TableBody>
               {champsCibles.map((champ) => {
+                // Récupérer la valeur active pour ce champ spécifique
                 const currentValue = getFieldValue(champ.nomTechnique);
                 
                 return (
-                  <TableRow key={champ.id}>
+                  <TableRow key={champ.id + "-row"}>
                     <TableCell className="whitespace-nowrap font-medium">{champ.blocNom}</TableCell>
                     <TableCell className="whitespace-nowrap">
                       <div className="font-semibold">{champ.nom}</div>
@@ -85,19 +87,19 @@ const MappingTable = ({ headers, mappings, onChange }: MappingTableProps) => {
                       <Select
                         value={currentValue}
                         onValueChange={(value) => {
-                          console.log(`Changing mapping for ${champ.nomTechnique} to ${value}`);
+                          console.log(`Mapping pour ${champ.nomTechnique} vers ${value}`);
                           onChange(champ.nomTechnique, value);
                         }}
                       >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Sélectionner une colonne" />
                         </SelectTrigger>
-                        <SelectContent className="max-h-[400px] overflow-y-auto bg-white">
+                        <SelectContent className="max-h-[400px] overflow-y-auto bg-white z-50">
                           <SelectItem value="none">Ne pas importer</SelectItem>
-                          {headers.map(header => (
+                          {headers.map((header, index) => (
                             header ? (
                               <SelectItem 
-                                key={header} 
+                                key={`${champ.id}-${header}-${index}`}
                                 value={header}
                               >
                                 {header}
