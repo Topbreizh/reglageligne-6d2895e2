@@ -146,7 +146,21 @@ const ChampTable: React.FC<ChampTableProps> = ({
                 </div>
               </TableCell>
               <TableCell>{champ.nom}</TableCell>
-              <TableCell>{champ.nomTechnique}</TableCell>
+              <TableCell>
+                <Input
+                  value={champ.nomTechnique}
+                  onChange={(e) =>
+                    handleChampChange(
+                      bloc.id,
+                      champ.id,
+                      "nomTechnique",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Nom technique du champ"
+                  className="border-noir-300"
+                />
+              </TableCell>
               <TableCell>
                 <Input
                   value={champ.lignesApplicables.join(", ")}

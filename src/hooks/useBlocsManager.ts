@@ -8,6 +8,21 @@ function uniqueId(prefix: string) {
   return `${prefix}_${Math.floor(Date.now() * Math.random())}`;
 }
 
+function generateUniqueTechnicalName(baseName: string, existingNames: string[]): string {
+  let candidate = baseName.toLowerCase().replace(/[^a-z0-9_]/g, '_');
+  
+  // If the name is already used, add a number suffix
+  if (existingNames.includes(candidate)) {
+    let counter = 1;
+    while (existingNames.includes(`${candidate}${counter}`)) {
+      counter++;
+    }
+    return `${candidate}${counter}`;
+  }
+  
+  return candidate;
+}
+
 export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onConfigurationChange?: (blocs: BlocConfiguration[]) => void) => {
   const [blocs, setBlocs] = useState<BlocConfiguration[]>([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -115,10 +130,13 @@ export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onCon
   const handleAddBloc = () => {
     const newOrder = blocs.length > 0 ? Math.max(...blocs.map(b => b.ordre)) + 1 : 1;
     const newId = uniqueId("bloc");
+    const existingNomsTechniques = blocs.map(b => b.nomTechnique || '');
+    const newNomTechnique = generateUniqueTechnicalName("nouveauBloc", existingNomsTechniques);
+    
     const newBloc: BlocConfiguration = {
       id: newId,
       nom: "Nouveau bloc",
-      nomTechnique: newId, // Ajout du nomTechnique lors de la création
+      nomTechnique: newNomTechnique,
       ordre: newOrder,
       lignesApplicables: ["*"],
       visible: true,
@@ -136,12 +154,20 @@ export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onCon
   };
 
   const handleAddChamp = (blocId: string) => {
-    const newChampsOrder = (blocs.find(b => b.id === blocId)?.champs.length || 0) + 1;
+    const bloc = blocs.find(b => b.id === blocId);
+    if (!bloc) return;
+    
+    const newChampsOrder = (bloc.champs.length || 0) + 1;
     const newId = uniqueId("champ");
+    
+    // Generate a unique technical name
+    const existingNomsTechniques = bloc.champs.map(c => c.nomTechnique);
+    const newNomTechnique = generateUniqueTechnicalName(`nouveauChamp${newChampsOrder}`, existingNomsTechniques);
+    
     const newChamp: ChampConfiguration = {
       id: newId,
       nom: "Nouveau champ",
-      nomTechnique: "nouveauChamp" + newChampsOrder, // Modifier pour éviter les doublons
+      nomTechnique: newNomTechnique,
       ordre: newChampsOrder,
       visible: true,
       lignesApplicables: ["*"]
