@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -6,10 +6,8 @@ import PageLayout from "@/components/layout/PageLayout";
 import { ReglageFirebase, getReglage } from "@/lib/firebaseReglage";
 import { toast } from "@/components/ui/use-toast";
 
-// Fonction pour convertir les nombres avec virgule en format français
 function parseNumberFR(value: string): number {
   if (!value) return 0;
-  // Remplacer la virgule par un point pour le calcul
   return parseFloat(value.replace(',', '.'));
 }
 
@@ -19,12 +17,12 @@ function calculQuantite(
   cadence: number,
   rognure: number | null = null
 ) {
-  let result = poids * nbBandes * cadence * 60 / 1000;
+  let principal = poids * nbBandes * cadence * 60 / 1000;
   if (rognure !== null) {
-    // Appliquer le pourcentage de rognure (non pas multiplier par le %)
-    result = result * (100 - rognure) / 100;
+    let pourcentage = (isNaN(rognure) ? 0 : rognure) / 100;
+    principal = principal * (1 + pourcentage);
   }
-  return isNaN(result) ? "" : result.toLocaleString("fr-FR", { maximumFractionDigits: 2 });
+  return isNaN(principal) ? "" : principal.toLocaleString("fr-FR", { maximumFractionDigits: 2 });
 }
 
 const BlocCalculMatieres = ({
@@ -45,7 +43,7 @@ const BlocCalculMatieres = ({
   };
   onFieldChange: (field: string, value: string) => void;
 }) => {
-  const [localRognure, setLocalRognure] = useState(values.rognure ?? "");
+  const [localRognure, setLocalRognure] = React.useState(values.rognure ?? "");
 
   React.useEffect(() => {
     setLocalRognure(values.rognure ?? "");
@@ -134,7 +132,6 @@ const BlocCalculMatieres = ({
   );
 };
 
-// Composant pour la recherche en haut de page
 const RechercheReglageBloc = ({
   onResult,
   loading,
@@ -146,7 +143,6 @@ const RechercheReglageBloc = ({
   const [numeroLigne, setNumeroLigne] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Pour le feedback, on peut ajouter un loader
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!codeArticle || !numeroLigne) return;
@@ -208,7 +204,6 @@ const RechercheReglageBloc = ({
 };
 
 const CalculMatieresPage = () => {
-  // États partagés pour les 3 blocs (Pâte, Fourrage, Marquant)
   const [fields, setFields] = useState({
     pate: { poids: "", nbBandes: "", cadence: "", rognure: "" },
     fourrage: { poids: "", nbBandes: "", cadence: "" },
@@ -216,27 +211,19 @@ const CalculMatieresPage = () => {
   });
   const [loading, setLoading] = useState(false);
 
-  // Lors d'une recherche, remplir les états selon la base (si trouvé)
   const handleReglageResult = (result: ReglageFirebase | null) => {
     if (result) {
       console.log("Données brutes Firebase:", result);
       
-      // Récupérer le nombre de bandes - vérifier plusieurs champs possibles
       const nbBandes = result.nbrDeBandes || result.nbrdebandes || "";
       console.log("Nombre de bandes récupéré:", nbBandes);
       
-      // Récupérer les poids - vérifier tous les champs possibles pour les différents types de poids
-      // Pour la pâte
       const poidsPate = result.poidsPate || result.poidpatequalistat || result.poidPatequalistat || "";
-      
-      // Pour le fourrage - vérifier toutes les variables possibles
       const poidsFourrage = 
         result.poidsFourrage || 
         result.poidfourragequalistat || 
         result.poidFourragequalistat || 
         "";
-      
-      // Pour le marquant - vérifier toutes les variables possibles
       const poidsMarquant = 
         result.poidsMarquant || 
         result.poidmarquantqualistat || 
@@ -249,7 +236,6 @@ const CalculMatieresPage = () => {
         marquant: poidsMarquant
       });
       
-      // Récupérer la cadence et la rognure
       const cadence = result.cadence || "";
       const rognure = result.rognure || "";
       
@@ -274,7 +260,6 @@ const CalculMatieresPage = () => {
     }
   };
 
-  // Pour la modification des champs dans chaque bloc
   const handleFieldChange = (bloc: "pate" | "fourrage" | "marquant", key: string, value: string) => {
     setFields((prev) => ({
       ...prev,
