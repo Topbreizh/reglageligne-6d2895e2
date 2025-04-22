@@ -124,19 +124,9 @@ const ModifierProduitPage = () => {
         throw new Error("Le code article et le numéro de ligne sont requis pour enregistrer un produit");
       }
       
-      const { id, photos, ...produitSansIdSansPhotos } = produitModifie;
+      const { id, ...produitSansId } = produitModifie;
       
-      const produitPourFirebase: Record<string, string> = {};
-      
-      Object.entries(produitSansIdSansPhotos).forEach(([key, value]) => {
-        produitPourFirebase[key] = String(value);
-      });
-      
-      if (photos && photos.length > 0) {
-        produitPourFirebase.photos = JSON.stringify(photos);
-      }
-      
-      await sauvegarderProduitComplet(produitPourFirebase);
+      await sauvegarderProduitComplet(produitSansId);
       
       toast({
         title: "Produit modifié",
