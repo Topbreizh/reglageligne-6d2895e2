@@ -209,6 +209,16 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
         </div>
       </div>
 
+      {produit.photos && produit.photos.length > 0 && (
+        <div className="mb-6 flex flex-wrap gap-4">
+          {produit.photos.map((url, idx) => (
+            <div key={idx} className="w-32 h-32 border border-gray-200 rounded-lg overflow-hidden flex items-center justify-center bg-gray-50">
+              <img src={url} alt={`Photo du produit ${idx + 1}`} className="object-cover w-full h-full" />
+            </div>
+          ))}
+        </div>
+      )}
+
       <div id="printable-content" className="space-y-4">
         {renderBlocs()}
       </div>

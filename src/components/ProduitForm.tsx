@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getBlocsConfiguration } from "@/lib/firebaseReglage";
 import ProduitFormSection from "./ProduitFormSection";
 import { isRequiredField } from "@/utils/produitFormUtils";
+import PhotoUploader from "./PhotoUploader";
 
 interface ProduitFormProps {
   produit?: Produit;
@@ -128,6 +129,13 @@ const ProduitForm = ({ produit, onSubmit, mode }: ProduitFormProps) => {
     onSubmit(formData);
   };
 
+  const handlePhotosChange = (urls: string[]) => {
+    setFormData(prev => ({
+      ...prev,
+      photos: urls
+    }));
+  };
+
   const estChampVisible = (blocId: string, champId: string) => {
     const bloc = blocsConfig.find(b => b.id === blocId);
     if (!bloc || !bloc.visible) return false;
@@ -164,6 +172,12 @@ const ProduitForm = ({ produit, onSubmit, mode }: ProduitFormProps) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+
+      <PhotoUploader
+        photos={formData.photos || []}
+        onPhotosChange={handlePhotosChange}
+      />
+
       {blocsTries.map((bloc) => {
         if (!estBlocVisible(bloc.id)) return null;
         const champsTries = [...bloc.champs].sort((a, b) => a.ordre - b.ordre);

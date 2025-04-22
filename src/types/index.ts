@@ -1,11 +1,10 @@
-
 export interface Produit {
   id?: string;
   // Bloc Article
   codeArticle: string;
   numeroLigne: string;
   designation: string;
-  
+
   // Bloc Laminage
   programme: string;
   facteur: string;
@@ -22,7 +21,7 @@ export interface Produit {
   farineurBas1: string;
   farineurBas2: string;
   farineurBas3: string;
-  
+
   // Bloc Façonnage 1-4-6
   queueDeCarpe: string;
   numeroDecoupe: string;
@@ -30,18 +29,18 @@ export interface Produit {
   distributeurChocoRaisin: string;
   humidificateur146: string;
   vitesseDoreuse: string;
-  
+
   // Bloc Guillotine
   p1LongueurDecoupe: string;
   p2Centrage: string;
   bielle: string;
   lameRacleur: string;
-  
+
   // Bloc Distributeur crème
   rademaker: string;
   aera: string;
   fritch: string;
-  
+
   // Bloc Façonnage 2-5
   retourneur: string;
   aligneur: string;
@@ -51,12 +50,12 @@ export interface Produit {
   rouleauSuperieur: string;
   tapisFaconneuse: string;
   reperePoignee: string;
-  
+
   // Bloc Fin de ligne
   rouleauPression: string;
   tapisAvantEtuveSurgel: string;
   etuveSurgel: string;
-  
+
   // Bloc Cadence, Personnel
   cadence: string;
   lamineur: string;
@@ -68,16 +67,18 @@ export interface Produit {
   sortieEtuve: string;
   ouvertureMP: string;
   commentaire: string;
-  
+
+  // Champ photos
+  photos?: string[];
+
   // Support pour des champs dynamiques supplémentaires
-  // Cela permet de récupérer des champs qui ne font pas partie des propriétés standards ci-dessus
-  [key: string]: string | undefined;
+  [key: string]: string | string[] | undefined;
 }
 
 export interface BlocConfiguration {
   id: string;
   nom: string;
-  nomTechnique?: string; // Ajout de la propriété nomTechnique comme optionnelle pour la compatibilité
+  nomTechnique?: string;
   ordre: number;
   lignesApplicables: string[];
   visible: boolean;
