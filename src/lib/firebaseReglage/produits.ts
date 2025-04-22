@@ -13,11 +13,15 @@ export async function sauvegarderProduitComplet(produit: Record<string, string>)
     const id = `${produit.codeArticle}_${produit.numeroLigne}`;
     console.log(`Firebase: sauvegarderProduitComplet - Enregistrement complet pour ${id}`);
     console.log("Données à enregistrer:", produit);
-    // Vérification du bloc calcul de pâte
+    // Vérification du bloc calcul de pâte avec la bonne casse
     console.log("Données du bloc calcul de pâte à enregistrer:", {
       poidsPate: produit.poidsPate,
       poidsArticle: produit.poidsArticle,
-      quantitePate: produit.quantitePate
+      quantitePate: produit.quantitePate,
+      poidPatequalistat: produit.poidPatequalistat,
+      poidFourragequalistat: produit.poidFourragequalistat,
+      poidMarquantqualistat: produit.poidMarquantqualistat,
+      nbrDeBandes: produit.nbrDeBandes
     });
     const ref = doc(db, "reglages", id);
     await setDoc(ref, produit, { merge: true });
@@ -37,6 +41,7 @@ export async function getAllProduits(): Promise<Produit[]> {
     const produits: Produit[] = [];
     snapshot.forEach(docSnap => {
       const data = docSnap.data();
+      // Assurez-vous d'utiliser la bonne casse pour les propriétés de l'objet
       const produit: Produit = {
         id: docSnap.id,
         codeArticle: data.codeArticle || "",

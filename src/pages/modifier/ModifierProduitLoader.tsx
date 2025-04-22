@@ -37,6 +37,7 @@ const ModifierProduitLoader = ({ mode }: ModifierProduitLoaderProps) => {
 
         if (docSnap.exists()) {
           const data = docSnap.data();
+          // S'assurer que tous les noms de champs utilisent la bonne casse
           const produitData: Produit = {
             id: docSnap.id,
             codeArticle: data.codeArticle || "",
@@ -45,7 +46,7 @@ const ModifierProduitLoader = ({ mode }: ModifierProduitLoaderProps) => {
             poidsPate: data.poidsPate || "",
             poidsArticle: data.poidsArticle || "",
             quantitePate: data.quantitePate || "",
-            // Correction des noms des champs pour être cohérent avec l'interface Produit
+            // Respecter exactement la casse définie dans l'interface Produit
             poidPatequalistat: data.poidPatequalistat || "",
             poidFourragequalistat: data.poidFourragequalistat || "",
             poidMarquantqualistat: data.poidMarquantqualistat || "",
