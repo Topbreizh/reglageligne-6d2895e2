@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -30,7 +30,28 @@ export const ChampTableRow: React.FC<ChampTableRowProps> = ({
   onDelete, onChange, onLignesApplicablesChange,
   onMove
 }) => {
-  console.log("Rendering ChampTableRow for champ:", champ.nom, "isEditing:", isEditing);
+  console.log(`Rendering ChampTableRow for champ:`, champ.nom, "isEditing:", isEditing);
+  
+  // Utilisez des états locaux pour les valeurs d'entrée
+  const [nomTechnique, setNomTechnique] = useState(champ.nomTechnique);
+  const [lignesApplicables, setLignesApplicables] = useState(champ.lignesApplicables.join(", "));
+  
+  // Mettez à jour les états locaux lorsque les props champ changent
+  useEffect(() => {
+    setNomTechnique(champ.nomTechnique);
+    setLignesApplicables(champ.lignesApplicables.join(", "));
+  }, [champ]);
+  
+  // Gestionnaires pour envoyer les modifications après les changements d'entrée
+  const handleNomTechniqueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNomTechnique(e.target.value);
+    onChange("nomTechnique", e.target.value);
+  };
+  
+  const handleLignesApplicablesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLignesApplicables(e.target.value);
+    onLignesApplicablesChange(e.target.value);
+  };
   
   return (
     <TableRow>
@@ -69,16 +90,16 @@ export const ChampTableRow: React.FC<ChampTableRowProps> = ({
       <TableCell>{champ.nom}</TableCell>
       <TableCell>
         <Input
-          value={champ.nomTechnique}
-          onChange={(e) => onChange("nomTechnique", e.target.value)}
+          value={nomTechnique}
+          onChange={handleNomTechniqueChange}
           placeholder="Nom technique du champ"
           className="border-noir-300"
         />
       </TableCell>
       <TableCell>
         <Input
-          value={champ.lignesApplicables.join(", ")}
-          onChange={(e) => onLignesApplicablesChange(e.target.value)}
+          value={lignesApplicables}
+          onChange={handleLignesApplicablesChange}
           placeholder="Exemple: 1, 2, * (pour toutes)"
           className="border-noir-300"
         />

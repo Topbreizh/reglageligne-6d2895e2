@@ -37,16 +37,18 @@ export function deleteChamp(blocs: BlocConfiguration[], blocId: string, champId:
 
 // Handles changing a champ field
 export function champChange(blocs: BlocConfiguration[], blocId: string, champId: string, field: keyof ChampConfiguration, value: any) {
-  console.log(`Changing champ ${champId} in bloc ${blocId}, field ${String(field)} to:`, value);
+  console.log(`champChange: Changing champ ${champId} in bloc ${blocId}, field ${String(field)} to:`, value);
   
-  return blocs.map((bloc) => {
+  const updatedBlocs = blocs.map((bloc) => {
     if (bloc.id === blocId) {
+      console.log(`Found bloc to update:`, bloc.nom);
       return {
         ...bloc,
         champs: bloc.champs.map((champ) => {
           if (champ.id === champId) {
-            console.log(`Found champ to update:`, champ);
-            const updatedChamp = { ...champ, [field]: value };
+            console.log(`Found champ to update:`, champ.nom);
+            const updatedChamp = { ...champ };
+            updatedChamp[field] = value;
             console.log(`Updated champ:`, updatedChamp);
             return updatedChamp;
           }
@@ -56,6 +58,9 @@ export function champChange(blocs: BlocConfiguration[], blocId: string, champId:
     }
     return bloc;
   });
+  
+  console.log("Updated blocs:", updatedBlocs);
+  return updatedBlocs;
 }
 
 // Handles changing lignesApplicables for a champ

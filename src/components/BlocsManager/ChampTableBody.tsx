@@ -24,38 +24,49 @@ const ChampTableBody: React.FC<ChampTableBodyProps> = ({
   handleLignesApplicablesChange,
   moveChamp,
   handleDeleteChamp,
-}) => (
-  <TableBody>
-    {champs.map((champ, i) => (
-      <ChampTableRow
-        key={champ.id}
-        champ={champ}
-        champIndex={i}
-        champsCount={champs.length}
-        blocId={blocId}
-        isEditing={editingChamp?.champ.id === champ.id && editingChamp.blocId === blocId}
-        onEdit={() => setEditingChamp({ champ, blocId })}
-        onCloseEdit={() => setEditingChamp(null)}
-        onEditSave={(values) => {
-          console.log("Saving champ edit with values:", values);
-          // Apply each field individually to ensure all are updated
-          handleChampChange(blocId, champ.id, "nom", values.nom);
-          handleChampChange(blocId, champ.id, "nomTechnique", values.nomTechnique);
-          
-          // Handle lignes applicables
-          const lignes = values.lignesApplicables
-            .split(",")
-            .map((v) => v.trim())
-            .filter(Boolean);
-          handleChampChange(blocId, champ.id, "lignesApplicables", lignes);
-        }}
-        onDelete={() => handleDeleteChamp(blocId, champ.id)}
-        onChange={(field, value) => handleChampChange(blocId, champ.id, field, value)}
-        onLignesApplicablesChange={(val) => handleLignesApplicablesChange(blocId, champ.id, val)}
-        onMove={(direction) => moveChamp(blocId, champ.id, direction)}
-      />
-    ))}
-  </TableBody>
-);
+}) => {
+  console.log("ChampTableBody rendering with champs:", champs);
+  console.log("Current editingChamp:", editingChamp);
+  
+  return (
+    <TableBody>
+      {champs.map((champ, i) => (
+        <ChampTableRow
+          key={champ.id}
+          champ={champ}
+          champIndex={i}
+          champsCount={champs.length}
+          blocId={blocId}
+          isEditing={editingChamp?.champ.id === champ.id && editingChamp.blocId === blocId}
+          onEdit={() => setEditingChamp({ champ, blocId })}
+          onCloseEdit={() => setEditingChamp(null)}
+          onEditSave={(values) => {
+            console.log("Saving champ edit with values:", values);
+            // Apply each field individually to ensure all are updated
+            handleChampChange(blocId, champ.id, "nom", values.nom);
+            handleChampChange(blocId, champ.id, "nomTechnique", values.nomTechnique);
+            
+            // Handle lignes applicables
+            const lignes = values.lignesApplicables
+              .split(",")
+              .map((v) => v.trim())
+              .filter(Boolean);
+            handleChampChange(blocId, champ.id, "lignesApplicables", lignes);
+            
+            // Close the dialog after saving
+            setEditingChamp(null);
+          }}
+          onDelete={() => handleDeleteChamp(blocId, champ.id)}
+          onChange={(field, value) => {
+            console.log(`Changing field ${String(field)} to:`, value);
+            handleChampChange(blocId, champ.id, field, value);
+          }}
+          onLignesApplicablesChange={(val) => handleLignesApplicablesChange(blocId, champ.id, val)}
+          onMove={(direction) => moveChamp(blocId, champ.id, direction)}
+        />
+      ))}
+    </TableBody>
+  );
+};
 
 export default ChampTableBody;
