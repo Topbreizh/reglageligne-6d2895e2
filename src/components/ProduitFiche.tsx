@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Produit, BlocConfiguration } from "@/types";
 import { blocsConfiguration as defaultBlocsConfig } from "@/data/blocConfig";
@@ -78,7 +77,6 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
   };
 
   const getChampValeur = (champTechnique: string) => {
-    // Log pour déboguer les valeurs manquantes
     if (!produit[champTechnique as keyof Produit]) {
       console.log(`Champ "${champTechnique}" non trouvé dans le produit:`, produit);
     }
@@ -103,7 +101,6 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
       return null;
     }
     
-    // Vérifier que le champ a un nomTechnique
     if (!champ.nomTechnique) {
       console.error(`Erreur: Le champ ${champ.nom} (ID: ${champ.id}) dans le bloc ${bloc.nom} n'a pas de nomTechnique`);
       return null;
@@ -143,7 +140,6 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
       })
       .sort((a, b) => a.ordre - b.ordre)
       .map(bloc => {
-        // Vérifier que le bloc a des champs avant de le rendre
         const champsVisibles = bloc.champs.filter(champ => {
           if (champ.lignesApplicables.includes("*")) return true;
           
@@ -156,10 +152,8 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
           return true;
         });
         
-        // Log pour debug
         console.log(`Bloc ${bloc.nom}: ${champsVisibles.length} champs visibles sur ${bloc.champs.length}`);
         
-        // Si bloc n'a pas de champs visibles, ne pas l'afficher
         if (champsVisibles.length === 0) {
           console.log(`Pas de champs visibles pour le bloc ${bloc.nom}, masquage du bloc`);
           return null;
@@ -168,7 +162,7 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
         return (
           <div key={bloc.id} className="printable-block mb-6 p-4 border border-gray-200 rounded-lg">
             <h2 className="text-lg font-bold mb-3 text-jaune-500">{bloc.nom}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+            <div className="space-y-2">
               {champsVisibles
                 .sort((a, b) => a.ordre - b.ordre)
                 .map(champ => renderChamp(bloc.id, champ.id))
@@ -183,7 +177,7 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
             )}
           </div>
         );
-      }).filter(Boolean); // Filtrer les blocs null (sans champs visibles)
+      }).filter(Boolean);
   };
 
   if (loading) {
