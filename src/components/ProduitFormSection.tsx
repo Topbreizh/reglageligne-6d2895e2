@@ -21,7 +21,11 @@ const ProduitFormSection = ({
     console.log("Rendu de la section Calcul de pâte avec données:", {
       poidsPate: formData.poidsPate,
       poidsArticle: formData.poidsArticle,
-      quantitePate: formData.quantitePate
+      quantitePate: formData.quantitePate,
+      poidPatequalistat: formData.poidPatequalistat,
+      poidFourragequalistat: formData.poidFourragequalistat,
+      poidMarquantqualistat: formData.poidMarquantqualistat,
+      nbrDeBandes: formData.nbrDeBandes
     });
     console.log("Champs visibles dans le bloc Calcul de pâte:", champsVisibles);
   }

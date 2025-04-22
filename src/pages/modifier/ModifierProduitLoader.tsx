@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Produit } from "@/types";
@@ -45,6 +44,10 @@ const ModifierProduitLoader = ({ mode }: ModifierProduitLoaderProps) => {
             poidsPate: data.poidsPate || "",
             poidsArticle: data.poidsArticle || "",
             quantitePate: data.quantitePate || "",
+            poidPatequalistat: data.poidPatequalistat || "",
+            poidFourragequalistat: data.poidFourragequalistat || "",
+            poidMarquantqualistat: data.poidMarquantqualistat || "",
+            nbrDeBandes: data.nbrDeBandes || "",
             programme: data.programme || "",
             facteur: data.facteur || "",
             regleLaminage: data.regleLaminage || "",
@@ -95,6 +98,19 @@ const ModifierProduitLoader = ({ mode }: ModifierProduitLoaderProps) => {
             ouvertureMP: data.ouvertureMP || "",
             commentaire: data.commentaire || "",
           };
+          
+          console.log("Data loaded from Firebase:", {
+            calculPate: {
+              poidsPate: produitData.poidsPate,
+              poidsArticle: produitData.poidsArticle,
+              quantitePate: produitData.quantitePate,
+              poidPatequalistat: produitData.poidPatequalistat,
+              poidFourragequalistat: produitData.poidFourragequalistat,
+              poidMarquantqualistat: produitData.poidMarquantqualistat,
+              nbrDeBandes: produitData.nbrDeBandes
+            }
+          });
+          
           setProduit(produitData);
         } else {
           toast({

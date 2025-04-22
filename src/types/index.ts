@@ -10,6 +10,10 @@ export interface Produit {
   poidsPate: string;
   poidsArticle: string;
   quantitePate: string;
+  poidPatequalistat: string;
+  poidFourragequalistat: string;
+  poidMarquantqualistat: string;
+  nbrDeBandes: string;
   
   // Bloc Laminage
   programme: string;

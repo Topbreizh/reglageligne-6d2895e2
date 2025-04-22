@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Produit, BlocConfiguration } from "@/types";
 import { blocsConfiguration as defaultBlocsConfig } from "@/data/blocConfig";
@@ -22,6 +21,10 @@ const EMPTY_PRODUIT: Produit = {
   poidsPate: "",
   poidsArticle: "",
   quantitePate: "",
+  poidPatequalistat: "",
+  poidFourragequalistat: "",
+  poidMarquantqualistat: "",
+  nbrDeBandes: "",
   programme: "",
   facteur: "",
   regleLaminage: "",

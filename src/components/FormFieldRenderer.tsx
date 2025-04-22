@@ -33,7 +33,7 @@ const FormFieldRenderer = ({ champ, value, onChange }: FormFieldRendererProps) =
         <Textarea
           id={champ.nomTechnique}
           name={champ.nomTechnique}
-          value={value}
+          value={value || ""}
           onChange={onChange}
           className="min-h-20 border-noir-300"
           required={isRequiredField(champ.nomTechnique)}
@@ -42,7 +42,7 @@ const FormFieldRenderer = ({ champ, value, onChange }: FormFieldRendererProps) =
         <Input
           id={champ.nomTechnique}
           name={champ.nomTechnique}
-          value={value}
+          value={value || ""}
           onChange={onChange}
           className="border-noir-300"
           required={isRequiredField(champ.nomTechnique)}
