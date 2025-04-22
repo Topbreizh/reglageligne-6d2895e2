@@ -50,6 +50,11 @@ const MappingTable = ({ headers, mappings, onChange }: MappingTableProps) => {
   console.log("Mappings actuels:", mappings);
   console.log("Champs cibles disponibles:", champsCibles);
 
+  const getFieldValue = (fieldId: string) => {
+    const mapping = mappings.find(m => m.champDestination === fieldId);
+    return mapping ? mapping.champSource : "none";
+  };
+
   return (
     <div>
       <h3 className="font-semibold mb-3">Mapping des champs</h3>
@@ -68,8 +73,7 @@ const MappingTable = ({ headers, mappings, onChange }: MappingTableProps) => {
             </TableHeader>
             <TableBody>
               {champsCibles.map((champ) => {
-                const mapping = mappings.find(m => m.champDestination === champ.nomTechnique);
-                const selectedValue = mapping ? mapping.champSource : "none";
+                const currentValue = getFieldValue(champ.nomTechnique);
                 
                 return (
                   <TableRow key={champ.id}>
@@ -79,7 +83,7 @@ const MappingTable = ({ headers, mappings, onChange }: MappingTableProps) => {
                     </TableCell>
                     <TableCell>
                       <Select
-                        value={selectedValue}
+                        value={currentValue}
                         onValueChange={(value) => {
                           console.log(`Changing mapping for ${champ.nomTechnique} to ${value}`);
                           onChange(champ.nomTechnique, value);
@@ -88,7 +92,7 @@ const MappingTable = ({ headers, mappings, onChange }: MappingTableProps) => {
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Sélectionner une colonne" />
                         </SelectTrigger>
-                        <SelectContent className="max-h-[400px]">
+                        <SelectContent className="max-h-[400px] overflow-y-auto bg-white">
                           <SelectItem value="none">Ne pas importer</SelectItem>
                           {headers.map(header => (
                             header ? (

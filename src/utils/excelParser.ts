@@ -57,6 +57,14 @@ export const parseExcelFile = (file: File): Promise<ParsedExcelData> => {
               return headerStr || `Colonne ${index + 1}`;
             });
             
+            // Ensure unique header names
+            const uniqueHeaders = new Map<string, number>();
+            headers = headers.map((header, index) => {
+              const count = uniqueHeaders.get(header) || 0;
+              uniqueHeaders.set(header, count + 1);
+              return count > 0 ? `${header} (${count})` : header;
+            });
+            
             // Limit to max 1000 rows to prevent performance issues
             const maxRows = Math.min(jsonData.length - 1, 1000);
             
