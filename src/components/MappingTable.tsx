@@ -46,6 +46,10 @@ const MappingTable = ({ headers, mappings, onChange }: MappingTableProps) => {
         }))
     );
 
+  // Logging pour déboguer
+  console.log("Mappings actuels:", mappings);
+  console.log("Champs cibles disponibles:", champsCibles);
+
   return (
     <div>
       <h3 className="font-semibold mb-3">Mapping des champs</h3>
@@ -64,10 +68,9 @@ const MappingTable = ({ headers, mappings, onChange }: MappingTableProps) => {
             </TableHeader>
             <TableBody>
               {champsCibles.map((champ) => {
-                const mapping = mappings.find(m => m.champDestination === champ.nomTechnique) || {
-                  champDestination: champ.nomTechnique,
-                  champSource: "none"
-                };
+                const mapping = mappings.find(m => m.champDestination === champ.nomTechnique);
+                const selectedValue = mapping ? mapping.champSource : "none";
+                
                 return (
                   <TableRow key={champ.id}>
                     <TableCell className="whitespace-nowrap font-medium">{champ.blocNom}</TableCell>
@@ -76,8 +79,11 @@ const MappingTable = ({ headers, mappings, onChange }: MappingTableProps) => {
                     </TableCell>
                     <TableCell>
                       <Select
-                        value={mapping.champSource}
-                        onValueChange={(value) => onChange(champ.nomTechnique, value)}
+                        value={selectedValue}
+                        onValueChange={(value) => {
+                          console.log(`Changing mapping for ${champ.nomTechnique} to ${value}`);
+                          onChange(champ.nomTechnique, value);
+                        }}
                       >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Sélectionner une colonne" />
@@ -85,12 +91,14 @@ const MappingTable = ({ headers, mappings, onChange }: MappingTableProps) => {
                         <SelectContent className="max-h-[400px]">
                           <SelectItem value="none">Ne pas importer</SelectItem>
                           {headers.map(header => (
-                            <SelectItem 
-                              key={header} 
-                              value={header || `header-${Math.random().toString(36).substring(2)}`}
-                            >
-                              {header || "Colonne sans titre"}
-                            </SelectItem>
+                            header ? (
+                              <SelectItem 
+                                key={header} 
+                                value={header}
+                              >
+                                {header}
+                              </SelectItem>
+                            ) : null
                           ))}
                         </SelectContent>
                       </Select>

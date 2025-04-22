@@ -64,7 +64,10 @@ export const parseExcelFile = (file: File): Promise<ParsedExcelData> => {
               const rowData: Record<string, any> = {};
               (row as any[]).forEach((cell, index) => {
                 if (index < headers.length) {
-                  rowData[headers[index]] = cell !== undefined ? String(cell) : "";
+                  const header = headers[index];
+                  if (header) { // Vérifier que l'en-tête n'est pas vide
+                    rowData[header] = cell !== undefined ? String(cell) : "";
+                  }
                 }
               });
               return rowData;

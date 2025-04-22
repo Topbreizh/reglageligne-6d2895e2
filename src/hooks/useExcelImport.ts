@@ -61,8 +61,8 @@ export const useExcelImport = () => {
       console.log("Fichier analysé avec succès");
       
       // Ensure no empty headers (replace with generated titles if needed)
-      const cleanedHeaders = parsedHeaders.map(header => 
-        header.trim() || `Colonne ${parsedHeaders.indexOf(header) + 1}`
+      const cleanedHeaders = parsedHeaders.map((header, index) => 
+        (header && header.trim()) ? header.trim() : `Colonne ${index + 1}`
       );
       
       if (cleanedHeaders.length === 0) {
@@ -92,6 +92,7 @@ export const useExcelImport = () => {
       setPreviewData(data);
       
       const initialMappings = generateInitialMappings(cleanedHeaders);
+      console.log("Mappings initiaux générés:", initialMappings);
       setMappings(initialMappings);
       setStep(2);
     } catch (error) {
@@ -112,18 +113,35 @@ export const useExcelImport = () => {
   };
 
   const handleMappingChange = (champDestination: string, champSource: string) => {
-    setMappings(
-      mappings.map((mapping) =>
-        mapping.champDestination === champDestination
-          ? { ...mapping, champSource }
-          : mapping
-      )
+    console.log(`Mise à jour du mapping: ${champDestination} => ${champSource}`);
+    
+    // Vérifier si le mapping existe déjà
+    const existingMappingIndex = mappings.findIndex(
+      (mapping) => mapping.champDestination === champDestination
     );
+
+    // Créer une copie du tableau de mappings
+    const updatedMappings = [...mappings];
+
+    if (existingMappingIndex !== -1) {
+      // Mettre à jour le mapping existant
+      updatedMappings[existingMappingIndex] = { 
+        ...updatedMappings[existingMappingIndex], 
+        champSource 
+      };
+    } else {
+      // Ajouter un nouveau mapping
+      updatedMappings.push({ champDestination, champSource });
+    }
+
+    console.log("Nouveaux mappings:", updatedMappings);
+    setMappings(updatedMappings);
   };
 
   const processMappingAndImport = async () => {
     try {
       setIsImporting(true);
+      console.log("Début de l'importation avec les mappings suivants:", mappings);
 
       // Charger la configuration des blocs pour vérifier la visibilité
       const blocsConfig = await getBlocsConfiguration();
@@ -154,8 +172,12 @@ export const useExcelImport = () => {
         return;
       }
 
+      // Filtrer les mappings pour ne garder que ceux avec une valeur source != "none"
+      const activeMappings = mappings.filter(mapping => mapping.champSource !== "none");
+      console.log("Mappings actifs pour l'importation:", activeMappings);
+
       // Filtrer les mappings pour ne garder que les champs visibles
-      const visibleMappings = mappings.filter(mapping => {
+      const visibleMappings = activeMappings.filter(mapping => {
         const [blocFound] = blocsConfig.filter(bloc => 
           bloc.visible && bloc.champs.some(champ => 
             champ.visible && champ.nomTechnique === mapping.champDestination
@@ -163,6 +185,8 @@ export const useExcelImport = () => {
         );
         return blocFound !== undefined;
       });
+
+      console.log("Mappings visibles filtrés:", visibleMappings);
 
       const produitsToSave = previewData.map(row => {
         const produit: Record<string, string> = {};
@@ -175,6 +199,8 @@ export const useExcelImport = () => {
 
         return produit;
       });
+
+      console.log(`${produitsToSave.length} produits à sauvegarder`);
 
       const savePromises = produitsToSave.map(produit => {
         if (!produit.codeArticle || !produit.numeroLigne) {
