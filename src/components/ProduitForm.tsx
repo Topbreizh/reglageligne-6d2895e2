@@ -2,15 +2,12 @@
 import { useState, useEffect } from "react";
 import { Produit, BlocConfiguration } from "@/types";
 import { blocsConfiguration as defaultBlocsConfig } from "@/data/blocConfig";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { getBlocsConfiguration } from "@/lib/firebaseReglage";
 import ProduitFormSection from "./ProduitFormSection";
-import { isRequiredField } from "@/utils/produitFormUtils";
+import ProduitFormLoadingSpinner from "./ProduitFormLoadingSpinner";
+import ProduitFormFooter from "./ProduitFormFooter";
+import { useBlocsVisibility } from "@/hooks/useBlocsVisibility";
 
 interface ProduitFormProps {
   produit?: Produit;
@@ -81,22 +78,20 @@ const ProduitForm = ({ produit, onSubmit, mode }: ProduitFormProps) => {
   const [blocsConfig, setBlocsConfig] = useState<BlocConfiguration[]>(defaultBlocsConfig);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { estChampVisible, estBlocVisible } = useBlocsVisibility(blocsConfig, formData);
 
   useEffect(() => {
     const fetchBlocsConfig = async () => {
       try {
         setLoading(true);
         const savedConfig = await getBlocsConfiguration();
-        
+
         if (savedConfig && savedConfig.length > 0) {
-          console.log("Configuration des blocs chargée pour le formulaire:", savedConfig);
           setBlocsConfig(savedConfig);
         } else {
-          console.log("Aucune configuration personnalisée trouvée, utilisation de la configuration par défaut");
           setBlocsConfig(defaultBlocsConfig);
         }
       } catch (error) {
-        console.error("Erreur lors du chargement de la configuration des blocs:", error);
         setBlocsConfig(defaultBlocsConfig);
       } finally {
         setLoading(false);
@@ -108,12 +103,6 @@ const ProduitForm = ({ produit, onSubmit, mode }: ProduitFormProps) => {
 
   useEffect(() => {
     if (produit) {
-      console.log("ProduitForm: Mise à jour des données avec le produit reçu:", produit);
-      console.log("Bloc Calcul de pâte dans produit:", {
-        poidsPate: produit.poidsPate,
-        poidsArticle: produit.poidsArticle,
-        quantitePate: produit.quantitePate
-      });
       setFormData(produit);
     }
   }, [produit]);
@@ -125,7 +114,7 @@ const ProduitForm = ({ produit, onSubmit, mode }: ProduitFormProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.codeArticle || !formData.numeroLigne || !formData.designation) {
       toast({
         title: "Erreur de validation",
@@ -135,57 +124,10 @@ const ProduitForm = ({ produit, onSubmit, mode }: ProduitFormProps) => {
       return;
     }
 
-    console.log("ProduitForm: Soumission du formulaire avec données:", formData);
-    console.log("Bloc Calcul de pâte dans formData:", {
-      poidsPate: formData.poidsPate,
-      poidsArticle: formData.poidsArticle,
-      quantitePate: formData.quantitePate
-    });
-    
     onSubmit(formData);
   };
 
-  const estChampVisible = (blocId: string, champId: string) => {
-    const bloc = blocsConfig.find(b => b.id === blocId);
-    if (!bloc || !bloc.visible) return false;
-    const champ = bloc.champs.find(c => c.id === champId);
-    if (!champ || !champ.visible) return false;
-    if (formData.numeroLigne && champ.lignesApplicables.length > 0) {
-      if (champ.lignesApplicables.includes("*")) return true;
-      if (champ.lignesApplicables.includes(formData.numeroLigne)) return true;
-      return false;
-    }
-    return true;
-  };
-
-  const estBlocVisible = (blocId: string) => {
-    const bloc = blocsConfig.find(b => b.id === blocId);
-    if (!bloc || !bloc.visible) return false;
-    if (formData.numeroLigne && bloc.lignesApplicables.length > 0) {
-      if (bloc.lignesApplicables.includes("*")) return true;
-      if (bloc.lignesApplicables.includes(formData.numeroLigne)) return true;
-      return false;
-    }
-    return true;
-  };
-
-  if (loading) {
-    return (
-      <div className="flex justify-center p-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-jaune-300"></div>
-      </div>
-    );
-  }
-
-  // Log des blocs et champs visibles pour débogage
-  const blocCalculPate = blocsConfig.find(b => b.id === "calculPate");
-  console.log("Bloc Calcul de pâte:", blocCalculPate);
-  console.log("Le bloc Calcul de pâte est-il visible?", estBlocVisible("calculPate"));
-  if (blocCalculPate) {
-    blocCalculPate.champs.forEach(champ => {
-      console.log(`Champ ${champ.nom} (${champ.nomTechnique}) est-il visible?`, estChampVisible("calculPate", champ.id));
-    });
-  }
+  if (loading) return <ProduitFormLoadingSpinner />;
 
   const blocsTries = [...blocsConfig].sort((a, b) => a.ordre - b.ordre);
 
@@ -194,9 +136,7 @@ const ProduitForm = ({ produit, onSubmit, mode }: ProduitFormProps) => {
       {blocsTries.map((bloc) => {
         if (!estBlocVisible(bloc.id)) return null;
         const champsTries = [...bloc.champs].sort((a, b) => a.ordre - b.ordre);
-        const champsVisibles = champsTries.filter((champ) =>
-          estChampVisible(bloc.id, champ.id)
-        );
+        const champsVisibles = champsTries.filter((champ) => estChampVisible(bloc.id, champ.id));
         if (champsVisibles.length === 0) return null;
         return (
           <ProduitFormSection
@@ -208,15 +148,7 @@ const ProduitForm = ({ produit, onSubmit, mode }: ProduitFormProps) => {
           />
         );
       })}
-
-      <div className="flex justify-end mt-6 gap-4">
-        <Button type="button" variant="outline" onClick={() => window.history.back()}>
-          Annuler
-        </Button>
-        <Button type="submit" className="bg-jaune-300 text-noir-800 hover:bg-jaune-400">
-          {mode === "create" ? "Créer" : "Enregistrer les modifications"}
-        </Button>
-      </div>
+      <ProduitFormFooter mode={mode} />
     </form>
   );
 };
