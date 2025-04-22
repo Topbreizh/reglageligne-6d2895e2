@@ -20,11 +20,11 @@ const FormFieldRenderer = ({ champ, value, onChange }: FormFieldRendererProps) =
     champ.nomTechnique === "designation" ||
     champ.nomTechnique === "commentaire";
 
-  // Corriger le problème de valeurs undefined en affichant une chaîne vide
+  // Fix the issue with undefined values and normalize case for nomTechnique
   const displayValue = value === undefined ? "" : value;
   
-  // Ajouter des logs pour déboguer les valeurs des champs avec leurs noms techniques
-  console.log(`Rendu du champ ${champ.nom} (${champ.nomTechnique}) avec valeur:`, displayValue);
+  // Debugging logs to identify field name mismatches
+  console.log(`FormFieldRenderer: Rendering field ${champ.nom} with nomTechnique: ${champ.nomTechnique}, value:`, displayValue);
 
   return (
     <div className={isFullWidth ? "md:col-span-3" : ""}>

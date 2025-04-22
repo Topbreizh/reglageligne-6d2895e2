@@ -1,3 +1,4 @@
+
 export interface Produit {
   id?: string;
   // Bloc Article
@@ -13,6 +14,7 @@ export interface Produit {
   poidFourragequalistat: string;
   poidMarquantqualistat: string;
   nbrDeBandes: string;
+  rognure?: string; // New field for % Rognure
   
   // Bloc Laminage
   programme: string;

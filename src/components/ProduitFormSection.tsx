@@ -16,23 +16,25 @@ const ProduitFormSection = ({
   formData,
   onChange,
 }: ProduitFormSectionProps) => {
-  // Logs détaillés pour comprendre les données reçues
-  console.log(`Rendu de la section ${bloc.nom} avec données:`, formData);
+  // Enhanced logging for debugging the data flow
+  console.log(`Rendering section ${bloc.nom} with id: ${bloc.id}`);
   
-  // Log spécifique pour le bloc calcul de pâte
+  // Special logging for the calcul de pâte block
   if (bloc.id === "calculPate") {
-    console.log("Données dans le bloc Calcul de pâte:", {
+    console.log("Data in Calcul de pâte block:", {
       poidsPate: formData.poidsPate,
       poidsArticle: formData.poidsArticle,
       quantitePate: formData.quantitePate,
       poidPatequalistat: formData.poidPatequalistat,
       poidFourragequalistat: formData.poidFourragequalistat,
       poidMarquantqualistat: formData.poidMarquantqualistat,
-      nbrDeBandes: formData.nbrDeBandes
+      nbrDeBandes: formData.nbrDeBandes,
+      // Check if rognure exists in the data
+      rognure: formData.rognure
     });
     
-    // Log des noms techniques des champs visibles pour vérifier
-    console.log("Champs visibles dans le bloc Calcul de pâte:", 
+    // Log visible fields to verify their technical names
+    console.log("Visible fields in Calcul de pâte:", 
       champsVisibles.map(c => ({ id: c.id, nom: c.nom, nomTechnique: c.nomTechnique }))
     );
   }
@@ -46,11 +48,12 @@ const ProduitFormSection = ({
       </CardHeader>
       <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {champsVisibles.map((champ) => {
-          // S'assurer que le nom technique existe dans le formData, sinon utiliser ""
-          const fieldValue = formData[champ.nomTechnique as keyof Produit] as string || "";
+          // Make sure to handle potential case-sensitivity issues in field names
+          const fieldName = champ.nomTechnique;
+          const fieldValue = formData[fieldName as keyof Produit] as string || "";
           
-          // Log pour chaque champ rendu
-          console.log(`Rendu du champ ${champ.nom} (${champ.nomTechnique}) avec valeur:`, fieldValue);
+          // Log each field being rendered for debugging
+          console.log(`Field in ${bloc.nom}: ${champ.nom} (${fieldName}) => value:`, fieldValue);
           
           return (
             <FormFieldRenderer

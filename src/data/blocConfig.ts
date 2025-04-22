@@ -26,7 +26,8 @@ export const blocsConfiguration: BlocConfiguration[] = [
       { id: "poidPatequalistat", nom: "Poids pâte Qualistat", nomTechnique: "poidPatequalistat", ordre: 4, visible: true, lignesApplicables: ["*"] },
       { id: "poidFourragequalistat", nom: "Poids fourrage qualistat", nomTechnique: "poidFourragequalistat", ordre: 5, visible: true, lignesApplicables: ["*"] },
       { id: "poidMarquantqualistat", nom: "Poids marquant Qualistat", nomTechnique: "poidMarquantqualistat", ordre: 6, visible: true, lignesApplicables: ["*"] },
-      { id: "nbrDeBandes", nom: "Nombre de bandes", nomTechnique: "nbrDeBandes", ordre: 7, visible: true, lignesApplicables: ["*"] }
+      { id: "nbrDeBandes", nom: "Nombre de bandes", nomTechnique: "nbrDeBandes", ordre: 7, visible: true, lignesApplicables: ["*"] },
+      { id: "rognure", nom: "% Rognure", nomTechnique: "rognure", ordre: 8, visible: true, lignesApplicables: ["*"] }
     ]
   },
   {

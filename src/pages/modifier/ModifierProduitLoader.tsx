@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Produit } from "@/types";
@@ -36,9 +35,8 @@ const ModifierProduitLoader = ({ mode }: ModifierProduitLoaderProps) => {
 
         if (docSnap.exists()) {
           const data = docSnap.data();
-          console.log("Données brutes du Firebase pour le produit:", data);
+          console.log("Raw data from Firebase for product:", data);
           
-          // S'assurer que tous les noms de champs utilisent la bonne casse
           const produitData: Produit = {
             id: docSnap.id,
             codeArticle: data.codeArticle || "",
@@ -47,11 +45,11 @@ const ModifierProduitLoader = ({ mode }: ModifierProduitLoaderProps) => {
             poidsPate: data.poidsPate || "",
             poidsArticle: data.poidsArticle || "",
             quantitePate: data.quantitePate || "",
-            // Respecter exactement la casse définie dans l'interface Produit
             poidPatequalistat: data.poidPatequalistat || "",
             poidFourragequalistat: data.poidFourragequalistat || "",
             poidMarquantqualistat: data.poidMarquantqualistat || "",
             nbrDeBandes: data.nbrDeBandes || "",
+            rognure: data.rognure || "",
             programme: data.programme || "",
             facteur: data.facteur || "",
             regleLaminage: data.regleLaminage || "",
@@ -103,15 +101,16 @@ const ModifierProduitLoader = ({ mode }: ModifierProduitLoaderProps) => {
             commentaire: data.commentaire || "",
           };
           
-          console.log("Données mappées pour le produit:", produitData);
-          console.log("Vérification spécifique du bloc calcul de pâte:", {
+          console.log("Processed data for product:", produitData);
+          console.log("Specific check for Calcul de pâte bloc fields:", {
             poidsPate: produitData.poidsPate,
             poidsArticle: produitData.poidsArticle,
             quantitePate: produitData.quantitePate,
             poidPatequalistat: produitData.poidPatequalistat,
             poidFourragequalistat: produitData.poidFourragequalistat,
             poidMarquantqualistat: produitData.poidMarquantqualistat,
-            nbrDeBandes: produitData.nbrDeBandes
+            nbrDeBandes: produitData.nbrDeBandes,
+            rognure: produitData.rognure
           });
           
           setProduit(produitData);
@@ -149,16 +148,16 @@ const ModifierProduitLoader = ({ mode }: ModifierProduitLoaderProps) => {
         }
       });
       
-      console.log("Données à envoyer pour sauvegarde:", {
-        calculPate: {
-          poidsPate: produitAEnregistrer.poidsPate,
-          poidsArticle: produitAEnregistrer.poidsArticle,
-          quantitePate: produitAEnregistrer.quantitePate,
-          poidPatequalistat: produitAEnregistrer.poidPatequalistat,
-          poidFourragequalistat: produitAEnregistrer.poidFourragequalistat,
-          poidMarquantqualistat: produitAEnregistrer.poidMarquantqualistat,
-          nbrDeBandes: produitAEnregistrer.nbrDeBandes
-        }
+      console.log("Data to be saved:", produitAEnregistrer);
+      console.log("Calcul de pâte data to be saved:", {
+        poidsPate: produitAEnregistrer.poidsPate,
+        poidsArticle: produitAEnregistrer.poidsArticle,
+        quantitePate: produitAEnregistrer.quantitePate,
+        poidPatequalistat: produitAEnregistrer.poidPatequalistat,
+        poidFourragequalistat: produitAEnregistrer.poidFourragequalistat,
+        poidMarquantqualistat: produitAEnregistrer.poidMarquantqualistat,
+        nbrDeBandes: produitAEnregistrer.nbrDeBandes,
+        rognure: produitAEnregistrer.rognure
       });
       
       await sauvegarderProduitComplet(produitAEnregistrer);
