@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import PageLayout from "@/components/layout/PageLayout";
@@ -38,6 +39,9 @@ const ModifierProduitPage = () => {
             codeArticle: data.codeArticle || "",
             numeroLigne: data.numeroLigne || "",
             designation: data.designation || "Sans designation",
+            poidsPate: data.poidsPate || "",
+            poidsArticle: data.poidsArticle || "",
+            quantitePate: data.quantitePate || "",
             programme: data.programme || "",
             facteur: data.facteur || "",
             regleLaminage: data.regleLaminage || "",

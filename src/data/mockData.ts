@@ -8,6 +8,10 @@ export const produitsInitiaux: Produit[] = [
     numeroLigne: "1",
     designation: "Pain au chocolat",
     
+    poidsPate: "250g",
+    poidsArticle: "85g",
+    quantitePate: "100",
+    
     programme: "P25",
     facteur: "1.5",
     regleLaminage: "Standard",
@@ -70,6 +74,10 @@ export const produitsInitiaux: Produit[] = [
     numeroLigne: "2",
     designation: "Croissant",
     
+    poidsPate: "200g",
+    poidsArticle: "70g",
+    quantitePate: "90",
+    
     programme: "P30",
     facteur: "1.2",
     regleLaminage: "Léger",
@@ -131,6 +139,10 @@ export const produitsInitiaux: Produit[] = [
     codeArticle: "P003",
     numeroLigne: "4",
     designation: "Pain aux raisins",
+    
+    poidsPate: "220g",
+    poidsArticle: "95g",
+    quantitePate: "110",
     
     programme: "P22",
     facteur: "1.4",
