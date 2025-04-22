@@ -41,6 +41,11 @@ const GestionBlocsPage = () => {
     fetchConfiguration();
   }, [toast]);
 
+  const handleConfigurationChange = (updatedBlocs: BlocConfiguration[]) => {
+    console.log("Configuration mise à jour dans GestionBlocsPage:", updatedBlocs);
+    setConfiguration(updatedBlocs);
+  };
+
   return (
     <PageLayout>
       <div className="max-w-6xl mx-auto">
@@ -54,7 +59,7 @@ const GestionBlocsPage = () => {
         ) : (
           <BlocsManager 
             initialConfiguration={configuration} 
-            onConfigurationChange={setConfiguration} 
+            onConfigurationChange={handleConfigurationChange} 
           />
         )}
       </div>

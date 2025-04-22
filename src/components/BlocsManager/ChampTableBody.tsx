@@ -42,18 +42,14 @@ const ChampTableBody: React.FC<ChampTableBodyProps> = ({
           onCloseEdit={() => setEditingChamp(null)}
           onEditSave={(values) => {
             console.log("Saving champ edit with values:", values);
-            // Apply each field individually to ensure all are updated
+            // Mettre à jour chaque champ individuellement
             handleChampChange(blocId, champ.id, "nom", values.nom);
             handleChampChange(blocId, champ.id, "nomTechnique", values.nomTechnique);
             
-            // Handle lignes applicables
-            const lignes = values.lignesApplicables
-              .split(",")
-              .map((v) => v.trim())
-              .filter(Boolean);
-            handleChampChange(blocId, champ.id, "lignesApplicables", lignes);
+            // Gérer les lignes applicables
+            handleLignesApplicablesChange(blocId, champ.id, values.lignesApplicables);
             
-            // Close the dialog after saving
+            // Fermer la boîte de dialogue après enregistrement
             setEditingChamp(null);
           }}
           onDelete={() => handleDeleteChamp(blocId, champ.id)}

@@ -32,25 +32,29 @@ export const ChampTableRow: React.FC<ChampTableRowProps> = ({
 }) => {
   console.log(`Rendering ChampTableRow for champ:`, champ.nom, "isEditing:", isEditing);
   
-  // Utilisez des états locaux pour les valeurs d'entrée
+  // État local pour les valeurs d'entrée
   const [nomTechnique, setNomTechnique] = useState(champ.nomTechnique);
   const [lignesApplicables, setLignesApplicables] = useState(champ.lignesApplicables.join(", "));
   
-  // Mettez à jour les états locaux lorsque les props champ changent
+  // Mettre à jour les états locaux quand la prop champ change
   useEffect(() => {
     setNomTechnique(champ.nomTechnique);
     setLignesApplicables(champ.lignesApplicables.join(", "));
   }, [champ]);
   
-  // Gestionnaires pour envoyer les modifications après les changements d'entrée
+  // Gestionnaires pour les changements d'entrée
   const handleNomTechniqueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNomTechnique(e.target.value);
-    onChange("nomTechnique", e.target.value);
+    const newValue = e.target.value;
+    setNomTechnique(newValue);
+    // Propager immédiatement le changement au parent
+    onChange("nomTechnique", newValue);
   };
   
   const handleLignesApplicablesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLignesApplicables(e.target.value);
-    onLignesApplicablesChange(e.target.value);
+    const newValue = e.target.value;
+    setLignesApplicables(newValue);
+    // Propager immédiatement le changement au parent
+    onLignesApplicablesChange(newValue);
   };
   
   return (

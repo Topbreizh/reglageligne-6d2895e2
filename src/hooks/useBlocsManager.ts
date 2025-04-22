@@ -20,7 +20,7 @@ import {
   saveBlocsConfig,
 } from "./useSaveBlocsConfiguration";
 
-/** Main orchestrating hook, delegates subtasks to helpers */
+/** Hook principal orchestrant les tâches, délègue les sous-tâches aux aides */
 export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onConfigurationChange?: (blocs: BlocConfiguration[]) => void) => {
   const [blocs, setBlocs] = useState<BlocConfiguration[]>([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -30,19 +30,23 @@ export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onCon
 
   useEffect(() => {
     if (initialConfiguration && initialConfiguration.length > 0) {
+      console.log("Setting initial blocs configuration:", initialConfiguration);
       setBlocs(JSON.parse(JSON.stringify(initialConfiguration)));
     }
   }, [initialConfiguration]);
 
-  // Bloc-level change
+  // Changement au niveau bloc
   const handleBlocChange = (id: string, field: keyof BlocConfiguration, value: any) => {
     console.log(`handleBlocChange: Updating bloc ${id}, field ${String(field)} to:`, value);
     const updatedBlocs = blocChange(blocs, id, field, value);
     setBlocs(updatedBlocs);
-    if (onConfigurationChange) onConfigurationChange(updatedBlocs);
+    if (onConfigurationChange) {
+      console.log("Calling onConfigurationChange with updated blocs");
+      onConfigurationChange(updatedBlocs);
+    }
   };
 
-  // Champ-level change
+  // Changement au niveau champ
   const handleChampChange = (
     blocId: string,
     champId: string,
@@ -53,7 +57,10 @@ export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onCon
     const updatedBlocs = champChange(blocs, blocId, champId, field, value);
     console.log("Updated blocs after champ change:", updatedBlocs);
     setBlocs(updatedBlocs);
-    if (onConfigurationChange) onConfigurationChange(updatedBlocs);
+    if (onConfigurationChange) {
+      console.log("Calling onConfigurationChange with updated blocs after champ change");
+      onConfigurationChange(updatedBlocs);
+    }
   };
 
   // Lignes applicables
@@ -70,24 +77,33 @@ export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onCon
       updatedBlocs = blocLignesApplicables(blocs, blocId, value);
     }
     setBlocs(updatedBlocs);
-    if (onConfigurationChange) onConfigurationChange(updatedBlocs);
+    if (onConfigurationChange) {
+      console.log("Calling onConfigurationChange with updated blocs after lignes applicables change");
+      onConfigurationChange(updatedBlocs);
+    }
   };
 
-  // Move bloc
+  // Déplacer bloc
   const moveBlocHandler = (blocId: string, direction: "up" | "down") => {
     const updatedBlocs = moveBloc(blocs, blocId, direction);
     setBlocs(updatedBlocs);
-    if (onConfigurationChange) onConfigurationChange(updatedBlocs);
+    if (onConfigurationChange) {
+      console.log("Calling onConfigurationChange after moving bloc");
+      onConfigurationChange(updatedBlocs);
+    }
   };
 
-  // Move champ
+  // Déplacer champ
   const moveChampHandler = (blocId: string, champId: string, direction: "up" | "down") => {
     const updatedBlocs = moveChamp(blocs, blocId, champId, direction);
     setBlocs(updatedBlocs);
-    if (onConfigurationChange) onConfigurationChange(updatedBlocs);
+    if (onConfigurationChange) {
+      console.log("Calling onConfigurationChange after moving champ");
+      onConfigurationChange(updatedBlocs);
+    }
   };
 
-  // Add a bloc
+  // Ajouter un bloc
   const handleAddBloc = () => {
     const newOrder = blocs.length > 0 ? Math.max(...blocs.map(b => b.ordre)) + 1 : 1;
     const newId = uniqueId("bloc");
@@ -104,7 +120,10 @@ export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onCon
     };
     const newBlocs = [...blocs, newBloc];
     setBlocs(newBlocs);
-    if (onConfigurationChange) onConfigurationChange(newBlocs);
+    if (onConfigurationChange) {
+      console.log("Calling onConfigurationChange after adding bloc");
+      onConfigurationChange(newBlocs);
+    }
     setEditingBloc(newBloc);
     toast({
       title: "Bloc ajouté",
@@ -113,7 +132,7 @@ export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onCon
     });
   };
 
-  // Add a champ
+  // Ajouter un champ
   const handleAddChamp = (blocId: string) => {
     const bloc = blocs.find(b => b.id === blocId);
     if (!bloc) return;
@@ -136,7 +155,10 @@ export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onCon
       return b;
     });
     setBlocs(updatedBlocs);
-    if (onConfigurationChange) onConfigurationChange(updatedBlocs);
+    if (onConfigurationChange) {
+      console.log("Calling onConfigurationChange after adding champ");
+      onConfigurationChange(updatedBlocs);
+    }
     setEditingChamp({champ: newChamp, blocId});
     toast({
       title: "Champ ajouté",
@@ -145,11 +167,14 @@ export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onCon
     });
   };
 
-  // Delete bloc
+  // Supprimer bloc
   const handleDeleteBloc = (blocId: string) => {
     const updatedBlocs = deleteBloc(blocs, blocId);
     setBlocs(updatedBlocs);
-    if (onConfigurationChange) onConfigurationChange(updatedBlocs);
+    if (onConfigurationChange) {
+      console.log("Calling onConfigurationChange after deleting bloc");
+      onConfigurationChange(updatedBlocs);
+    }
     toast({
       title: "Bloc supprimé",
       description: "Le bloc a été supprimé avec succès.",
@@ -157,11 +182,14 @@ export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onCon
     });
   };
 
-  // Delete champ
+  // Supprimer champ
   const handleDeleteChamp = (blocId: string, champId: string) => {
     const updatedBlocs = deleteChamp(blocs, blocId, champId);
     setBlocs(updatedBlocs);
-    if (onConfigurationChange) onConfigurationChange(updatedBlocs);
+    if (onConfigurationChange) {
+      console.log("Calling onConfigurationChange after deleting champ");
+      onConfigurationChange(updatedBlocs);
+    }
     toast({
       title: "Champ supprimé",
       description: "Le champ a été supprimé avec succès.",
@@ -170,6 +198,7 @@ export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onCon
   };
 
   const saveConfiguration = async () => {
+    console.log("Saving configuration with blocs:", blocs);
     await saveBlocsConfig(blocs, toast, setIsSaving);
   };
 
