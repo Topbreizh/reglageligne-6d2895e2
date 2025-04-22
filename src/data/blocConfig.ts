@@ -1,4 +1,3 @@
-
 import { BlocConfiguration } from "@/types";
 
 export const blocsConfiguration: BlocConfiguration[] = [
@@ -15,9 +14,21 @@ export const blocsConfiguration: BlocConfiguration[] = [
     ]
   },
   {
+    id: "calculPate",
+    nom: "Calcul de pâte",
+    ordre: 2,
+    lignesApplicables: ["*"],
+    visible: true,
+    champs: [
+      { id: "poidsPate", nom: "Poids pâte", nomTechnique: "poidsPate", ordre: 1, visible: true, lignesApplicables: ["*"] },
+      { id: "poidsArticle", nom: "Poids article", nomTechnique: "poidsArticle", ordre: 2, visible: true, lignesApplicables: ["*"] },
+      { id: "quantitePate", nom: "Quantité pâte", nomTechnique: "quantitePate", ordre: 3, visible: true, lignesApplicables: ["*"] }
+    ]
+  },
+  {
     id: "laminage",
     nom: "Laminage",
-    ordre: 2,
+    ordre: 3,
     lignesApplicables: ["*"],
     visible: true,
     champs: [
@@ -41,7 +52,7 @@ export const blocsConfiguration: BlocConfiguration[] = [
   {
     id: "faconnage146",
     nom: "Façonnage 1-4-6",
-    ordre: 3,
+    ordre: 4,
     lignesApplicables: ["1", "4", "6"],
     visible: true,
     champs: [
@@ -56,7 +67,7 @@ export const blocsConfiguration: BlocConfiguration[] = [
   {
     id: "guillotine",
     nom: "Guillotine",
-    ordre: 4,
+    ordre: 5,
     lignesApplicables: ["*"],
     visible: true,
     champs: [
@@ -69,7 +80,7 @@ export const blocsConfiguration: BlocConfiguration[] = [
   {
     id: "distributeurCreme",
     nom: "Distributeur crème",
-    ordre: 5,
+    ordre: 6,
     lignesApplicables: ["*"],
     visible: true,
     champs: [
@@ -81,7 +92,7 @@ export const blocsConfiguration: BlocConfiguration[] = [
   {
     id: "faconnage25",
     nom: "Façonnage 2-5",
-    ordre: 6,
+    ordre: 7,
     lignesApplicables: ["2", "5"],
     visible: true,
     champs: [
@@ -98,7 +109,7 @@ export const blocsConfiguration: BlocConfiguration[] = [
   {
     id: "finDeLigne",
     nom: "Fin de ligne",
-    ordre: 7,
+    ordre: 8,
     lignesApplicables: ["*"],
     visible: true,
     champs: [
@@ -110,7 +121,7 @@ export const blocsConfiguration: BlocConfiguration[] = [
   {
     id: "cadencePersonnel",
     nom: "Cadence, Personnel",
-    ordre: 8,
+    ordre: 9,
     lignesApplicables: ["*"],
     visible: true,
     champs: [

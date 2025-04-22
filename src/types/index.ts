@@ -6,6 +6,11 @@ export interface Produit {
   numeroLigne: string;
   designation: string;
   
+  // Bloc Calcul de pâte
+  poidsPate: string;
+  poidsArticle: string;
+  quantitePate: string;
+  
   // Bloc Laminage
   programme: string;
   facteur: string;
