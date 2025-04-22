@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Produit } from "@/types";
@@ -37,6 +38,7 @@ const ModifierProduitLoader = ({ mode }: ModifierProduitLoaderProps) => {
           const data = docSnap.data();
           console.log("Raw data from Firebase for product:", data);
           
+          // Standardize field names to ensure consistent casing with our Produit type
           const produitData: Produit = {
             id: docSnap.id,
             codeArticle: data.codeArticle || "",
@@ -45,10 +47,11 @@ const ModifierProduitLoader = ({ mode }: ModifierProduitLoaderProps) => {
             poidsPate: data.poidsPate || "",
             poidsArticle: data.poidsArticle || "",
             quantitePate: data.quantitePate || "",
-            poidPatequalistat: data.poidPatequalistat || "",
-            poidFourragequalistat: data.poidFourragequalistat || "",
-            poidMarquantqualistat: data.poidMarquantqualistat || "",
-            nbrDeBandes: data.nbrDeBandes || "",
+            // Handle all possible case variations in the source data
+            poidPatequalistat: data.poidPatequalistat || data.poidpatequalistat || data.PoidPatequalistat || "",
+            poidFourragequalistat: data.poidFourragequalistat || data.poidfourragequalistat || data.PoidFourragequalistat || "",
+            poidMarquantqualistat: data.poidMarquantqualistat || data.poidmarquantqualistat || data.PoidMarquantqualistat || "",
+            nbrDeBandes: data.nbrDeBandes || data.nbrdebandes || data.NbrDeBandes || "",
             rognure: data.rognure || "",
             programme: data.programme || "",
             facteur: data.facteur || "",
@@ -111,6 +114,26 @@ const ModifierProduitLoader = ({ mode }: ModifierProduitLoaderProps) => {
             poidMarquantqualistat: produitData.poidMarquantqualistat,
             nbrDeBandes: produitData.nbrDeBandes,
             rognure: produitData.rognure
+          });
+          
+          // Also check for keys with lowercase and other variations of case
+          console.log("Checking all possible variations of key names in raw data:");
+          console.log("poidPatequalistat:", data.poidPatequalistat);
+          console.log("poidpatequalistat:", data.poidpatequalistat);
+          console.log("PoidPatequalistat:", data.PoidPatequalistat);
+          console.log("poidFourragequalistat:", data.poidFourragequalistat);
+          console.log("poidfourragequalistat:", data.poidfourragequalistat);
+          console.log("poidMarquantqualistat:", data.poidMarquantqualistat);
+          console.log("poidmarquantqualistat:", data.poidmarquantqualistat);
+          console.log("nbrDeBandes:", data.nbrDeBandes);
+          console.log("nbrdebandes:", data.nbrdebandes);
+          
+          // Add any missing fields from raw data that might not be in our type
+          Object.keys(data).forEach(key => {
+            if (!(key in produitData) && data[key]) {
+              (produitData as any)[key] = data[key];
+              console.log(`Added extra field from raw data: ${key} = ${data[key]}`);
+            }
           });
           
           setProduit(produitData);
