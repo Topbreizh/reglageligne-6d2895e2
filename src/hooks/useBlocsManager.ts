@@ -112,9 +112,11 @@ export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onCon
 
   const handleAddBloc = () => {
     const newOrder = blocs.length > 0 ? Math.max(...blocs.map(b => b.ordre)) + 1 : 1;
+    const newId = uniqueId("bloc");
     const newBloc: BlocConfiguration = {
-      id: uniqueId("bloc"),
+      id: newId,
       nom: "Nouveau bloc",
+      nomTechnique: newId, // Ajout du nomTechnique lors de la création
       ordre: newOrder,
       lignesApplicables: ["*"],
       visible: true,
@@ -133,10 +135,11 @@ export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onCon
 
   const handleAddChamp = (blocId: string) => {
     const newChampsOrder = (blocs.find(b => b.id === blocId)?.champs.length || 0) + 1;
+    const newId = uniqueId("champ");
     const newChamp: ChampConfiguration = {
-      id: uniqueId("champ"),
+      id: newId,
       nom: "Nouveau champ",
-      nomTechnique: "nouveauChamp",
+      nomTechnique: "nouveauChamp" + newChampsOrder, // Modifier pour éviter les doublons
       ordre: newChampsOrder,
       visible: true,
       lignesApplicables: ["*"]

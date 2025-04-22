@@ -67,7 +67,7 @@ const BlocAccordionItem: React.FC<BlocAccordionItemProps> = ({
     if (editingBloc && editingBloc.id === bloc.id) {
       blocForm.reset({
         nom: editingBloc.nom,
-        nomTechnique: editingBloc.id,
+        nomTechnique: editingBloc.nomTechnique || editingBloc.id, // Utiliser nomTechnique s'il existe, sinon id
         lignesApplicables: editingBloc.lignesApplicables.join(", "),
       });
     }
@@ -79,9 +79,14 @@ const BlocAccordionItem: React.FC<BlocAccordionItemProps> = ({
       .split(",")
       .map(line => line.trim())
       .filter(line => line);
+    
+    // Mise à jour du nom et des lignes applicables
     handleBlocChange(editingBloc.id, "nom", values.nom);
-    handleBlocChange(editingBloc.id, "id", values.nomTechnique);
     handleBlocChange(editingBloc.id, "lignesApplicables", lignesApplicables);
+    
+    // Mise à jour du nom technique en tant que propriété distincte, pas comme id
+    handleBlocChange(editingBloc.id, "nomTechnique", values.nomTechnique);
+    
     setEditingBloc(null);
   };
 

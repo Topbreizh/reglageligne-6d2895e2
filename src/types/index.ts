@@ -73,6 +73,7 @@ export interface Produit {
 export interface BlocConfiguration {
   id: string;
   nom: string;
+  nomTechnique?: string; // Ajout de la propriété nomTechnique comme optionnelle pour la compatibilité
   ordre: number;
   lignesApplicables: string[];
   visible: boolean;
