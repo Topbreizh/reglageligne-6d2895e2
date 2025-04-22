@@ -33,16 +33,25 @@ export const ChampTableRow: React.FC<ChampTableRowProps> = ({
   console.log(`Rendering ChampTableRow for champ:`, champ.nom, "isEditing:", isEditing);
   
   // État local pour les valeurs d'entrée
+  const [nomValue, setNomValue] = useState(champ.nom);
   const [nomTechnique, setNomTechnique] = useState(champ.nomTechnique);
   const [lignesApplicables, setLignesApplicables] = useState(champ.lignesApplicables.join(", "));
   
   // Mettre à jour les états locaux quand la prop champ change
   useEffect(() => {
+    setNomValue(champ.nom);
     setNomTechnique(champ.nomTechnique);
     setLignesApplicables(champ.lignesApplicables.join(", "));
   }, [champ]);
   
   // Gestionnaires pour les changements d'entrée
+  const handleNomChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setNomValue(newValue);
+    // Propager immédiatement le changement au parent
+    onChange("nom", newValue);
+  };
+  
   const handleNomTechniqueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setNomTechnique(newValue);
@@ -100,7 +109,14 @@ export const ChampTableRow: React.FC<ChampTableRowProps> = ({
           </div>
         </div>
       </TableCell>
-      <TableCell>{champ.nom}</TableCell>
+      <TableCell>
+        <Input
+          value={nomValue}
+          onChange={handleNomChange}
+          placeholder="Nom du champ"
+          className="border-noir-300"
+        />
+      </TableCell>
       <TableCell>
         <Input
           value={nomTechnique}
