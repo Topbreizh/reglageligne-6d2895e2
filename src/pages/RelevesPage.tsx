@@ -1,287 +1,121 @@
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PageLayout from "@/components/layout/PageLayout";
-import { Produit } from "@/types";
-import { produitsInitiaux } from "@/data/mockData";
 import { Input } from "@/components/ui/input";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Search, FileText } from "lucide-react";
-import { Link } from "react-router-dom";
-import { blocsConfiguration } from "@/data/blocConfig";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+
+const DUMMY_RESULTS = [
+  { champ: "Champ 1", valeur: "Valeur 1" },
+  { champ: "Champ 2", valeur: "Valeur 2" },
+  { champ: "Champ 3", valeur: "Valeur 3" },
+];
+
+const blocs = [
+  { id: 1, title: "Bloc 1" },
+  { id: 2, title: "Bloc 2" },
+  { id: 3, title: "Bloc 3" },
+  { id: 4, title: "Bloc 4" },
+  { id: 5, title: "Bloc 5" },
+];
 
 const RelevesPage = () => {
-  const [produits, setProduits] = useState<Produit[]>([]);
-  const [filteredProduits, setFilteredProduits] = useState<Produit[]>([]);
-  const [searchColumns, setSearchColumns] = useState({
-    column1: { field: "codeArticle", value: "" },
-    column2: { field: "numeroLigne", value: "" },
-    column3: { field: "designation", value: "" },
-    column4: { field: "cadence", value: "" },
-  });
+  const [codeArticle, setCodeArticle] = useState("");
+  const [numeroLigne, setNumeroLigne] = useState("");
+  const [searchClicked, setSearchClicked] = useState(false);
 
-  // Liste des champs disponibles pour les colonnes de recherche
-  const availableFields = blocsConfiguration.flatMap((bloc) =>
-    bloc.champs.map((champ) => ({
-      id: champ.nomTechnique,
-      label: `${bloc.nom} - ${champ.nom}`,
-    }))
-  );
-
-  useEffect(() => {
-    // Dans un vrai système, on chargerait les produits depuis une API
-    setProduits(produitsInitiaux);
-    setFilteredProduits(produitsInitiaux);
-  }, []);
-
-  const handleSearch = () => {
-    const filtered = produits.filter((produit) => {
-      // Vérifier chaque colonne de recherche
-      const matchColumn1 =
-        !searchColumns.column1.value ||
-        String(produit[searchColumns.column1.field as keyof Produit] || "")
-          .toLowerCase()
-          .includes(searchColumns.column1.value.toLowerCase());
-
-      const matchColumn2 =
-        !searchColumns.column2.value ||
-        String(produit[searchColumns.column2.field as keyof Produit] || "")
-          .toLowerCase()
-          .includes(searchColumns.column2.value.toLowerCase());
-
-      const matchColumn3 =
-        !searchColumns.column3.value ||
-        String(produit[searchColumns.column3.field as keyof Produit] || "")
-          .toLowerCase()
-          .includes(searchColumns.column3.value.toLowerCase());
-
-      const matchColumn4 =
-        !searchColumns.column4.value ||
-        String(produit[searchColumns.column4.field as keyof Produit] || "")
-          .toLowerCase()
-          .includes(searchColumns.column4.value.toLowerCase());
-
-      return matchColumn1 && matchColumn2 && matchColumn3 && matchColumn4;
-    });
-
-    setFilteredProduits(filtered);
-  };
-
-  const handleColumnChange = (
-    columnKey: string,
-    field: string,
-    value: string
-  ) => {
-    setSearchColumns((prev) => ({
-      ...prev,
-      [columnKey]: {
-        ...prev[columnKey as keyof typeof prev],
-        [field]: value,
-      },
-    }));
-  };
-
-  const getFieldLabel = (fieldId: string) => {
-    const field = availableFields.find((f) => f.id === fieldId);
-    return field ? field.label : fieldId;
+  // Simule la recherche
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSearchClicked(true);
+    // Ici on pourrait appeler une vraie API, en attendant juste flag pour affichage
   };
 
   return (
     <PageLayout>
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <h1 className="text-2xl md:text-3xl font-bold mb-6">
-          <span className="text-noir-800">Relevés des</span> <span className="text-jaune-300">réglages</span>
+          <span className="text-noir-800">Relevés</span>{" "}
+          <span className="text-jaune-300">réglages</span>
         </h1>
-
-        <div className="space-y-6">
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-noir-200">
-            <h2 className="text-lg font-semibold mb-4">Recherche multicritères</h2>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {/* Colonne 1 */}
-              <div>
-                <Label htmlFor="column1-field" className="field-label">Colonne 1</Label>
-                <select
-                  id="column1-field"
-                  className="w-full border border-noir-300 rounded-md p-2 mb-2"
-                  value={searchColumns.column1.field}
-                  onChange={(e) =>
-                    handleColumnChange("column1", "field", e.target.value)
-                  }
-                >
-                  {availableFields.map((field) => (
-                    <option key={field.id} value={field.id}>
-                      {field.label}
-                    </option>
-                  ))}
-                </select>
-                <Input
-                  id="column1-value"
-                  placeholder="Valeur"
-                  value={searchColumns.column1.value}
-                  onChange={(e) =>
-                    handleColumnChange("column1", "value", e.target.value)
-                  }
-                  className="border-noir-300"
-                />
-              </div>
-
-              {/* Colonne 2 */}
-              <div>
-                <Label htmlFor="column2-field" className="field-label">Colonne 2</Label>
-                <select
-                  id="column2-field"
-                  className="w-full border border-noir-300 rounded-md p-2 mb-2"
-                  value={searchColumns.column2.field}
-                  onChange={(e) =>
-                    handleColumnChange("column2", "field", e.target.value)
-                  }
-                >
-                  {availableFields.map((field) => (
-                    <option key={field.id} value={field.id}>
-                      {field.label}
-                    </option>
-                  ))}
-                </select>
-                <Input
-                  id="column2-value"
-                  placeholder="Valeur"
-                  value={searchColumns.column2.value}
-                  onChange={(e) =>
-                    handleColumnChange("column2", "value", e.target.value)
-                  }
-                  className="border-noir-300"
-                />
-              </div>
-
-              {/* Colonne 3 */}
-              <div>
-                <Label htmlFor="column3-field" className="field-label">Colonne 3</Label>
-                <select
-                  id="column3-field"
-                  className="w-full border border-noir-300 rounded-md p-2 mb-2"
-                  value={searchColumns.column3.field}
-                  onChange={(e) =>
-                    handleColumnChange("column3", "field", e.target.value)
-                  }
-                >
-                  {availableFields.map((field) => (
-                    <option key={field.id} value={field.id}>
-                      {field.label}
-                    </option>
-                  ))}
-                </select>
-                <Input
-                  id="column3-value"
-                  placeholder="Valeur"
-                  value={searchColumns.column3.value}
-                  onChange={(e) =>
-                    handleColumnChange("column3", "value", e.target.value)
-                  }
-                  className="border-noir-300"
-                />
-              </div>
-
-              {/* Colonne 4 */}
-              <div>
-                <Label htmlFor="column4-field" className="field-label">Colonne 4</Label>
-                <select
-                  id="column4-field"
-                  className="w-full border border-noir-300 rounded-md p-2 mb-2"
-                  value={searchColumns.column4.field}
-                  onChange={(e) =>
-                    handleColumnChange("column4", "field", e.target.value)
-                  }
-                >
-                  {availableFields.map((field) => (
-                    <option key={field.id} value={field.id}>
-                      {field.label}
-                    </option>
-                  ))}
-                </select>
-                <Input
-                  id="column4-value"
-                  placeholder="Valeur"
-                  value={searchColumns.column4.value}
-                  onChange={(e) =>
-                    handleColumnChange("column4", "value", e.target.value)
-                  }
-                  className="border-noir-300"
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end mt-4">
-              <Button
-                onClick={handleSearch}
-                className="bg-jaune-300 text-noir-800 hover:bg-jaune-400"
-              >
-                <Search className="h-4 w-4 mr-2" />
-                Rechercher
-              </Button>
-            </div>
+        {/* Inputs de recherche */}
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4" onSubmit={handleSearch}>
+          <div>
+            <Label htmlFor="codeArticle">Code Article</Label>
+            <Input
+              id="codeArticle"
+              value={codeArticle}
+              onChange={(e) => setCodeArticle(e.target.value)}
+              placeholder="Saisir le code article"
+            />
           </div>
-
-          <div className="bg-white rounded-lg shadow-sm border border-noir-200 overflow-x-auto">
-            <Table>
-              <TableHeader className="bg-noir-100">
-                <TableRow>
-                  <TableHead>Code Article</TableHead>
-                  <TableHead>Numéro de Ligne</TableHead>
-                  <TableHead>Désignation</TableHead>
-                  <TableHead>{getFieldLabel(searchColumns.column1.field)}</TableHead>
-                  <TableHead>{getFieldLabel(searchColumns.column2.field)}</TableHead>
-                  <TableHead>{getFieldLabel(searchColumns.column3.field)}</TableHead>
-                  <TableHead>{getFieldLabel(searchColumns.column4.field)}</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredProduits.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center py-4">
-                      Aucun produit trouvé.
-                    </TableCell>
-                  </TableRow>
+          <div>
+            <Label htmlFor="numeroLigne">Numéro de Ligne</Label>
+            <Input
+              id="numeroLigne"
+              value={numeroLigne}
+              onChange={(e) => setNumeroLigne(e.target.value)}
+              placeholder="Saisir le numéro de ligne"
+            />
+          </div>
+          {/* Bouton rechercher sur une nouvelle ligne en mobile */}
+          <div className="md:col-span-2 flex justify-end mt-2">
+            <button
+              type="submit"
+              className="bg-jaune-300 hover:bg-jaune-400 text-noir-800 font-medium py-2 px-4 rounded"
+            >
+              Rechercher
+            </button>
+          </div>
+        </form>
+        {/* Résultats sous les inputs */}
+        <div className="mb-6">
+          {searchClicked && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Résultats de la recherche</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {/* Affichage du tableau ou message si aucun résultat */}
+                {DUMMY_RESULTS.length === 0 ? (
+                  <div className="text-center text-muted-foreground">Aucun résultat trouvé.</div>
                 ) : (
-                  filteredProduits.map((produit) => (
-                    <TableRow key={produit.id} className="hover:bg-jaune-50">
-                      <TableCell className="font-medium">{produit.codeArticle}</TableCell>
-                      <TableCell>{produit.numeroLigne}</TableCell>
-                      <TableCell>{produit.designation}</TableCell>
-                      <TableCell>
-                        {String(produit[searchColumns.column1.field as keyof Produit] || "-")}
-                      </TableCell>
-                      <TableCell>
-                        {String(produit[searchColumns.column2.field as keyof Produit] || "-")}
-                      </TableCell>
-                      <TableCell>
-                        {String(produit[searchColumns.column3.field as keyof Produit] || "-")}
-                      </TableCell>
-                      <TableCell>
-                        {String(produit[searchColumns.column4.field as keyof Produit] || "-")}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Link to={`/fiche/${produit.id}`}>
-                          <Button variant="outline" size="sm">
-                            <FileText className="h-4 w-4 mr-1" />
-                            Fiche
-                          </Button>
-                        </Link>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Champ</TableHead>
+                          <TableHead>Valeur</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {DUMMY_RESULTS.map((item, i) => (
+                          <TableRow key={i}>
+                            <TableCell>{item.champ}</TableCell>
+                            <TableCell>{item.valeur}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
                 )}
-              </TableBody>
-            </Table>
-          </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+        {/* Les 5 blocs disposés en 2 colonnes (1 colonne mobile) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {blocs.map((bloc) => (
+            <Card key={bloc.id} className="h-40 flex flex-col justify-center items-center">
+              <CardHeader>
+                <CardTitle>{bloc.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-muted-foreground">Contenu du bloc {bloc.id}</div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     </PageLayout>
@@ -289,3 +123,4 @@ const RelevesPage = () => {
 };
 
 export default RelevesPage;
+
