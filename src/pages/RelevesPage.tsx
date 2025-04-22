@@ -2,72 +2,130 @@
 import { useState } from "react";
 import PageLayout from "@/components/layout/PageLayout";
 import { Input } from "@/components/ui/input";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { produitsInitiaux } from "@/data/mockData";
 import { Produit } from "@/types";
+import { Label } from "@/components/ui/label";
 
-const getAllFieldLabels = (produit: Produit): [string, string][] => {
-  // Exclure id de l'affichage, mais prendre tout le reste
-  return Object.entries(produit)
-    .filter(([key]) => key !== "id")
-    .map(([key, value]) => {
-      // Mettre en forme l'affichage du nom du champ
-      const formattedKey = key
-        .replace(/[A-Z]/g, (m) => " " + m.toLowerCase())
-        .replace(/^./, (c) => c.toUpperCase())
-        .replace(/_/g, " ")
-        .trim();
-      return [formattedKey, value || ""];
-    });
-};
+// Liste ordonnée des champs du type Produit à afficher dans les fiches
+const produitChamps: { nom: string; key: keyof Produit }[] = [
+  { nom: "Code article", key: "codeArticle" },
+  { nom: "Numero ligne", key: "numeroLigne" },
+  { nom: "Designation", key: "designation" },
+  { nom: "Poids pate", key: "poidsPate" },
+  { nom: "Poids article", key: "poidsArticle" },
+  { nom: "Quantite pate", key: "quantitePate" },
+  { nom: "Poid patequalistat", key: "poidPatequalistat" },
+  { nom: "Poid fourragequalistat", key: "poidFourragequalistat" },
+  { nom: "Poid marquantqualistat", key: "poidMarquantqualistat" },
+  { nom: "Nbr de bandes", key: "nbrDeBandes" },
+  { nom: "% Rognure", key: "rognure" },
+  { nom: "Programme", key: "programme" },
+  { nom: "Facteur", key: "facteur" },
+  { nom: "Regle laminage", key: "regleLaminage" },
+  { nom: "Quick", key: "quick" },
+  { nom: "Calibreur 1", key: "calibreur1" },
+  { nom: "Calibreur 2", key: "calibreur2" },
+  { nom: "Calibreur 3", key: "calibreur3" },
+  { nom: "Laminoir", key: "laminoir" },
+  { nom: "Vitesse laminage", key: "vitesseLaminage" },
+  { nom: "Farineur haut 1", key: "farineurHaut1" },
+  { nom: "Farineur haut 2", key: "farineurHaut2" },
+  { nom: "Farineur haut 3", key: "farineurHaut3" },
+  { nom: "Farineur bas 1", key: "farineurBas1" },
+  { nom: "Farineur bas 2", key: "farineurBas2" },
+  { nom: "Farineur bas 3", key: "farineurBas3" },
+  { nom: "Queue de carpe", key: "queueDeCarpe" },
+  { nom: "Numero découpe", key: "numeroDecoupe" },
+  { nom: "Buse", key: "buse" },
+  { nom: "Distributeur choco raisin", key: "distributeurChocoRaisin" },
+  { nom: "Humidificateur 1-4-6", key: "humidificateur146" },
+  { nom: "Vitesse doreuse", key: "vitesseDoreuse" },
+  { nom: "P1 longueur découpe", key: "p1LongueurDecoupe" },
+  { nom: "P2 centrage", key: "p2Centrage" },
+  { nom: "Bielle", key: "bielle" },
+  { nom: "Lame racleur", key: "lameRacleur" },
+  { nom: "Rademaker", key: "rademaker" },
+  { nom: "Aera", key: "aera" },
+  { nom: "Fritch", key: "fritch" },
+  { nom: "Retourneur", key: "retourneur" },
+  { nom: "Aligneur", key: "aligneur" },
+  { nom: "Humidificateur 2-5", key: "humidificateur25" },
+  { nom: "Push plaque", key: "pushPlaque" },
+  { nom: "Rouleau inférieur", key: "rouleauInferieur" },
+  { nom: "Rouleau supérieur", key: "rouleauSuperieur" },
+  { nom: "Tapis faconneuse", key: "tapisFaconneuse" },
+  { nom: "Repère poignée", key: "reperePoignee" },
+  { nom: "Rouleau pression", key: "rouleauPression" },
+  { nom: "Tapis avant étuve surg", key: "tapisAvantEtuveSurgel" },
+  { nom: "Etuve/surgel", key: "etuveSurgel" },
+  { nom: "Cadence", key: "cadence" },
+  { nom: "Lamineur", key: "lamineur" },
+  { nom: "Surveillant", key: "surveillant" },
+  { nom: "Distributeur raisin choco", key: "distributeurRaisinChoco" },
+  { nom: "Pose", key: "pose" },
+  { nom: "Pliage triage", key: "pliageTriage" },
+  { nom: "Topping", key: "topping" },
+  { nom: "Sortie étuve", key: "sortieEtuve" },
+  { nom: "Ouverture MP", key: "ouvertureMP" },
+  { nom: "Commentaire", key: "commentaire" },
+];
 
-const ProduitFiche = ({ produit }: { produit: Produit }) => (
-  <Card className="flex flex-col h-full border-2 border-[#9b87f5] shadow bg-[#D3E4FD]">
-    <CardHeader className="p-3 pb-1 bg-[#FEF7CD] border-b border-[#f6e085]">
-      <CardTitle className="text-lg font-semibold text-[#555] truncate">
-        <span className="block">Code article : <span className="font-mono text-[#9b87f5]">{produit.codeArticle}</span></span>
-        <span className="block text-xs text-[#9b87f5]">Ligne : {produit.numeroLigne}</span>
-      </CardTitle>
-    </CardHeader>
-    <CardContent className="p-4 pt-2 overflow-y-auto text-sm">
-      <div className="flex flex-col gap-1">
-        {getAllFieldLabels(produit).map(([label, value]) => (
-          <div key={label} className="flex justify-between border-b border-dashed border-[#ededf6] py-[1px] last:border-none">
-            <span className="font-medium text-[#666]">{label}</span>
-            <span className="ml-3 text-[#333] font-mono break-all">{value}</span>
-          </div>
-        ))}
+function ProduitFicheGrille({ produit }: { produit: Produit }) {
+  return (
+    <div className="rounded border border-indigo-300 shadow overflow-hidden w-[280px] bg-white flex flex-col">
+      {/* En-tête jaune pâle */}
+      <div className="bg-yellow-100 border-b border-indigo-200 px-4 py-2">
+        <div className="font-bold text-lg text-neutral-800">
+          Code article : <span className="text-indigo-500 font-mono underline">{produit.codeArticle}</span>
+        </div>
+        <div className="text-sm" style={{ color: "#8886d0" }}>
+          Ligne : <span className="underline font-mono">{produit.numeroLigne}</span>
+        </div>
       </div>
-    </CardContent>
-  </Card>
-);
+      {/* Champs produit en mode tableau bleu pâle */}
+      <div className="flex-1 bg-blue-100/80 p-0">
+        <table className="w-full text-sm border-separate" style={{ borderSpacing: 0 }}>
+          <tbody>
+            {produitChamps.map(({ nom, key }) => (
+              <tr key={key} className="border-b border-blue-200 last:border-none">
+                <td className="pl-3 py-0.5 text-right text-blue-900 font-medium whitespace-nowrap">{nom}</td>
+                <td className="pl-2 py-0.5 pr-2 font-mono text-black whitespace-pre-wrap">{produit[key] ?? ""}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
 
-const RelevesPage = () => {
+export default function RelevesPage() {
   const [codeArticle, setCodeArticle] = useState("");
   const [numeroLigne, setNumeroLigne] = useState("");
 
-  // Filtrage dynamique
-  const filtered = produitsInitiaux.filter((p) =>
-    (codeArticle ? p.codeArticle.toLowerCase().includes(codeArticle.toLowerCase()) : true) &&
-    (numeroLigne ? p.numeroLigne.toLowerCase().includes(numeroLigne.toLowerCase()) : true)
-  );
+  // Filtre produits
+  const produitsFiltres = produitsInitiaux.filter((produit) => {
+    const matchCode = codeArticle.length === 0 || (produit.codeArticle ?? "").toLowerCase().includes(codeArticle.toLowerCase());
+    const matchLigne = numeroLigne.length === 0 || (produit.numeroLigne ?? "").toLowerCase().includes(numeroLigne.toLowerCase());
+    return matchCode && matchLigne;
+  });
 
-  const produitsAffiches = filtered.slice(0, 5);
-
+  const produitsAffiches = produitsFiltres.slice(0, 5); // 5 max
+  
   return (
     <PageLayout>
       <div className="max-w-7xl mx-auto">
         <h1 className="text-2xl md:text-3xl font-bold mb-6 flex gap-4 items-center">
-          <span className="text-noir-800">Relevés</span>
-          <span className="text-jaune-300">lignes</span>
+          <span className="text-noir-800">Relevés produits</span>
+          <span className="text-indigo-400 font-semibold">grille</span>
         </h1>
-        {/* Barre Recherche */}
-        <form className="bg-white rounded-md shadow p-4 mb-8 flex flex-wrap gap-4 justify-between items-end border" onSubmit={e => e.preventDefault()}>
-          <div className="w-full md:w-auto flex-1">
-            <Label htmlFor="recherche-codeArticle">Code Article</Label>
+        {/* Barre de recherche */}
+        <form className="bg-white rounded shadow p-4 mb-6 flex flex-wrap gap-4 border"
+              onSubmit={e => e.preventDefault()}>
+          <div className="w-full md:w-1/4 flex flex-col">
+            <Label htmlFor="rech-codeArticle">Code article</Label>
             <Input
-              id="recherche-codeArticle"
+              id="rech-codeArticle"
               value={codeArticle}
               onChange={e => setCodeArticle(e.target.value)}
               placeholder="Entrer le code article"
@@ -75,10 +133,10 @@ const RelevesPage = () => {
               autoComplete="off"
             />
           </div>
-          <div className="w-full md:w-auto flex-1">
-            <Label htmlFor="recherche-numeroLigne">Numéro Ligne</Label>
+          <div className="w-full md:w-1/4 flex flex-col">
+            <Label htmlFor="rech-numeroLigne">Numéro ligne</Label>
             <Input
-              id="recherche-numeroLigne"
+              id="rech-numeroLigne"
               value={numeroLigne}
               onChange={e => setNumeroLigne(e.target.value)}
               placeholder="Entrer le numéro de ligne"
@@ -88,21 +146,19 @@ const RelevesPage = () => {
           </div>
         </form>
 
-        {/* Grille Fiches Produits */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+        {/* Grille : 1 ligne de 5 max. */}
+        <div className="flex flex-wrap gap-6 justify-center">
           {produitsAffiches.length === 0 ? (
-            <div className="col-span-full text-center py-8 text-[#888] text-lg">
+            <div className="w-full text-center py-8 text-[#888] text-lg">
               Aucun produit trouvé.
             </div>
           ) : (
             produitsAffiches.map((produit) => (
-              <ProduitFiche key={produit.id || Math.random()} produit={produit} />
+              <ProduitFicheGrille key={produit.id || Math.random()} produit={produit} />
             ))
           )}
         </div>
       </div>
     </PageLayout>
   );
-};
-
-export default RelevesPage;
+}
