@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   AccordionItem, AccordionTrigger, AccordionContent,
@@ -21,6 +20,10 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BlocConfiguration, ChampConfiguration } from "@/types";
+import BlocEditDialog from "./BlocEditDialog";
+import BlocOrderControls from "./BlocOrderControls";
+import BlocDeleteDialog from "./BlocDeleteDialog";
+import BlocLignesApplicablesInput from "./BlocLignesApplicablesInput";
 
 const blocSchema = z.object({
   nom: z.string().min(1, "Le nom du bloc est requis"),
@@ -53,43 +56,6 @@ const BlocAccordionItem: React.FC<BlocAccordionItemProps> = ({
   moveBloc, moveChamp,
   handleAddChamp, handleDeleteBloc, handleDeleteChamp
 }) => {
-  // Form for bloc edit dialog
-  const blocForm = useForm<z.infer<typeof blocSchema>>({
-    resolver: zodResolver(blocSchema),
-    defaultValues: {
-      nom: "",
-      nomTechnique: "",
-      lignesApplicables: "",
-    }
-  });
-
-  React.useEffect(() => {
-    if (editingBloc && editingBloc.id === bloc.id) {
-      blocForm.reset({
-        nom: editingBloc.nom,
-        nomTechnique: editingBloc.nomTechnique || editingBloc.id, // Utiliser nomTechnique s'il existe, sinon id
-        lignesApplicables: editingBloc.lignesApplicables.join(", "),
-      });
-    }
-  }, [editingBloc, bloc, blocForm]);
-
-  const onSubmitBlocEdit = (values: z.infer<typeof blocSchema>) => {
-    if (!editingBloc) return;
-    const lignesApplicables = values.lignesApplicables
-      .split(",")
-      .map(line => line.trim())
-      .filter(line => line);
-    
-    // Mise à jour du nom et des lignes applicables
-    handleBlocChange(editingBloc.id, "nom", values.nom);
-    handleBlocChange(editingBloc.id, "lignesApplicables", lignesApplicables);
-    
-    // Mise à jour du nom technique en tant que propriété distincte, pas comme id
-    handleBlocChange(editingBloc.id, "nomTechnique", values.nomTechnique);
-    
-    setEditingBloc(null);
-  };
-
   return (
     <AccordionItem value={bloc.id} className="border border-noir-200 rounded-md overflow-hidden">
       <AccordionTrigger className="px-4 py-2 bg-noir-100 hover:bg-noir-200 transition-colors">
@@ -112,153 +78,33 @@ const BlocAccordionItem: React.FC<BlocAccordionItemProps> = ({
               <Label htmlFor={`bloc-${bloc.id}-ordre`} className="field-label">
                 Ordre d'affichage
               </Label>
-              <div className="flex gap-2">
-                <Input
-                  id={`bloc-${bloc.id}-ordre`}
-                  type="number"
-                  value={bloc.ordre}
-                  onChange={(e) =>
-                    handleBlocChange(bloc.id, "ordre", parseInt(e.target.value))
-                  }
-                  className="border-noir-300 w-24"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => moveBloc(bloc.id, "up")}
-                  disabled={bloc.ordre <= 1}
-                >
-                  ▲
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => moveBloc(bloc.id, "down")}
-                  disabled={bloc.ordre >= allBlocsCount}
-                >
-                  ▼
-                </Button>
-              </div>
+              <BlocOrderControls
+                blocId={bloc.id}
+                ordre={bloc.ordre}
+                allBlocsCount={allBlocsCount}
+                handleBlocChange={handleBlocChange}
+                moveBloc={moveBloc}
+              />
             </div>
             <div>
-              <Label htmlFor={`bloc-${bloc.id}-lignes`} className="field-label">
-                Lignes applicables
-              </Label>
-              <Input
-                id={`bloc-${bloc.id}-lignes`}
-                value={bloc.lignesApplicables.join(", ")}
-                onChange={(e) =>
-                  handleLignesApplicablesChange(bloc.id, null, e.target.value)
-                }
-                placeholder="Exemple: 1, 2, * (pour toutes)"
-                className="border-noir-300"
+              <BlocLignesApplicablesInput
+                blocId={bloc.id}
+                lignesApplicables={bloc.lignesApplicables}
+                handleLignesApplicablesChange={handleLignesApplicablesChange}
               />
-              <p className="text-xs text-noir-600 mt-1">
-                Séparez les numéros par des virgules. Utilisez * pour toutes les lignes.
-              </p>
             </div>
           </div>
           <div className="flex justify-end gap-2 mt-2">
-            {/* Boutons d'édition et de suppression de bloc */}
-            <Dialog open={editingBloc?.id === bloc.id} onOpenChange={(open) => !open && setEditingBloc(null)}>
-              <DialogTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setEditingBloc(bloc)}
-                >
-                  <Pencil className="h-4 w-4 mr-1" /> Modifier
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Modifier le bloc</DialogTitle>
-                  <DialogDescription>
-                    Modifiez les propriétés du bloc ci-dessous.
-                  </DialogDescription>
-                </DialogHeader>
-                <Form {...blocForm}>
-                  <form onSubmit={blocForm.handleSubmit(onSubmitBlocEdit)} className="space-y-4">
-                    <FormField
-                      control={blocForm.control}
-                      name="nom"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Nom du bloc</FormLabel>
-                          <FormControl>
-                            <Input {...field} placeholder="Ex: Article, Laminage..." />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={blocForm.control}
-                      name="nomTechnique"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Identifiant technique</FormLabel>
-                          <FormControl>
-                            <Input {...field} placeholder="Ex: article, laminage..." />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={blocForm.control}
-                      name="lignesApplicables"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Lignes applicables</FormLabel>
-                          <FormControl>
-                            <Input {...field} placeholder="Ex: 1, 2, * (pour toutes)" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <DialogFooter>
-                      <DialogClose asChild>
-                        <Button type="button" variant="outline">Annuler</Button>
-                      </DialogClose>
-                      <Button type="submit">Enregistrer</Button>
-                    </DialogFooter>
-                  </form>
-                </Form>
-              </DialogContent>
-            </Dialog>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className="border-destructive text-destructive hover:bg-destructive/10"
-                >
-                  <Trash2 className="h-4 w-4 mr-1" /> Supprimer
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Supprimer le bloc</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Êtes-vous sûr de vouloir supprimer le bloc "{bloc.nom}" ?
-                    Cette action supprimera également tous les champs associés et ne peut pas être annulée.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Annuler</AlertDialogCancel>
-                  <AlertDialogAction 
-                    onClick={() => handleDeleteBloc(bloc.id)}
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  >
-                    Supprimer
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            <BlocEditDialog
+              bloc={bloc}
+              editingBloc={editingBloc}
+              setEditingBloc={setEditingBloc}
+              handleBlocChange={handleBlocChange}
+            />
+            <BlocDeleteDialog
+              blocNom={bloc.nom}
+              onDelete={() => handleDeleteBloc(bloc.id)}
+            />
           </div>
           <div className="mt-6">
             <ChampTable 
