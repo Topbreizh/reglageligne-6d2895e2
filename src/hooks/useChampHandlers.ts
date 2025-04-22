@@ -36,7 +36,13 @@ export function deleteChamp(blocs: BlocConfiguration[], blocId: string, champId:
 }
 
 // Handles changing a champ field
-export function champChange(blocs: BlocConfiguration[], blocId: string, champId: string, field: keyof ChampConfiguration, value: any) {
+export function champChange(
+  blocs: BlocConfiguration[], 
+  blocId: string, 
+  champId: string, 
+  field: keyof ChampConfiguration, 
+  value: any
+) {
   console.log(`champChange: Changing champ ${champId} in bloc ${blocId}, field ${String(field)} to:`, value);
   
   const updatedBlocs = blocs.map((bloc) => {
@@ -47,10 +53,12 @@ export function champChange(blocs: BlocConfiguration[], blocId: string, champId:
         champs: bloc.champs.map((champ) => {
           if (champ.id === champId) {
             console.log(`Found champ to update:`, champ.nom);
-            const updatedChamp = { ...champ };
-            updatedChamp[field] = value;
+            // Create a new champ object with the updated field
+            const updatedChamp = { ...champ } as Record<string, any>;
+            // Use type assertion to safely assign the value
+            updatedChamp[field as string] = value;
             console.log(`Updated champ:`, updatedChamp);
-            return updatedChamp;
+            return updatedChamp as ChampConfiguration;
           }
           return champ;
         }),
