@@ -37,9 +37,16 @@ const ChampTableBody: React.FC<ChampTableBodyProps> = ({
         onEdit={() => setEditingChamp({ champ, blocId })}
         onCloseEdit={() => setEditingChamp(null)}
         onEditSave={(values) => {
-          const lignes = values.lignesApplicables.split(",").map((v) => v.trim()).filter(Boolean);
+          console.log("Saving champ edit with values:", values);
+          // Apply each field individually to ensure all are updated
           handleChampChange(blocId, champ.id, "nom", values.nom);
           handleChampChange(blocId, champ.id, "nomTechnique", values.nomTechnique);
+          
+          // Handle lignes applicables
+          const lignes = values.lignesApplicables
+            .split(",")
+            .map((v) => v.trim())
+            .filter(Boolean);
           handleChampChange(blocId, champ.id, "lignesApplicables", lignes);
         }}
         onDelete={() => handleDeleteChamp(blocId, champ.id)}

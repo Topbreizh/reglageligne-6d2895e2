@@ -36,6 +36,7 @@ export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onCon
 
   // Bloc-level change
   const handleBlocChange = (id: string, field: keyof BlocConfiguration, value: any) => {
+    console.log(`handleBlocChange: Updating bloc ${id}, field ${String(field)} to:`, value);
     const updatedBlocs = blocChange(blocs, id, field, value);
     setBlocs(updatedBlocs);
     if (onConfigurationChange) onConfigurationChange(updatedBlocs);
@@ -48,7 +49,9 @@ export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onCon
     field: keyof ChampConfiguration,
     value: any
   ) => {
+    console.log(`handleChampChange: Updating champ ${champId} in bloc ${blocId}, field ${String(field)} to:`, value);
     const updatedBlocs = champChange(blocs, blocId, champId, field, value);
+    console.log("Updated blocs after champ change:", updatedBlocs);
     setBlocs(updatedBlocs);
     if (onConfigurationChange) onConfigurationChange(updatedBlocs);
   };
@@ -59,6 +62,7 @@ export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onCon
     champId: string | null,
     value: string
   ) => {
+    console.log(`handleLignesApplicablesChange: Updating ${champId ? 'champ '+champId : 'bloc'} in bloc ${blocId} to:`, value);
     let updatedBlocs = blocs;
     if (champId) {
       updatedBlocs = champLignesApplicables(blocs, blocId, champId, value);

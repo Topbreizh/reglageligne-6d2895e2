@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogClose,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,21 +40,21 @@ export const ChampEditDialog: React.FC<ChampEditDialogProps> = ({
     }
   });
 
+  // This useEffect ensures the form is reset with the current champ values when the dialog opens
   React.useEffect(() => {
-    champForm.reset({
-      nom: champ.nom,
-      nomTechnique: champ.nomTechnique,
-      lignesApplicables: champ.lignesApplicables.join(", "),
-    });
-  }, [champ, champForm]);
+    if (open) {
+      console.log("Resetting form with champ values:", champ);
+      champForm.reset({
+        nom: champ.nom,
+        nomTechnique: champ.nomTechnique,
+        lignesApplicables: champ.lignesApplicables.join(", "),
+      });
+    }
+  }, [champ, champForm, open]);
 
   const onSubmit = (values: ChampFormValues) => {
-    // Make sure to pass all required properties
-    onSave({
-      nom: values.nom,
-      nomTechnique: values.nomTechnique,
-      lignesApplicables: values.lignesApplicables
-    });
+    console.log("Submitting form with values:", values);
+    onSave(values);
     onClose();
   };
 
