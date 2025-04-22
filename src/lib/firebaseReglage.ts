@@ -75,8 +75,17 @@ export async function getReglage(
     const snap = await getDoc(ref);
     
     if (snap.exists()) {
-      console.log(`Firebase: getReglage - Données trouvées pour ${id}`, snap.data());
-      return snap.data() as ReglageFirebase;
+      const data = snap.data();
+      console.log(`Firebase: getReglage - Données trouvées pour ${id}`, data);
+      
+      // Vérifier spécifiquement les champs du bloc calcul de pâte
+      console.log("Données du bloc calcul de pâte dans Firebase:", {
+        poidsPate: data.poidsPate,
+        poidsArticle: data.poidsArticle,
+        quantitePate: data.quantitePate
+      });
+      
+      return data as ReglageFirebase;
     }
     
     console.log(`Firebase: getReglage - Aucune donnée trouvée pour ${id}`);
@@ -119,6 +128,13 @@ export async function sauvegarderProduitComplet(produit: Record<string, string>)
     const id = `${produit.codeArticle}_${produit.numeroLigne}`;
     console.log(`Firebase: sauvegarderProduitComplet - Enregistrement complet pour ${id}`);
     console.log("Données à enregistrer:", produit);
+    
+    // Vérifier spécifiquement les champs du bloc calcul de pâte
+    console.log("Données du bloc calcul de pâte à enregistrer:", {
+      poidsPate: produit.poidsPate,
+      poidsArticle: produit.poidsArticle,
+      quantitePate: produit.quantitePate
+    });
     
     const ref = doc(db, REGLES_COLLECTION, id);
     await setDoc(ref, produit, { merge: true });
@@ -189,10 +205,18 @@ export async function getAllProduits(): Promise<Produit[]> {
     const produits: Produit[] = [];
     snapshot.forEach(docSnap => {
       const data = docSnap.data();
-      produits.push({
+      
+      // Assurez-vous que tous les champs sont définis, y compris ceux du bloc calcul de pâte
+      const produit: Produit = {
         ...data,
         id: docSnap.id,
-      } as Produit);
+        // S'assurer que ces champs sont toujours définis
+        poidsPate: data.poidsPate || "",
+        poidsArticle: data.poidsArticle || "",
+        quantitePate: data.quantitePate || ""
+      };
+      
+      produits.push(produit as Produit);
     });
     return produits;
   } catch (error) {

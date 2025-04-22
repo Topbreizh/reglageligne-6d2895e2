@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Produit, BlocConfiguration } from "@/types";
 import { blocsConfiguration as defaultBlocsConfig } from "@/data/blocConfig";
@@ -107,6 +108,12 @@ const ProduitForm = ({ produit, onSubmit, mode }: ProduitFormProps) => {
 
   useEffect(() => {
     if (produit) {
+      console.log("ProduitForm: Mise à jour des données avec le produit reçu:", produit);
+      console.log("Bloc Calcul de pâte dans produit:", {
+        poidsPate: produit.poidsPate,
+        poidsArticle: produit.poidsArticle,
+        quantitePate: produit.quantitePate
+      });
       setFormData(produit);
     }
   }, [produit]);
@@ -128,6 +135,13 @@ const ProduitForm = ({ produit, onSubmit, mode }: ProduitFormProps) => {
       return;
     }
 
+    console.log("ProduitForm: Soumission du formulaire avec données:", formData);
+    console.log("Bloc Calcul de pâte dans formData:", {
+      poidsPate: formData.poidsPate,
+      poidsArticle: formData.poidsArticle,
+      quantitePate: formData.quantitePate
+    });
+    
     onSubmit(formData);
   };
 
@@ -161,6 +175,16 @@ const ProduitForm = ({ produit, onSubmit, mode }: ProduitFormProps) => {
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-jaune-300"></div>
       </div>
     );
+  }
+
+  // Log des blocs et champs visibles pour débogage
+  const blocCalculPate = blocsConfig.find(b => b.id === "calculPate");
+  console.log("Bloc Calcul de pâte:", blocCalculPate);
+  console.log("Le bloc Calcul de pâte est-il visible?", estBlocVisible("calculPate"));
+  if (blocCalculPate) {
+    blocCalculPate.champs.forEach(champ => {
+      console.log(`Champ ${champ.nom} (${champ.nomTechnique}) est-il visible?`, estChampVisible("calculPate", champ.id));
+    });
   }
 
   const blocsTries = [...blocsConfig].sort((a, b) => a.ordre - b.ordre);

@@ -20,6 +20,9 @@ const FormFieldRenderer = ({ champ, value, onChange }: FormFieldRendererProps) =
     champ.nomTechnique === "designation" ||
     champ.nomTechnique === "commentaire";
 
+  // Ajouter des logs pour déboguer les valeurs des champs
+  console.log(`Rendu du champ ${champ.nom} (${champ.nomTechnique}) avec valeur:`, value);
+
   return (
     <div className={isFullWidth ? "md:col-span-3" : ""}>
       <Label htmlFor={champ.nomTechnique} className="field-label">
