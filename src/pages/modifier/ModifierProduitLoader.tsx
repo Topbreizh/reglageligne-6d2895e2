@@ -8,7 +8,6 @@ import { db } from "@/lib/firebase";
 import ProduitLoadingSkeleton from "./ProduitLoadingSkeleton";
 import ProduitNotFound from "./ProduitNotFound";
 import ProduitForm from "@/components/ProduitForm";
-import PageLayout from "@/components/layout/PageLayout";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { sauvegarderProduitComplet } from "@/lib/firebaseReglage";
@@ -37,6 +36,8 @@ const ModifierProduitLoader = ({ mode }: ModifierProduitLoaderProps) => {
 
         if (docSnap.exists()) {
           const data = docSnap.data();
+          console.log("Données brutes du Firebase pour le produit:", data);
+          
           // S'assurer que tous les noms de champs utilisent la bonne casse
           const produitData: Produit = {
             id: docSnap.id,
@@ -102,16 +103,15 @@ const ModifierProduitLoader = ({ mode }: ModifierProduitLoaderProps) => {
             commentaire: data.commentaire || "",
           };
           
-          console.log("Data loaded from Firebase:", {
-            calculPate: {
-              poidsPate: produitData.poidsPate,
-              poidsArticle: produitData.poidsArticle,
-              quantitePate: produitData.quantitePate,
-              poidPatequalistat: produitData.poidPatequalistat,
-              poidFourragequalistat: produitData.poidFourragequalistat,
-              poidMarquantqualistat: produitData.poidMarquantqualistat,
-              nbrDeBandes: produitData.nbrDeBandes
-            }
+          console.log("Données mappées pour le produit:", produitData);
+          console.log("Vérification spécifique du bloc calcul de pâte:", {
+            poidsPate: produitData.poidsPate,
+            poidsArticle: produitData.poidsArticle,
+            quantitePate: produitData.quantitePate,
+            poidPatequalistat: produitData.poidPatequalistat,
+            poidFourragequalistat: produitData.poidFourragequalistat,
+            poidMarquantqualistat: produitData.poidMarquantqualistat,
+            nbrDeBandes: produitData.nbrDeBandes
           });
           
           setProduit(produitData);
@@ -148,6 +148,19 @@ const ModifierProduitLoader = ({ mode }: ModifierProduitLoaderProps) => {
           produitAEnregistrer[key] = String(value);
         }
       });
+      
+      console.log("Données à envoyer pour sauvegarde:", {
+        calculPate: {
+          poidsPate: produitAEnregistrer.poidsPate,
+          poidsArticle: produitAEnregistrer.poidsArticle,
+          quantitePate: produitAEnregistrer.quantitePate,
+          poidPatequalistat: produitAEnregistrer.poidPatequalistat,
+          poidFourragequalistat: produitAEnregistrer.poidFourragequalistat,
+          poidMarquantqualistat: produitAEnregistrer.poidMarquantqualistat,
+          nbrDeBandes: produitAEnregistrer.nbrDeBandes
+        }
+      });
+      
       await sauvegarderProduitComplet(produitAEnregistrer);
 
       toast({

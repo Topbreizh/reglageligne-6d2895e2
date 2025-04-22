@@ -16,9 +16,12 @@ const ProduitFormSection = ({
   formData,
   onChange,
 }: ProduitFormSectionProps) => {
-  // Ajouter des logs pour déboguer
+  // Logs détaillés pour comprendre les données reçues
+  console.log(`Rendu de la section ${bloc.nom} avec données:`, formData);
+  
+  // Log spécifique pour le bloc calcul de pâte
   if (bloc.id === "calculPate") {
-    console.log("Rendu de la section Calcul de pâte avec données:", {
+    console.log("Données dans le bloc Calcul de pâte:", {
       poidsPate: formData.poidsPate,
       poidsArticle: formData.poidsArticle,
       quantitePate: formData.quantitePate,
@@ -27,7 +30,11 @@ const ProduitFormSection = ({
       poidMarquantqualistat: formData.poidMarquantqualistat,
       nbrDeBandes: formData.nbrDeBandes
     });
-    console.log("Champs visibles dans le bloc Calcul de pâte:", champsVisibles);
+    
+    // Log des noms techniques des champs visibles pour vérifier
+    console.log("Champs visibles dans le bloc Calcul de pâte:", 
+      champsVisibles.map(c => ({ id: c.id, nom: c.nom, nomTechnique: c.nomTechnique }))
+    );
   }
 
   return (
@@ -41,6 +48,9 @@ const ProduitFormSection = ({
         {champsVisibles.map((champ) => {
           // S'assurer que le nom technique existe dans le formData, sinon utiliser ""
           const fieldValue = formData[champ.nomTechnique as keyof Produit] as string || "";
+          
+          // Log pour chaque champ rendu
+          console.log(`Rendu du champ ${champ.nom} (${champ.nomTechnique}) avec valeur:`, fieldValue);
           
           return (
             <FormFieldRenderer

@@ -41,6 +41,8 @@ export async function getAllProduits(): Promise<Produit[]> {
     const produits: Produit[] = [];
     snapshot.forEach(docSnap => {
       const data = docSnap.data();
+      console.log("Données brutes du produit:", data);
+      
       // Assurez-vous d'utiliser la bonne casse pour les propriétés de l'objet
       const produit: Produit = {
         id: docSnap.id,
@@ -104,6 +106,16 @@ export async function getAllProduits(): Promise<Produit[]> {
         ouvertureMP: data.ouvertureMP || "",
         commentaire: data.commentaire || ""
       };
+      
+      // Log pour vérifier les champs spécifiques qui nous intéressent
+      console.log("Données du produit après mappage (bloc calcul pâte):", {
+        id: produit.id,
+        poidPatequalistat: produit.poidPatequalistat,
+        poidFourragequalistat: produit.poidFourragequalistat,
+        poidMarquantqualistat: produit.poidMarquantqualistat,
+        nbrDeBandes: produit.nbrDeBandes
+      });
+      
       produits.push(produit);
     });
     console.log(`Firebase: getAllProduits - ${produits.length} produits récupérés`);
