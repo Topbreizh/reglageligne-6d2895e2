@@ -11,6 +11,10 @@ export const produitsInitiaux: Produit[] = [
     poidsPate: "250g",
     poidsArticle: "85g",
     quantitePate: "100",
+    poidPatequalistat: "240g",
+    poidFourragequalistat: "30g",
+    poidMarquantqualistat: "15g",
+    nbrDeBandes: "3",
     
     programme: "P25",
     facteur: "1.5",
@@ -77,6 +81,10 @@ export const produitsInitiaux: Produit[] = [
     poidsPate: "200g",
     poidsArticle: "70g",
     quantitePate: "90",
+    poidPatequalistat: "195g",
+    poidFourragequalistat: "25g",
+    poidMarquantqualistat: "12g",
+    nbrDeBandes: "2",
     
     programme: "P30",
     facteur: "1.2",
@@ -143,6 +151,10 @@ export const produitsInitiaux: Produit[] = [
     poidsPate: "220g",
     poidsArticle: "95g",
     quantitePate: "110",
+    poidPatequalistat: "215g",
+    poidFourragequalistat: "35g",
+    poidMarquantqualistat: "18g",
+    nbrDeBandes: "3",
     
     programme: "P22",
     facteur: "1.4",
