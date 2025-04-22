@@ -59,8 +59,11 @@ const MappingTable = ({ headers, mappings, onChange }: MappingTableProps) => (
                       <SelectContent className="max-h-[400px]">
                         <SelectItem value="none">Ne pas importer</SelectItem>
                         {headers.map(header => (
-                          <SelectItem value={header} key={header}>
-                            {header}
+                          <SelectItem 
+                            key={header} 
+                            value={header || `header-${Math.random().toString(36).substring(2)}`}
+                          >
+                            {header || "Colonne sans titre"}
                           </SelectItem>
                         ))}
                       </SelectContent>

@@ -59,7 +59,12 @@ export const useExcelImport = () => {
       const { headers: parsedHeaders, data } = await parseExcelFile(selectedFile);
       console.log("Fichier analysé avec succès");
       
-      if (parsedHeaders.length === 0) {
+      // Ensure no empty headers (replace with generated titles if needed)
+      const cleanedHeaders = parsedHeaders.map(header => 
+        header.trim() || `Colonne ${parsedHeaders.indexOf(header) + 1}`
+      );
+      
+      if (cleanedHeaders.length === 0) {
         setErrorMessage("Aucune colonne détectée dans le fichier");
         toast({
           title: "Fichier invalide",
@@ -81,11 +86,11 @@ export const useExcelImport = () => {
         return;
       }
       
-      console.log("Données récupérées:", { headers: parsedHeaders.length, data: data.length });
-      setHeaders(parsedHeaders);
+      console.log("Données récupérées:", { headers: cleanedHeaders.length, data: data.length });
+      setHeaders(cleanedHeaders);
       setPreviewData(data);
       
-      const initialMappings = generateInitialMappings(parsedHeaders);
+      const initialMappings = generateInitialMappings(cleanedHeaders);
       setMappings(initialMappings);
       setStep(2);
     } catch (error) {
