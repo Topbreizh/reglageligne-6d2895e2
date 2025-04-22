@@ -78,36 +78,42 @@ const MappingTable = ({ headers, mappings, onChange }: MappingTableProps) => {
                 const currentValue = getFieldValue(champ.nomTechnique);
                 
                 return (
-                  <TableRow key={champ.id + "-row"}>
+                  <TableRow key={`row-${champ.id}-${champ.nomTechnique}`}>
                     <TableCell className="whitespace-nowrap font-medium">{champ.blocNom}</TableCell>
                     <TableCell className="whitespace-nowrap">
                       <div className="font-semibold">{champ.nom}</div>
                     </TableCell>
                     <TableCell>
-                      <Select
-                        value={currentValue}
-                        onValueChange={(value) => {
-                          console.log(`Mapping pour ${champ.nomTechnique} vers ${value}`);
-                          onChange(champ.nomTechnique, value);
-                        }}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Sélectionner une colonne" />
-                        </SelectTrigger>
-                        <SelectContent className="max-h-[400px] overflow-y-auto bg-white z-50">
-                          <SelectItem value="none">Ne pas importer</SelectItem>
-                          {headers.map((header, index) => (
-                            header ? (
-                              <SelectItem 
-                                key={`${champ.id}-${header}-${index}`}
-                                value={header}
-                              >
-                                {header}
-                              </SelectItem>
-                            ) : null
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <div className="w-full relative" id={`select-container-${champ.nomTechnique}`}>
+                        <Select
+                          key={`select-${champ.nomTechnique}`}
+                          value={currentValue}
+                          onValueChange={(value) => {
+                            console.log(`Mapping pour ${champ.nomTechnique} vers ${value}`);
+                            onChange(champ.nomTechnique, value);
+                          }}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Sélectionner une colonne" />
+                          </SelectTrigger>
+                          <SelectContent 
+                            className="max-h-[400px] overflow-y-auto bg-white z-[100]"
+                            position="popper"
+                          >
+                            <SelectItem value="none">Ne pas importer</SelectItem>
+                            {headers.map((header, index) => (
+                              header ? (
+                                <SelectItem 
+                                  key={`item-${champ.nomTechnique}-${header}-${index}`}
+                                  value={header}
+                                >
+                                  {header}
+                                </SelectItem>
+                              ) : null
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </TableCell>
                   </TableRow>
                 );
