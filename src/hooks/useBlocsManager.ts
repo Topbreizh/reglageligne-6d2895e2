@@ -22,6 +22,7 @@ export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onCon
   }, [initialConfiguration]);
 
   const handleBlocChange = (id: string, field: keyof BlocConfiguration, value: any) => {
+    console.log(`handleBlocChange: ${id}, field: ${field}, value:`, value);
     const updatedBlocs = blocs.map((bloc) =>
       bloc.id === id ? { ...bloc, [field]: value } : bloc
     );
@@ -35,6 +36,7 @@ export const useBlocsManager = (initialConfiguration: BlocConfiguration[], onCon
     field: keyof ChampConfiguration,
     value: any
   ) => {
+    console.log(`handleChampChange: blocId=${blocId}, champId=${champId}, field=${field}, value:`, value);
     const updatedBlocs = blocs.map((bloc) => {
       if (bloc.id === blocId) {
         return {

@@ -51,6 +51,7 @@ const ChampTable: React.FC<ChampTableProps> = ({
     }
   });
 
+  // Reset form when editing champ changes
   React.useEffect(() => {
     if (editingChamp && editingChamp.blocId === bloc.id) {
       champForm.reset({
@@ -61,15 +62,20 @@ const ChampTable: React.FC<ChampTableProps> = ({
     }
   }, [editingChamp, bloc.id, champForm]);
 
+  // Submit handler for champ edit
   const onSubmitChampEdit = (values: z.infer<typeof champSchema>) => {
     if (!editingChamp) return;
+    
     const lignesApplicables = values.lignesApplicables
       .split(",")
       .map(line => line.trim())
       .filter(line => line);
+    
+    // Update all fields separately
     handleChampChange(bloc.id, editingChamp.champ.id, "nom", values.nom);
     handleChampChange(bloc.id, editingChamp.champ.id, "nomTechnique", values.nomTechnique);
     handleChampChange(bloc.id, editingChamp.champ.id, "lignesApplicables", lignesApplicables);
+    
     setEditingChamp(null);
   };
 
