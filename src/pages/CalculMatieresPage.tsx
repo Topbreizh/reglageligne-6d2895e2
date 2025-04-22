@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import PageLayout from "@/components/layout/PageLayout";
 import { ReglageFirebase, getReglage } from "@/lib/firebaseReglage";
+import { toast } from "@/components/ui/use-toast";
 
 function calculQuantite(
   poids: number,
@@ -120,7 +121,7 @@ const BlocCalculMatieres = ({
           )}
         </form>
         <div className="text-right text-lg font-semibold text-noir-700">
-          Quantité à l’heure : {quantite} kg
+          Quantité à l'heure : {quantite} kg
         </div>
       </CardContent>
     </Card>
@@ -144,9 +145,31 @@ const RechercheReglageBloc = ({
     e.preventDefault();
     if (!codeArticle || !numeroLigne) return;
     setIsLoading(true);
-    const reglage = await getReglage(codeArticle.trim(), numeroLigne.trim());
-    onResult(reglage);
-    setIsLoading(false);
+    try {
+      const reglage = await getReglage(codeArticle.trim(), numeroLigne.trim());
+      onResult(reglage);
+      if (reglage) {
+        toast({
+          title: "Données récupérées",
+          description: `Données pour l'article ${codeArticle} (ligne ${numeroLigne}) chargées.`,
+        });
+      } else {
+        toast({
+          title: "Aucune donnée trouvée",
+          description: `Aucune donnée trouvée pour l'article ${codeArticle} (ligne ${numeroLigne}).`,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Erreur lors de la recherche:", error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la recherche.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -156,7 +179,7 @@ const RechercheReglageBloc = ({
         <Input
           value={codeArticle}
           onChange={(e) => setCodeArticle(e.target.value)}
-          placeholder="ex : 123456"
+          placeholder="ex : 123456"
         />
       </div>
       <div>
@@ -164,7 +187,7 @@ const RechercheReglageBloc = ({
         <Input
           value={numeroLigne}
           onChange={(e) => setNumeroLigne(e.target.value)}
-          placeholder="ex : 1"
+          placeholder="ex : 1"
         />
       </div>
       <button
@@ -190,22 +213,43 @@ const CalculMatieresPage = () => {
   // Lors d'une recherche, remplir les états selon la base (si trouvé)
   const handleReglageResult = (result: ReglageFirebase | null) => {
     if (result) {
+      console.log("Données brutes Firebase:", result);
+      
+      // Récupérer le nombre de bandes - vérifier plusieurs champs possibles
+      const nbBandes = result.nbrDeBandes || result.nbrdebandes || "";
+      console.log("Nombre de bandes récupéré:", nbBandes);
+      
+      // Récupérer les poids - vérifier plusieurs champs possibles
+      const poidsPate = result.poidsPate || result.poidpatequalistat || "";
+      const poidsFourrage = result.poidsFourrage || result.poidfourragequalistat || "";
+      const poidsMarquant = result.poidsMarquant || result.poidmarquantqualistat || "";
+      
+      console.log("Poids récupérés:", {
+        pate: poidsPate,
+        fourrage: poidsFourrage,
+        marquant: poidsMarquant
+      });
+      
+      // Récupérer la cadence et la rognure
+      const cadence = result.cadence || "";
+      const rognure = result.rognure || "";
+      
       setFields({
         pate: {
-          poids: result.poidsPate ?? result.poidPatequalistat ?? "",
-          nbBandes: result.nbrDeBandes ?? "",
-          cadence: result.cadence ?? "",
-          rognure: result.rognure ?? "",
+          poids: poidsPate,
+          nbBandes: nbBandes,
+          cadence: cadence,
+          rognure: rognure,
         },
         fourrage: {
-          poids: result.poidsFourrage ?? result.poidFourragequalistat ?? "",
-          nbBandes: result.nbrDeBandes ?? "",
-          cadence: result.cadence ?? "",
+          poids: poidsFourrage,
+          nbBandes: nbBandes,
+          cadence: cadence,
         },
         marquant: {
-          poids: result.poidsMarquant ?? result.poidMarquantqualistat ?? "",
-          nbBandes: result.nbrDeBandes ?? "",
-          cadence: result.cadence ?? "",
+          poids: poidsMarquant,
+          nbBandes: nbBandes,
+          cadence: cadence,
         },
       });
     }
