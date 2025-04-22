@@ -29,7 +29,6 @@ const ProduitFormSection = ({
       poidFourragequalistat: formData.poidFourragequalistat,
       poidMarquantqualistat: formData.poidMarquantqualistat,
       nbrDeBandes: formData.nbrDeBandes,
-      // Check if rognure exists in the data
       rognure: formData.rognure
     });
     
@@ -50,15 +49,26 @@ const ProduitFormSection = ({
         {champsVisibles.map((champ) => {
           // Make sure to handle potential case-sensitivity issues in field names
           const fieldName = champ.nomTechnique;
-          const fieldValue = formData[fieldName as keyof Produit] as string || "";
+          
+          // Fix case sensitivity issues by standardizing field names
+          let standardizedFieldName = fieldName;
+          if (fieldName.toLowerCase() === "poidpatequalistat") standardizedFieldName = "poidPatequalistat";
+          if (fieldName.toLowerCase() === "poidfourragequalistat") standardizedFieldName = "poidFourragequalistat";
+          if (fieldName.toLowerCase() === "poidmarquantqualistat") standardizedFieldName = "poidMarquantqualistat";
+          if (fieldName.toLowerCase() === "nbrdebandes") standardizedFieldName = "nbrDeBandes";
+          
+          const fieldValue = formData[standardizedFieldName as keyof Produit] as string || "";
           
           // Log each field being rendered for debugging
-          console.log(`Field in ${bloc.nom}: ${champ.nom} (${fieldName}) => value:`, fieldValue);
+          console.log(`Field in ${bloc.nom}: ${champ.nom} (${fieldName} -> ${standardizedFieldName}) => value:`, fieldValue);
           
           return (
             <FormFieldRenderer
               key={champ.id}
-              champ={champ}
+              champ={{
+                ...champ,
+                nomTechnique: standardizedFieldName // Use standardized field name
+              }}
               value={fieldValue}
               onChange={onChange}
             />

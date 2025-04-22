@@ -23,7 +23,7 @@ const FormFieldRenderer = ({ champ, value, onChange }: FormFieldRendererProps) =
   // Fix the issue with undefined values and normalize case for nomTechnique
   const displayValue = value === undefined ? "" : value;
   
-  // Debugging logs to identify field name mismatches
+  // Enhanced debugging logs to identify field name mismatches
   console.log(`FormFieldRenderer: Rendering field ${champ.nom} with nomTechnique: ${champ.nomTechnique}, value:`, displayValue);
 
   return (
