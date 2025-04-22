@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import PageLayout from "@/components/layout/PageLayout";
 import BlocsManager from "@/components/BlocsManager";
 import { BlocConfiguration } from "@/types";
-import { getBlocsConfiguration } from "@/lib/firebaseReglage";
+import { getBlocsConfiguration, sauvegarderBlocsConfiguration } from "@/lib/firebaseReglage";
 import { blocsConfiguration as defaultBlocsConfig } from "@/data/blocConfig";
 import { useToast } from "@/hooks/use-toast";
 
@@ -43,7 +43,28 @@ const GestionBlocsPage = () => {
 
   const handleConfigurationChange = (updatedBlocs: BlocConfiguration[]) => {
     console.log("Configuration mise à jour dans GestionBlocsPage:", updatedBlocs);
-    setConfiguration(updatedBlocs);
+    // Créer une copie profonde pour éviter tout problème de référence
+    setConfiguration(JSON.parse(JSON.stringify(updatedBlocs)));
+  };
+
+  const handleSaveConfiguration = async () => {
+    try {
+      setLoading(true);
+      await sauvegarderBlocsConfiguration(configuration);
+      toast({
+        title: "Configuration sauvegardée",
+        description: "Les modifications des blocs et champs ont été enregistrées.",
+      });
+    } catch (error) {
+      console.error("Erreur lors de la sauvegarde de la configuration:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Impossible de sauvegarder la configuration.",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

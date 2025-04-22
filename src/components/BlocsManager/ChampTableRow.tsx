@@ -56,6 +56,15 @@ export const ChampTableRow: React.FC<ChampTableRowProps> = ({
     // Propager immédiatement le changement au parent
     onLignesApplicablesChange(newValue);
   };
+
+  const handleEditSave = (values: { nom: string; nomTechnique: string; lignesApplicables: string }) => {
+    console.log("ChampTableRow: Saving edit with values:", values);
+    // Mise à jour explicite de chaque champ
+    onChange("nom", values.nom);
+    onChange("nomTechnique", values.nomTechnique);
+    onLignesApplicablesChange(values.lignesApplicables);
+    onEditSave(values);
+  };
   
   return (
     <TableRow>
@@ -128,7 +137,7 @@ export const ChampTableRow: React.FC<ChampTableRowProps> = ({
             champ={champ}
             blocId={blocId}
             onClose={onCloseEdit}
-            onSave={onEditSave}
+            onSave={handleEditSave}
           />
           <ChampDeleteDialog
             champ={champ}

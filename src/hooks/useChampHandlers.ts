@@ -45,7 +45,10 @@ export function champChange(
 ) {
   console.log(`champChange: Changing champ ${champId} in bloc ${blocId}, field ${String(field)} to:`, value);
   
-  const updatedBlocs = blocs.map((bloc) => {
+  // Créer une copie profonde des blocs pour éviter les problèmes de référence
+  const blocsDeepCopy = JSON.parse(JSON.stringify(blocs));
+  
+  const updatedBlocs = blocsDeepCopy.map((bloc: BlocConfiguration) => {
     if (bloc.id === blocId) {
       console.log(`Found bloc to update:`, bloc.nom);
       return {
@@ -53,12 +56,11 @@ export function champChange(
         champs: bloc.champs.map((champ) => {
           if (champ.id === champId) {
             console.log(`Found champ to update:`, champ.nom);
-            // Create a new champ object with the updated field
-            const updatedChamp = { ...champ } as Record<string, any>;
-            // Use type assertion to safely assign the value
-            updatedChamp[field as string] = value;
+            // Créer un nouveau champ avec le champ mis à jour
+            const updatedChamp = { ...champ };
+            updatedChamp[field] = value;
             console.log(`Updated champ:`, updatedChamp);
-            return updatedChamp as ChampConfiguration;
+            return updatedChamp;
           }
           return champ;
         }),
