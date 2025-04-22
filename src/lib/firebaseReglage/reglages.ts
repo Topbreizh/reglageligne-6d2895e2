@@ -1,4 +1,3 @@
-
 import { collection, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore";
 import { db } from "../firebase";
 import { BlocConfiguration, Produit } from "@/types";
@@ -98,5 +97,37 @@ export async function rechercheParCodeArticle(codeArticle: string): Promise<Regl
   } catch (error) {
     console.error("Firebase: Erreur lors de la recherche par codeArticle:", error);
     return [];
+  }
+}
+
+// Fonction pour sauvegarder un produit complet
+export async function sauvegarderProduitComplet(produit: Record<string, string>): Promise<boolean> {
+  try {
+    const { codeArticle, numeroLigne } = produit;
+    
+    if (!codeArticle || !numeroLigne) {
+      console.error("codeArticle et numeroLigne sont requis pour enregistrer un produit");
+      throw new Error("codeArticle et numeroLigne sont requis pour enregistrer un produit");
+    }
+    
+    const id = `${codeArticle}_${numeroLigne}`;
+    console.log(`Firebase: sauvegarderProduitComplet - Enregistrement du produit ${id}`);
+    
+    // S'assurer que les champs du bloc calculPate sont bien présents
+    console.log("Valeurs des champs calculPate avant enregistrement:", {
+      poidPatequalistat: produit.poidPatequalistat || "",
+      poidFourragequalistat: produit.poidFourragequalistat || "",
+      poidMarquantqualistat: produit.poidMarquantqualistat || "",
+      nbrDeBandes: produit.nbrDeBandes || ""
+    });
+    
+    const ref = doc(db, "reglages", id);
+    await setDoc(ref, produit, { merge: true });
+    
+    console.log(`Firebase: sauvegarderProduitComplet - Succès pour le produit ${id}`);
+    return true;
+  } catch (error) {
+    console.error("Firebase: Erreur lors de l'enregistrement du produit complet:", error);
+    throw error;
   }
 }

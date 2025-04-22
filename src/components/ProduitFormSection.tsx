@@ -38,14 +38,19 @@ const ProduitFormSection = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {champsVisibles.map((champ) => (
-          <FormFieldRenderer
-            key={champ.id}
-            champ={champ}
-            value={formData[champ.nomTechnique as keyof Produit] as string}
-            onChange={onChange}
-          />
-        ))}
+        {champsVisibles.map((champ) => {
+          // S'assurer que le nom technique existe dans le formData, sinon utiliser ""
+          const fieldValue = formData[champ.nomTechnique as keyof Produit] as string || "";
+          
+          return (
+            <FormFieldRenderer
+              key={champ.id}
+              champ={champ}
+              value={fieldValue}
+              onChange={onChange}
+            />
+          );
+        })}
       </CardContent>
     </Card>
   );

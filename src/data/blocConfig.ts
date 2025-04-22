@@ -22,7 +22,11 @@ export const blocsConfiguration: BlocConfiguration[] = [
     champs: [
       { id: "poidsPate", nom: "Poids pâte", nomTechnique: "poidsPate", ordre: 1, visible: true, lignesApplicables: ["*"] },
       { id: "poidsArticle", nom: "Poids article", nomTechnique: "poidsArticle", ordre: 2, visible: true, lignesApplicables: ["*"] },
-      { id: "quantitePate", nom: "Quantité pâte", nomTechnique: "quantitePate", ordre: 3, visible: true, lignesApplicables: ["*"] }
+      { id: "quantitePate", nom: "Quantité pâte", nomTechnique: "quantitePate", ordre: 3, visible: true, lignesApplicables: ["*"] },
+      { id: "poidPatequalistat", nom: "Poids pâte Qualistat", nomTechnique: "poidPatequalistat", ordre: 4, visible: true, lignesApplicables: ["*"] },
+      { id: "poidFourragequalistat", nom: "Poids fourrage qualistat", nomTechnique: "poidFourragequalistat", ordre: 5, visible: true, lignesApplicables: ["*"] },
+      { id: "poidMarquantqualistat", nom: "Poids marquant Qualistat", nomTechnique: "poidMarquantqualistat", ordre: 6, visible: true, lignesApplicables: ["*"] },
+      { id: "nbrDeBandes", nom: "Nombre de bandes", nomTechnique: "nbrDeBandes", ordre: 7, visible: true, lignesApplicables: ["*"] }
     ]
   },
   {

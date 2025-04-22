@@ -1,4 +1,3 @@
-
 export interface Produit {
   id?: string;
   // Bloc Article

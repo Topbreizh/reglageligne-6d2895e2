@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Produit } from "@/types";
@@ -44,6 +45,7 @@ const ModifierProduitLoader = ({ mode }: ModifierProduitLoaderProps) => {
             poidsPate: data.poidsPate || "",
             poidsArticle: data.poidsArticle || "",
             quantitePate: data.quantitePate || "",
+            // Correction des noms des champs pour être cohérent avec l'interface Produit
             poidPatequalistat: data.poidPatequalistat || "",
             poidFourragequalistat: data.poidFourragequalistat || "",
             poidMarquantqualistat: data.poidMarquantqualistat || "",

@@ -20,8 +20,11 @@ const FormFieldRenderer = ({ champ, value, onChange }: FormFieldRendererProps) =
     champ.nomTechnique === "designation" ||
     champ.nomTechnique === "commentaire";
 
-  // Ajouter des logs pour déboguer les valeurs des champs
-  console.log(`Rendu du champ ${champ.nom} (${champ.nomTechnique}) avec valeur:`, value);
+  // Corriger le problème de valeurs undefined en affichant une chaîne vide
+  const displayValue = value === undefined ? "" : value;
+  
+  // Ajouter des logs pour déboguer les valeurs des champs avec leurs noms techniques
+  console.log(`Rendu du champ ${champ.nom} (${champ.nomTechnique}) avec valeur:`, displayValue);
 
   return (
     <div className={isFullWidth ? "md:col-span-3" : ""}>
@@ -33,7 +36,7 @@ const FormFieldRenderer = ({ champ, value, onChange }: FormFieldRendererProps) =
         <Textarea
           id={champ.nomTechnique}
           name={champ.nomTechnique}
-          value={value || ""}
+          value={displayValue}
           onChange={onChange}
           className="min-h-20 border-noir-300"
           required={isRequiredField(champ.nomTechnique)}
@@ -42,7 +45,7 @@ const FormFieldRenderer = ({ champ, value, onChange }: FormFieldRendererProps) =
         <Input
           id={champ.nomTechnique}
           name={champ.nomTechnique}
-          value={value || ""}
+          value={displayValue}
           onChange={onChange}
           className="border-noir-300"
           required={isRequiredField(champ.nomTechnique)}
