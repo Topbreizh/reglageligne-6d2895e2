@@ -68,6 +68,10 @@ export interface Produit {
   sortieEtuve: string;
   ouvertureMP: string;
   commentaire: string;
+  
+  // Support pour des champs dynamiques supplémentaires
+  // Cela permet de récupérer des champs qui ne font pas partie des propriétés standards ci-dessus
+  [key: string]: string | undefined;
 }
 
 export interface BlocConfiguration {

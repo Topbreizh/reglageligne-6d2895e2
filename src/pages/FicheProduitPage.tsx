@@ -33,66 +33,20 @@ const FicheProduitPage = () => {
         
         if (docSnap.exists()) {
           const data = docSnap.data();
+          console.log("Données brutes du produit:", data);
           
-          // Conversion des données en objet Produit
-          const produitData: Produit = {
+          // Conversion en objet Produit avec support pour champs dynamiques
+          const produitData = {
             id: docSnap.id,
+            ...data,
+            // Propriétés requises avec valeurs par défaut (si absentes)
             codeArticle: data.codeArticle || "",
             numeroLigne: data.numeroLigne || "",
             designation: data.designation || "Sans designation",
-            programme: data.programme || "",
-            facteur: data.facteur || "",
-            regleLaminage: data.regleLaminage || "",
-            quick: data.quick || "",
-            calibreur1: data.calibreur1 || "",
-            calibreur2: data.calibreur2 || "",
-            calibreur3: data.calibreur3 || "",
-            laminoir: data.laminoir || "",
-            vitesseLaminage: data.vitesseLaminage || "",
-            farineurHaut1: data.farineurHaut1 || "",
-            farineurHaut2: data.farineurHaut2 || "",
-            farineurHaut3: data.farineurHaut3 || "",
-            farineurBas1: data.farineurBas1 || "",
-            farineurBas2: data.farineurBas2 || "",
-            farineurBas3: data.farineurBas3 || "",
-            queueDeCarpe: data.queueDeCarpe || "",
-            numeroDecoupe: data.numeroDecoupe || "",
-            buse: data.buse || "",
-            distributeurChocoRaisin: data.distributeurChocoRaisin || "",
-            humidificateur146: data.humidificateur146 || "",
-            vitesseDoreuse: data.vitesseDoreuse || "",
-            p1LongueurDecoupe: data.p1LongueurDecoupe || "",
-            p2Centrage: data.p2Centrage || "",
-            bielle: data.bielle || "",
-            lameRacleur: data.lameRacleur || "",
-            rademaker: data.rademaker || "",
-            aera: data.aera || "",
-            fritch: data.fritch || "",
-            retourneur: data.retourneur || "",
-            aligneur: data.aligneur || "",
-            humidificateur25: data.humidificateur25 || "",
-            pushPlaque: data.pushPlaque || "",
-            rouleauInferieur: data.rouleauInferieur || "",
-            rouleauSuperieur: data.rouleauSuperieur || "",
-            tapisFaconneuse: data.tapisFaconneuse || "",
-            reperePoignee: data.reperePoignee || "",
-            rouleauPression: data.rouleauPression || "",
-            tapisAvantEtuveSurgel: data.tapisAvantEtuveSurgel || "",
-            etuveSurgel: data.etuveSurgel || "",
-            cadence: data.cadence || "",
-            lamineur: data.lamineur || "",
-            surveillant: data.surveillant || "",
-            distributeurRaisinChoco: data.distributeurRaisinChoco || "",
-            pose: data.pose || "",
-            pliageTriage: data.pliageTriage || "",
-            topping: data.topping || "",
-            sortieEtuve: data.sortieEtuve || "",
-            ouvertureMP: data.ouvertureMP || "",
-            commentaire: data.commentaire || "",
           };
           
-          console.log("Produit récupéré depuis Firebase:", produitData);
-          setProduit(produitData);
+          console.log("Produit complet récupéré:", produitData);
+          setProduit(produitData as Produit);
         } else {
           console.log("Aucun produit trouvé avec l'ID:", id);
           toast({

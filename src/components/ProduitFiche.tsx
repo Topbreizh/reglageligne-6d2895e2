@@ -78,17 +78,36 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
   };
 
   const getChampValeur = (champTechnique: string) => {
+    // Log pour déboguer les valeurs manquantes
+    if (!produit[champTechnique as keyof Produit]) {
+      console.log(`Champ "${champTechnique}" non trouvé dans le produit:`, produit);
+    }
     return produit[champTechnique as keyof Produit] || "-";
   };
 
   const renderChamp = (blocId: string, champId: string) => {
     const bloc = blocsConfig.find(b => b.id === blocId);
-    if (!bloc) return null;
+    if (!bloc) {
+      console.log(`Bloc ${blocId} non trouvé dans la configuration`);
+      return null;
+    }
     
     const champ = bloc.champs.find(c => c.id === champId);
-    if (!champ) return null;
+    if (!champ) {
+      console.log(`Champ ${champId} non trouvé dans le bloc ${blocId}`);
+      return null;
+    }
     
-    if (!estChampVisible(blocId, champId)) return null;
+    if (!estChampVisible(blocId, champId)) {
+      console.log(`Champ ${champ.nom} (${champ.nomTechnique}) non visible pour ligne=${produit.numeroLigne}`);
+      return null;
+    }
+    
+    // Vérifier que le champ a un nomTechnique
+    if (!champ.nomTechnique) {
+      console.error(`Erreur: Le champ ${champ.nom} (ID: ${champ.id}) dans le bloc ${bloc.nom} n'a pas de nomTechnique`);
+      return null;
+    }
     
     return (
       <div key={champ.id} className="flex flex-col md:flex-row md:items-center mb-2">
@@ -99,9 +118,12 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
   };
 
   const renderBlocs = () => {
+    console.log("Rendu des blocs avec la configuration:", blocsConfig);
+    
     return blocsConfig
       .filter(bloc => {
         const blocVisible = estBlocVisible(bloc.id);
+        console.log(`Bloc ${bloc.nom} (${bloc.id}) visible: ${blocVisible}`);
         
         if (blocVisible) {
           if (bloc.id === "faconnage146" && produit.numeroLigne) {
@@ -121,22 +143,33 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
       })
       .sort((a, b) => a.ordre - b.ordre)
       .map(bloc => {
+        // Vérifier que le bloc a des champs avant de le rendre
+        const champsVisibles = bloc.champs.filter(champ => {
+          if (champ.lignesApplicables.includes("*")) return true;
+          
+          if (!produit.numeroLigne) return true;
+          
+          if (champ.lignesApplicables.length > 0) {
+            return champ.lignesApplicables.includes(produit.numeroLigne);
+          }
+          
+          return true;
+        });
+        
+        // Log pour debug
+        console.log(`Bloc ${bloc.nom}: ${champsVisibles.length} champs visibles sur ${bloc.champs.length}`);
+        
+        // Si bloc n'a pas de champs visibles, ne pas l'afficher
+        if (champsVisibles.length === 0) {
+          console.log(`Pas de champs visibles pour le bloc ${bloc.nom}, masquage du bloc`);
+          return null;
+        }
+        
         return (
           <div key={bloc.id} className="printable-block mb-6 p-4 border border-gray-200 rounded-lg">
             <h2 className="text-lg font-bold mb-3 text-jaune-500">{bloc.nom}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
-              {bloc.champs
-                .filter(champ => {
-                  if (champ.lignesApplicables.includes("*")) return true;
-                  
-                  if (!produit.numeroLigne) return true;
-                  
-                  if (champ.lignesApplicables.length > 0) {
-                    return champ.lignesApplicables.includes(produit.numeroLigne);
-                  }
-                  
-                  return true;
-                })
+              {champsVisibles
                 .sort((a, b) => a.ordre - b.ordre)
                 .map(champ => renderChamp(bloc.id, champ.id))
               }
@@ -150,7 +183,7 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
             )}
           </div>
         );
-      });
+      }).filter(Boolean); // Filtrer les blocs null (sans champs visibles)
   };
 
   if (loading) {
