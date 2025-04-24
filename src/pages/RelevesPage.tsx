@@ -1,3 +1,4 @@
+
 import PageLayout from "@/components/layout/PageLayout";
 import { ReleveBloc } from "@/components/ReleveBloc";
 import { Button } from "@/components/ui/button";
@@ -26,8 +27,8 @@ const RelevesPage = () => {
           </Button>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 print:grid-cols-5 print:gap-2">
-          {[...Array(5)].map((_, index) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 print:gap-2">
+          {[...Array(6)].map((_, index) => (
             <ReleveBloc key={index} index={index + 1} />
           ))}
         </div>
