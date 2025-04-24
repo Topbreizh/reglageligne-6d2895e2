@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,7 +11,6 @@ import RecherchePage from "./pages/RecherchePage";
 import NouveauProduitPage from "./pages/NouveauProduitPage";
 import FicheProduitPage from "./pages/FicheProduitPage";
 import ModifierProduitPage from "./pages/ModifierProduitPage";
-import RelevesPage from "./pages/RelevesPage";
 import ImportPage from "./pages/ImportPage";
 import GestionBlocsPage from "./pages/GestionBlocsPage";
 import NotFound from "./pages/NotFound";
@@ -30,7 +30,6 @@ const App = () => (
           <Route path="/nouveau-produit" element={<NouveauProduitPage />} />
           <Route path="/fiche/:id" element={<FicheProduitPage />} />
           <Route path="/modifier/:id" element={<ModifierProduitPage />} />
-          <Route path="/releves" element={<RelevesPage />} />
           <Route path="/import" element={<ImportPage />} />
           <Route path="/gestion-blocs" element={<GestionBlocsPage />} />
           <Route path="/calcul-matieres" element={<CalculMatieresPage />} />
@@ -42,3 +41,4 @@ const App = () => (
 );
 
 export default App;
+
