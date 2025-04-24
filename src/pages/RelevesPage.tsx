@@ -2,7 +2,7 @@
 import PageLayout from "@/components/layout/PageLayout";
 import { ReleveBloc } from "@/components/ReleveBloc";
 import { Button } from "@/components/ui/button";
-import { printer } from "lucide-react";
+import { Printer } from "lucide-react";
 
 const RelevesPage = () => {
   const handlePrint = () => {
@@ -22,7 +22,7 @@ const RelevesPage = () => {
             variant="outline"
             className="print:hidden"
           >
-            <printer className="h-4 w-4 mr-2" />
+            <Printer className="h-4 w-4 mr-2" />
             Imprimer
           </Button>
         </div>
