@@ -66,13 +66,89 @@ export const ReleveBloc = ({ index }: ReleveBlocProps) => {
     }
   };
 
+  const renderProduitDetails = (produit: Produit) => {
+    return (
+      <div className="space-y-3 mt-4 text-sm">
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <span className="font-semibold">Code Article:</span> {produit.codeArticle}
+          </div>
+          <div>
+            <span className="font-semibold">N° Ligne:</span> {produit.numeroLigne}
+          </div>
+          <div className="col-span-2">
+            <span className="font-semibold">Désignation:</span> {produit.designation}
+          </div>
+        </div>
+        
+        <div className="border-t pt-2">
+          <div className="font-semibold mb-1">Calcul de pâte</div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <span className="font-semibold">Poids pâte:</span> {produit.poidsPate}
+            </div>
+            <div>
+              <span className="font-semibold">Poids article:</span> {produit.poidsArticle}
+            </div>
+            <div>
+              <span className="font-semibold">Quantité pâte:</span> {produit.quantitePate}
+            </div>
+            <div>
+              <span className="font-semibold">Nbr de bandes:</span> {produit.nbrDeBandes}
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t pt-2">
+          <div className="font-semibold mb-1">Laminage</div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <span className="font-semibold">Programme:</span> {produit.programme}
+            </div>
+            <div>
+              <span className="font-semibold">Facteur:</span> {produit.facteur}
+            </div>
+            <div>
+              <span className="font-semibold">Règle laminage:</span> {produit.regleLaminage}
+            </div>
+            <div>
+              <span className="font-semibold">Quick:</span> {produit.quick}
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t pt-2">
+          <div className="font-semibold mb-1">Façonnage</div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <span className="font-semibold">Queue de carpe:</span> {produit.queueDeCarpe}
+            </div>
+            <div>
+              <span className="font-semibold">Buse:</span> {produit.buse}
+            </div>
+            <div>
+              <span className="font-semibold">Humidificateur:</span> {produit.humidificateur146}
+            </div>
+          </div>
+        </div>
+
+        {produit.commentaire && (
+          <div className="border-t pt-2">
+            <div className="font-semibold">Commentaire</div>
+            <p>{produit.commentaire}</p>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
-    <Card className="shadow-lg">
-      <CardHeader className="bg-gray-50 border-b">
+    <Card className="shadow-lg print:shadow-none print:border-black">
+      <CardHeader className="bg-gray-50 border-b print:bg-white">
         <div className="font-semibold text-lg">Relevé {index}</div>
       </CardHeader>
       <CardContent className="p-4">
-        <form onSubmit={handleSearch} className="space-y-4">
+        <form onSubmit={handleSearch} className="space-y-4 print:hidden">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1">Code Article</label>
@@ -108,12 +184,7 @@ export const ReleveBloc = ({ index }: ReleveBlocProps) => {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-jaune-300"></div>
           </div>
         ) : produit ? (
-          <div className="mt-4 space-y-2 border-t pt-4">
-            <div className="font-semibold">{produit.designation}</div>
-            <div className="text-sm text-gray-600">
-              Code: {produit.codeArticle} | Ligne: {produit.numeroLigne}
-            </div>
-          </div>
+          renderProduitDetails(produit)
         ) : null}
       </CardContent>
     </Card>
