@@ -40,13 +40,33 @@ export const ReleveBloc = ({ index }: ReleveBlocProps) => {
 
       if (docSnap.exists()) {
         const data = docSnap.data();
-        setProduit({
+        console.log("Données brutes récupérées:", data);
+        
+        // Création d'un objet avec toutes les propriétés de data
+        const produitData: Record<string, string> = {};
+        
+        // Ajouter toutes les propriétés du document Firestore
+        Object.entries(data).forEach(([key, value]) => {
+          if (typeof value === 'string') {
+            produitData[key] = value;
+          } else if (value !== null && value !== undefined) {
+            produitData[key] = String(value);
+          } else {
+            produitData[key] = "";
+          }
+        });
+        
+        // S'assurer que les champs principaux existent
+        const produitComplet = {
           id: docSnap.id,
-          ...data,
           codeArticle: data.codeArticle || "",
           numeroLigne: data.numeroLigne || "",
-          designation: data.designation || "Sans designation"
-        } as Produit);
+          designation: data.designation || "Sans designation",
+          ...produitData
+        } as Produit;
+        
+        console.log("Produit après traitement:", produitComplet);
+        setProduit(produitComplet);
       } else {
         toast({
           variant: "destructive",
@@ -68,9 +88,10 @@ export const ReleveBloc = ({ index }: ReleveBlocProps) => {
   };
 
   const renderProduitDetails = (produit: Produit) => {
-    // Fonction pour grouper les champs par bloc selon la configuration
+    // Fonction pour afficher tous les champs disponibles regroupés par blocs
     const renderBlocs = () => {
       return blocsConfiguration.map((bloc) => {
+        // Filtrer les champs qui sont visibles et applicables à la ligne
         const champsVisibles = bloc.champs.filter(champ => {
           return champ.visible && 
                  (champ.lignesApplicables.includes('*') || 
@@ -81,42 +102,86 @@ export const ReleveBloc = ({ index }: ReleveBlocProps) => {
 
         return (
           <div key={bloc.id} className="border-t pt-2 mt-2">
-            <div className="font-semibold mb-1">{bloc.nom}</div>
+            <div className="font-semibold mb-1 text-xs">{bloc.nom}</div>
             <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs">
               {champsVisibles.map((champ) => {
-                const valeur = produit[champ.nomTechnique as keyof Produit];
-                return (
-                  <div key={champ.id} className="overflow-hidden text-ellipsis">
-                    <span className="font-semibold">{champ.nom}:</span>{" "}
-                    {valeur || "-"}
-                  </div>
-                );
-              })}
+                // Récupérer la valeur du champ dans l'objet produit
+                const valeur = produit[champ.nomTechnique as keyof Produit] || "";
+                
+                // Vérifier si la valeur est non vide avant de l'afficher
+                if (valeur) {
+                  return (
+                    <div key={champ.id} className="overflow-hidden text-ellipsis">
+                      <span className="font-medium">{champ.nom}:</span>{" "}
+                      {valeur}
+                    </div>
+                  );
+                }
+                return null;
+              }).filter(Boolean)}
             </div>
           </div>
         );
       }).filter(Boolean);
     };
 
+    // Chercher les autres champs qui n'apparaissent pas dans les blocs configurés
+    const renderChampsSupplémentaires = () => {
+      const champsConnus = new Set();
+      
+      // Ajouter tous les champs connus dans les blocs
+      blocsConfiguration.forEach(bloc => {
+        bloc.champs.forEach(champ => {
+          champsConnus.add(champ.nomTechnique);
+        });
+      });
+      
+      // Trouver les champs qui ne sont pas dans la configuration mais qui ont des valeurs
+      const champsSupplémentaires = Object.entries(produit)
+        .filter(([key, value]) => {
+          return !champsConnus.has(key) && 
+                 key !== "id" && 
+                 value && 
+                 typeof value === 'string' && 
+                 value.trim() !== "";
+        });
+      
+      if (champsSupplémentaires.length === 0) return null;
+      
+      return (
+        <div className="border-t pt-2 mt-2">
+          <div className="font-semibold mb-1 text-xs">Autres informations</div>
+          <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs">
+            {champsSupplémentaires.map(([key, value]) => (
+              <div key={key} className="overflow-hidden text-ellipsis">
+                <span className="font-medium">{key}:</span> {value}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    };
+
     return (
-      <div className="space-y-2 mt-4 text-sm">
-        <div className="grid grid-cols-2 gap-2">
+      <div className="space-y-1 mt-2 print:mt-0">
+        <div className="grid grid-cols-2 gap-2 text-xs">
           <div>
-            <span className="font-semibold">Code Article:</span> {produit.codeArticle}
+            <span className="font-medium">Code Article:</span> {produit.codeArticle}
           </div>
           <div>
-            <span className="font-semibold">N° Ligne:</span> {produit.numeroLigne}
+            <span className="font-medium">N° Ligne:</span> {produit.numeroLigne}
           </div>
           <div className="col-span-2">
-            <span className="font-semibold">Désignation:</span> {produit.designation}
+            <span className="font-medium">Désignation:</span> {produit.designation}
           </div>
         </div>
         
         {renderBlocs()}
+        {renderChampsSupplémentaires()}
         
         {produit.commentaire && (
           <div className="border-t pt-2">
-            <div className="font-semibold">Commentaire</div>
+            <div className="font-medium text-xs">Commentaire</div>
             <p className="text-xs">{produit.commentaire}</p>
           </div>
         )}
@@ -125,11 +190,11 @@ export const ReleveBloc = ({ index }: ReleveBlocProps) => {
   };
 
   return (
-    <Card className="shadow-lg print:shadow-none print:border-black">
-      <CardHeader className="bg-gray-50 border-b print:bg-white">
-        <div className="font-semibold text-lg">Relevé {index}</div>
+    <Card className="shadow-lg print:shadow-none print:border-black print:text-black">
+      <CardHeader className="bg-gray-50 border-b print:bg-white print:p-2">
+        <div className="font-semibold text-lg print:text-sm">Relevé {index}</div>
       </CardHeader>
-      <CardContent className="p-4">
+      <CardContent className="p-4 print:p-1">
         <form onSubmit={handleSearch} className="space-y-4 print:hidden">
           <div className="grid grid-cols-2 gap-4">
             <div>
