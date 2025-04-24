@@ -15,6 +15,7 @@ import ImportPage from "./pages/ImportPage";
 import GestionBlocsPage from "./pages/GestionBlocsPage";
 import NotFound from "./pages/NotFound";
 import CalculMatieresPage from "./pages/CalculMatieresPage";
+import RelevesPage from "./pages/RelevesPage";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/nouveau-produit" element={<NouveauProduitPage />} />
           <Route path="/fiche/:id" element={<FicheProduitPage />} />
           <Route path="/modifier/:id" element={<ModifierProduitPage />} />
+          <Route path="/releves" element={<RelevesPage />} />
           <Route path="/import" element={<ImportPage />} />
           <Route path="/gestion-blocs" element={<GestionBlocsPage />} />
           <Route path="/calcul-matieres" element={<CalculMatieresPage />} />
@@ -41,4 +43,3 @@ const App = () => (
 );
 
 export default App;
-
