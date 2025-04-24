@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Produit } from "@/types";
+import { blocsConfiguration } from "@/data/blocConfig";
 
 interface ReleveBlocProps {
   index: number;
@@ -67,8 +68,38 @@ export const ReleveBloc = ({ index }: ReleveBlocProps) => {
   };
 
   const renderProduitDetails = (produit: Produit) => {
+    // Fonction pour grouper les champs par bloc selon la configuration
+    const renderBlocs = () => {
+      return blocsConfiguration.map((bloc) => {
+        const champsVisibles = bloc.champs.filter(champ => {
+          return champ.visible && 
+                 (champ.lignesApplicables.includes('*') || 
+                  champ.lignesApplicables.includes(produit.numeroLigne));
+        });
+
+        if (champsVisibles.length === 0) return null;
+
+        return (
+          <div key={bloc.id} className="border-t pt-2 mt-2">
+            <div className="font-semibold mb-1">{bloc.nom}</div>
+            <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs">
+              {champsVisibles.map((champ) => {
+                const valeur = produit[champ.nomTechnique as keyof Produit];
+                return (
+                  <div key={champ.id} className="overflow-hidden text-ellipsis">
+                    <span className="font-semibold">{champ.nom}:</span>{" "}
+                    {valeur || "-"}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      }).filter(Boolean);
+    };
+
     return (
-      <div className="space-y-3 mt-4 text-sm">
+      <div className="space-y-2 mt-4 text-sm">
         <div className="grid grid-cols-2 gap-2">
           <div>
             <span className="font-semibold">Code Article:</span> {produit.codeArticle}
@@ -81,61 +112,12 @@ export const ReleveBloc = ({ index }: ReleveBlocProps) => {
           </div>
         </div>
         
-        <div className="border-t pt-2">
-          <div className="font-semibold mb-1">Calcul de pâte</div>
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <span className="font-semibold">Poids pâte:</span> {produit.poidsPate}
-            </div>
-            <div>
-              <span className="font-semibold">Poids article:</span> {produit.poidsArticle}
-            </div>
-            <div>
-              <span className="font-semibold">Quantité pâte:</span> {produit.quantitePate}
-            </div>
-            <div>
-              <span className="font-semibold">Nbr de bandes:</span> {produit.nbrDeBandes}
-            </div>
-          </div>
-        </div>
-
-        <div className="border-t pt-2">
-          <div className="font-semibold mb-1">Laminage</div>
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <span className="font-semibold">Programme:</span> {produit.programme}
-            </div>
-            <div>
-              <span className="font-semibold">Facteur:</span> {produit.facteur}
-            </div>
-            <div>
-              <span className="font-semibold">Règle laminage:</span> {produit.regleLaminage}
-            </div>
-            <div>
-              <span className="font-semibold">Quick:</span> {produit.quick}
-            </div>
-          </div>
-        </div>
-
-        <div className="border-t pt-2">
-          <div className="font-semibold mb-1">Façonnage</div>
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <span className="font-semibold">Queue de carpe:</span> {produit.queueDeCarpe}
-            </div>
-            <div>
-              <span className="font-semibold">Buse:</span> {produit.buse}
-            </div>
-            <div>
-              <span className="font-semibold">Humidificateur:</span> {produit.humidificateur146}
-            </div>
-          </div>
-        </div>
-
+        {renderBlocs()}
+        
         {produit.commentaire && (
           <div className="border-t pt-2">
             <div className="font-semibold">Commentaire</div>
-            <p>{produit.commentaire}</p>
+            <p className="text-xs">{produit.commentaire}</p>
           </div>
         )}
       </div>
