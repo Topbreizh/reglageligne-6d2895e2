@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -42,10 +41,8 @@ export const ReleveBloc = ({ index }: ReleveBlocProps) => {
         const data = docSnap.data();
         console.log("Données brutes récupérées:", data);
         
-        // Création d'un objet avec toutes les propriétés de data
         const produitData: Record<string, string> = {};
         
-        // Ajouter toutes les propriétés du document Firestore
         Object.entries(data).forEach(([key, value]) => {
           if (typeof value === 'string') {
             produitData[key] = value;
@@ -56,7 +53,6 @@ export const ReleveBloc = ({ index }: ReleveBlocProps) => {
           }
         });
         
-        // S'assurer que les champs principaux existent
         const produitComplet = {
           id: docSnap.id,
           codeArticle: data.codeArticle || "",
@@ -88,10 +84,8 @@ export const ReleveBloc = ({ index }: ReleveBlocProps) => {
   };
 
   const renderProduitDetails = (produit: Produit) => {
-    // Fonction pour afficher tous les champs disponibles regroupés par blocs
     const renderBlocs = () => {
       return blocsConfiguration.map((bloc) => {
-        // Filtrer les champs qui sont visibles et applicables à la ligne
         const champsVisibles = bloc.champs.filter(champ => {
           return champ.visible && 
                  (champ.lignesApplicables.includes('*') || 
@@ -105,10 +99,8 @@ export const ReleveBloc = ({ index }: ReleveBlocProps) => {
             <div className="font-semibold mb-1 text-xs">{bloc.nom}</div>
             <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs">
               {champsVisibles.map((champ) => {
-                // Récupérer la valeur du champ dans l'objet produit
                 const valeur = produit[champ.nomTechnique as keyof Produit] || "";
                 
-                // Vérifier si la valeur est non vide avant de l'afficher
                 if (valeur) {
                   return (
                     <div key={champ.id} className="overflow-hidden text-ellipsis">
@@ -125,18 +117,15 @@ export const ReleveBloc = ({ index }: ReleveBlocProps) => {
       }).filter(Boolean);
     };
 
-    // Chercher les autres champs qui n'apparaissent pas dans les blocs configurés
     const renderChampsSupplémentaires = () => {
       const champsConnus = new Set();
       
-      // Ajouter tous les champs connus dans les blocs
       blocsConfiguration.forEach(bloc => {
         bloc.champs.forEach(champ => {
           champsConnus.add(champ.nomTechnique);
         });
       });
       
-      // Trouver les champs qui ne sont pas dans la configuration mais qui ont des valeurs
       const champsSupplémentaires = Object.entries(produit)
         .filter(([key, value]) => {
           return !champsConnus.has(key) && 
@@ -190,7 +179,7 @@ export const ReleveBloc = ({ index }: ReleveBlocProps) => {
   };
 
   return (
-    <Card className="shadow-lg print:shadow-none print:border-black print:text-black">
+    <Card className="shadow-lg print:shadow-none print:border-black print:text-black ReleveBloc">
       <CardHeader className="bg-gray-50 border-b print:bg-white print:p-2">
         <div className="font-semibold text-lg print:text-sm">Relevé {index}</div>
       </CardHeader>
