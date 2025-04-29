@@ -32,7 +32,7 @@
   #printable-content {
     display: grid !important;
     grid-template-columns: repeat(3, 1fr) !important;
-    gap: 0.25rem !important;
+    gap: 2mm !important;
     width: 100% !important;
     padding: 0 !important;
   }
@@ -53,6 +53,7 @@
     width: 100%;
     border: 0.5px solid #ddd !important;
     border-radius: 2px !important;
+    overflow: visible !important; /* Prevent text cutting */
   }
 
   .printable-block h2 {
@@ -60,10 +61,17 @@
     margin-bottom: 1px !important;
   }
 
-  .grid {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 1px !important;
+  .printable-block > div > div {
+    display: flex !important;
+    align-items: flex-start !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Prevent content from being cut off */
+  .break-words {
+    word-break: break-word !important;
+    white-space: normal !important;
   }
 
   /* Page break control */
@@ -78,8 +86,8 @@
 
   /* Hide non-printable elements */
   .no-print, 
-  .page-header-wrapper,  /* Hide the page header with date */
-  .page-footer-wrapper { /* Hide the page footer with document generated date */
+  .page-header-wrapper,
+  .page-footer-wrapper {
     display: none !important;
   }
 
@@ -102,16 +110,21 @@
   html, body {
     font-size: 8px !important;
   }
+
+  /* Ensure consistent spacing */
+  .printable-block {
+    margin: 0 0 2mm 0 !important;
+  }
 }
 
 /* A4 Landscape specific adjustments */
 @media print and (width: 297mm) and (height: 210mm) {
   #printable-content {
-    grid-template-columns: repeat(4, 1fr) !important;
+    grid-template-columns: repeat(3, 1fr) !important;
   }
   
   html, body {
-    font-size: 7px !important;
+    font-size: 8px !important;
   }
 }
 
@@ -127,31 +140,42 @@
 }
 
 /* PDF Export specific styles - will be applied when html2canvas renders */
-@media screen and (min-resolution: 192dpi) {
-  .pdf-export-mode .printable-page {
-    width: 210mm !important;
-    padding: 5mm !important;
-    background-color: white !important;
-  }
-  
-  .pdf-export-mode #printable-content {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 0.25rem !important;
-  }
-  
-  .pdf-export-mode .printable-block {
-    padding: 2px !important;
-    margin-bottom: 2px !important;
-    break-inside: avoid;
-    page-break-inside: avoid;
-    display: inline-block;
-    width: 100%;
-    border: 0.5px solid #ddd !important;
-  }
-  
-  .pdf-export-mode .page-header-wrapper,
-  .pdf-export-mode .page-footer-wrapper {
-    display: none !important;
-  }
+.pdf-export-mode .printable-page,
+body.print-mode .printable-page {
+  width: 210mm !important;
+  padding: 5mm !important;
+  background-color: white !important;
+}
+
+.pdf-export-mode #printable-content,
+body.print-mode #printable-content {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 2mm !important;
+}
+
+.pdf-export-mode .printable-block,
+body.print-mode .printable-block {
+  padding: 2px !important;
+  margin-bottom: 2mm !important;
+  break-inside: avoid;
+  page-break-inside: avoid;
+  display: inline-block;
+  width: 100%;
+  border: 0.5px solid #ddd !important;
+  overflow: visible !important;
+}
+
+.pdf-export-mode .page-header-wrapper,
+.pdf-export-mode .page-footer-wrapper,
+body.print-mode .page-header-wrapper,
+body.print-mode .page-footer-wrapper {
+  display: none !important;
+}
+
+/* Prevent content from being cut off in PDF */
+.pdf-export-mode .break-words,
+body.print-mode .break-words {
+  word-break: break-word !important;
+  white-space: normal !important;
 }

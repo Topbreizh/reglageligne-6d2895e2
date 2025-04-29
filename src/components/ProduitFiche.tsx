@@ -14,7 +14,13 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
   const { loading, estChampVisible, getChampValeur, getVisibleBlocs } = useProduitFicheBlocs(produit);
 
   const printFiche = () => {
+    // Add print-specific class to the body before printing
+    document.body.classList.add('print-mode');
     window.print();
+    // Remove the class after printing
+    setTimeout(() => {
+      document.body.classList.remove('print-mode');
+    }, 500);
   };
 
   if (loading) {
@@ -30,7 +36,7 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
   return (
     <div className="printable-page">
       {/* Wrapper for the page header that will be hidden during print/PDF */}
-      <div className="page-header-wrapper">
+      <div className="page-header-wrapper no-print">
         <div className="text-xs text-right text-gray-500 mb-2">
           {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}
         </div>
@@ -53,7 +59,7 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
       <ProduitFicheFooter />
       
       {/* Wrapper for the page footer that will be hidden during print/PDF */}
-      <div className="page-footer-wrapper">
+      <div className="page-footer-wrapper no-print">
         <div className="text-xs text-center text-gray-500 mt-4">
           Document généré le {new Date().toLocaleDateString()}
         </div>

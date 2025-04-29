@@ -61,15 +61,16 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
           styleElement.innerHTML = `
             .printable-block { 
               padding: 2px !important;
-              margin-bottom: 2px !important;
+              margin-bottom: 2mm !important;
               break-inside: avoid !important;
               border: 0.5px solid #ddd !important;
               border-radius: 2px !important;
+              overflow: visible !important;
             }
             #printable-content {
               display: grid !important;
               grid-template-columns: repeat(3, 1fr) !important;
-              gap: 0.25rem !important;
+              gap: 2mm !important;
             }
             .printable-block h2 {
               font-size: 9px !important;
@@ -77,6 +78,16 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
             }
             .page-header-wrapper, .page-footer-wrapper {
               display: none !important;
+            }
+            .break-words {
+              word-break: break-word !important;
+              white-space: normal !important;
+            }
+            .printable-block > div > div {
+              display: flex !important;
+              align-items: flex-start !important;
+              padding: 0 !important;
+              margin: 0 !important;
             }
           `;
           clonedDoc.head.appendChild(styleElement);

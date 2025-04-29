@@ -24,8 +24,8 @@ const ProduitFicheBloc = ({ bloc, produit, estChampVisible, getChampValeur }: Pr
         {champsVisibles
           .sort((a, b) => a.ordre - b.ordre)
           .map(champ => (
-            <div key={champ.id} className="flex flex-row items-start gap-1 mb-0 print:mb-0">
-              <div className="font-semibold text-xs print:text-[8px] w-20 print:w-16 min-w-fit truncate">{champ.nom}:</div>
+            <div key={champ.id} className="flex flex-row items-start gap-1 mb-0.5 print:mb-0">
+              <div className="font-semibold text-xs print:text-[8px] w-20 print:w-16 min-w-fit whitespace-nowrap">{champ.nom}:</div>
               <div className="text-xs print:text-[8px] break-words">{getChampValeur(champ.nomTechnique)}</div>
             </div>
           ))
@@ -35,7 +35,7 @@ const ProduitFicheBloc = ({ bloc, produit, estChampVisible, getChampValeur }: Pr
       {bloc.id === "cadencePersonnel" && estChampVisible("cadencePersonnel", "commentaire") && (
         <div className="mt-0.5 print:mt-0">
           <h3 className="font-semibold text-xs print:text-[8px]">Commentaire:</h3>
-          <p className="whitespace-pre-line text-xs print:text-[8px] line-clamp-3 print:line-clamp-2">{produit.commentaire || "-"}</p>
+          <p className="whitespace-pre-line text-xs print:text-[8px] break-words">{produit.commentaire || "-"}</p>
         </div>
       )}
     </div>
