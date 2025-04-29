@@ -1,0 +1,229 @@
+
+/* Print Styles - Extracted from index.css */
+
+@media print {
+  /* Base print styles */
+  @page {
+    size: portrait;
+    margin: 5mm;
+    /* Remove default header and footer with URLs and page info */
+    margin-bottom: 0;
+  }
+
+  /* Additional page control to hide browser footer */
+  @page :first {
+    margin-bottom: 0;
+  }
+  
+  @page :left {
+    margin-bottom: 0; 
+  }
+  
+  @page :right {
+    margin-bottom: 0;
+  }
+
+  html, body {
+    width: 100% !important;
+    height: auto !important;
+    background: white !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: 8px !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Layout adjustments */
+  .printable-page {
+    width: 100% !important;
+    height: auto !important;
+    padding: 0 !important;
+    max-width: none !important;
+    margin: 0 auto !important;
+  }
+
+  #printable-content {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 2mm !important;
+    width: 100% !important;
+    padding: 0 !important;
+  }
+
+  /* Block styling */
+  .printable-block {
+    padding: 2px !important;
+    margin-bottom: 2px !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    display: inline-block;
+    width: 100%;
+    border: 0.5px solid #ddd !important;
+    border-radius: 2px !important;
+    overflow: visible !important; /* Prevent text cutting */
+  }
+
+  .printable-block h2 {
+    font-size: 9px !important;
+    margin-bottom: 1px !important;
+  }
+
+  .printable-block > div > div {
+    display: flex !important;
+    align-items: flex-start !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Prevent content from being cut off */
+  .break-words {
+    word-break: break-word !important;
+    white-space: normal !important;
+    overflow-wrap: break-word !important;
+    max-width: calc(100% - 20px) !important;
+  }
+
+  /* Page break control */
+  .printable-block:nth-child(3n) {
+    page-break-after: auto;
+  }
+
+  /* Force page breaks every 30 blocks (10 rows of 3 columns) */
+  .printable-block:nth-child(30n) {
+    page-break-after: always;
+  }
+
+  /* Hide non-printable elements */
+  .print\\:hidden {
+    display: none !important;
+  }
+
+  /* Only show the printable content */
+  body > *:not(.printable-page),
+  .printable-page > *:not(#printable-content) {
+    display: none !important;
+  }
+
+  /* Hide all navigation, headers, footers completely */
+  header, nav, footer, .navbar, .footer, .nav-container {
+    display: none !important;
+  }
+
+  /* Improve table rendering */
+  table {
+    border-collapse: collapse !important;
+  }
+
+  td, th {
+    font-size: 8px !important;
+  }
+  
+  /* Remove page margins */
+  @page {
+    margin: 10mm 5mm 0mm 5mm;
+  }
+}
+
+/* A4 Portrait specific adjustments */
+@media print and (width: 210mm) and (height: 297mm) {
+  #printable-content {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  
+  html, body {
+    font-size: 8px !important;
+  }
+
+  /* Ensure consistent spacing */
+  .printable-block {
+    margin: 0 0 2mm 0 !important;
+  }
+}
+
+/* A4 Landscape specific adjustments */
+@media print and (width: 297mm) and (height: 210mm) {
+  #printable-content {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  
+  html, body {
+    font-size: 8px !important;
+  }
+}
+
+/* Letter size adjustments (US) */
+@media print and (width: 8.5in) and (height: 11in) {
+  #printable-content {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  
+  .printable-block {
+    padding: 2px !important;
+  }
+}
+
+/* PDF Export specific styles - will be applied when html2canvas renders */
+.pdf-export-mode .printable-page,
+body.print-mode .printable-page {
+  width: 210mm !important;
+  padding: 5mm !important;
+  background-color: white !important;
+}
+
+.pdf-export-mode #printable-content,
+body.print-mode #printable-content {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 2mm !important;
+}
+
+.pdf-export-mode .printable-block,
+body.print-mode .printable-block {
+  padding: 2px !important;
+  margin-bottom: 2mm !important;
+  break-inside: avoid;
+  page-break-inside: avoid;
+  display: inline-block;
+  width: 100%;
+  border: 0.5px solid #ddd !important;
+  overflow: visible !important;
+}
+
+/* Hide everything except the blocks in PDF export mode */
+.pdf-export-mode > *:not(#printable-content),
+body.print-mode > *:not(#printable-content) {
+  display: none !important;
+}
+
+.pdf-export-mode .print\\:hidden,
+body.print-mode .print\\:hidden {
+  display: none !important;
+}
+
+/* Prevent content from being cut off in PDF */
+.pdf-export-mode .break-words,
+body.print-mode .break-words {
+  word-break: break-word !important;
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+  max-width: calc(100% - 20px) !important;
+}
+
+/* Ensure both print modes use identical styling */
+body.print-mode {
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+body.print-mode .printable-block {
+  padding: 2px !important;
+  border: 0.5px solid #ddd !important;
+  border-radius: 2px !important;
+}
+
+body.print-mode .printable-block h2 {
+  font-size: 9px !important;
+  margin-bottom: 1px !important;
+}
