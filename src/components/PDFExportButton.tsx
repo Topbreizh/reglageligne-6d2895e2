@@ -4,6 +4,7 @@ import { Printer } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface PDFExportButtonProps {
   contentId: string;
@@ -11,6 +12,7 @@ interface PDFExportButtonProps {
 
 const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const handleExportPDF = async () => {
     try {
@@ -38,22 +40,18 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
       const pageHeight = pdf.internal.pageSize.getHeight();
       const margin = 2; // 2mm margin (reduced from 3mm)
 
-      // Create a clone of the element for PDF rendering to avoid affecting the actual DOM
-      const clonedElement = element.cloneNode(true) as HTMLElement;
-      clonedElement.style.width = '210mm';
-      clonedElement.style.padding = '0';
-      clonedElement.style.margin = '0';
-      clonedElement.style.display = 'grid';
-      clonedElement.style.gridTemplateColumns = 'repeat(3, 1fr)';
-      clonedElement.style.gap = '0.5mm';
-      
-      // Apply styling to ensure better PDF rendering
-      Array.from(clonedElement.querySelectorAll('.printable-block')).forEach((block: HTMLElement) => {
-        block.style.padding = '1px';
-        block.style.margin = '0 0 1px 0';
-        block.style.border = '0.5px solid #ddd';
-        block.style.overflow = 'visible';
-      });
+      // Mobile-specific adjustments for better rendering
+      if (isMobile) {
+        element.style.width = '100%';
+        // Force 3-column layout on mobile for PDF export
+        const blocks = element.querySelectorAll('.printable-block');
+        blocks.forEach((block: HTMLElement) => {
+          block.style.width = '100%';
+          block.style.margin = '0 0 1px 0';
+          block.style.padding = '1px';
+          block.style.border = '0.5px solid #ddd';
+        });
+      }
 
       const canvas = await html2canvas(element, {
         scale: 2, // Higher resolution

@@ -5,6 +5,7 @@ import ProduitFicheHeader from "./fiche/ProduitFicheHeader";
 import ProduitFicheBloc from "./fiche/ProduitFicheBloc";
 import ProduitFicheFooter from "./fiche/ProduitFicheFooter";
 import { useProduitFicheBlocs } from "@/hooks/useProduitFicheBlocs";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ProduitFicheProps {
   produit: Produit;
@@ -12,10 +13,29 @@ interface ProduitFicheProps {
 
 const ProduitFiche = ({ produit }: ProduitFicheProps) => {
   const { loading, estChampVisible, getChampValeur, getVisibleBlocs } = useProduitFicheBlocs(produit);
+  const isMobile = useIsMobile();
 
   const printFiche = () => {
     // Add print-specific class to the body before printing
     document.body.classList.add('print-mode');
+    
+    // Force proper styling on mobile before printing
+    if (isMobile) {
+      const printableContent = document.getElementById('printable-content');
+      if (printableContent) {
+        // Save original styles to restore later
+        const originalStyles = {
+          display: printableContent.style.display,
+          gridTemplateColumns: printableContent.style.gridTemplateColumns,
+          gap: printableContent.style.gap
+        };
+        
+        // Force 3-column grid for printing on mobile
+        printableContent.style.display = 'grid';
+        printableContent.style.gridTemplateColumns = 'repeat(3, 1fr)';
+        printableContent.style.gap = '0.5mm';
+      }
+    }
     
     // Override browser print styles to hide URL and page info
     const style = document.createElement('style');
@@ -70,7 +90,7 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
       </div>
 
       {/* This is the only content that will be visible during printing */}
-      <div id="printable-content" className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-3 gap-1 print:gap-0">
+      <div id="printable-content" className={`grid grid-cols-1 ${!isMobile ? 'md:grid-cols-2' : ''} print:grid-cols-3 gap-1 print:gap-0`}>
         {visibleBlocs.map(bloc => (
           <ProduitFicheBloc
             key={bloc.id}

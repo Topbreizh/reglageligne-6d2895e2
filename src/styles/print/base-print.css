@@ -130,4 +130,34 @@
   td, th {
     font-size: 12px !important;
   }
+  
+  /* Mobile-specific print optimizations */
+  @media screen and (max-width: 768px) {
+    #printable-content {
+      display: grid !important;
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 0.25mm !important;
+    }
+    
+    .printable-block {
+      padding: 0.25px !important;
+      margin: 0 0 0.25px 0 !important;
+      font-size: 10px !important;
+    }
+    
+    .printable-block h2 {
+      font-size: 12px !important;
+    }
+    
+    /* Ensure text fits in columns */
+    .printable-block > div > div {
+      gap: 0 !important;
+    }
+    
+    .printable-block .font-semibold {
+      font-size: 10px !important;
+      max-width: 10px !important;
+    }
+  }
 }
+

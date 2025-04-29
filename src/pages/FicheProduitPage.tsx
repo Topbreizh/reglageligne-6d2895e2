@@ -9,6 +9,7 @@ import { ArrowLeft } from "lucide-react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const FicheProduitPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +17,7 @@ const FicheProduitPage = () => {
   const [produit, setProduit] = useState<Produit | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const fetchProduit = async () => {
@@ -71,6 +73,26 @@ const FicheProduitPage = () => {
 
     fetchProduit();
   }, [id, toast]);
+
+  // Optimization for mobile printing
+  useEffect(() => {
+    if (isMobile) {
+      const meta = document.querySelector('meta[name="viewport"]');
+      if (meta) {
+        // Store original content to restore later
+        const originalContent = meta.getAttribute('content');
+        
+        meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0');
+        
+        // Restore on unmount
+        return () => {
+          if (originalContent) {
+            meta.setAttribute('content', originalContent);
+          }
+        };
+      }
+    }
+  }, [isMobile]);
 
   if (loading) {
     return (
