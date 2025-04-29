@@ -21,16 +21,10 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
 
       const element = document.getElementById(contentId);
       if (!element) throw new Error("Contenu non trouvé");
-
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        windowWidth: 1200,
-        windowHeight: 1600,
-        backgroundColor: "#ffffff",
-      });
-
+      
+      // Add PDF export class to improve rendering
+      document.body.classList.add('pdf-export-mode');
+      
       // A4 dimensions in mm (210×297mm)
       const pdf = new jsPDF({
         orientation: "portrait",
@@ -38,32 +32,74 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
         format: "a4",
       });
 
-      const imgData = canvas.toDataURL("image/jpeg", 1.0);
-      const imgWidth = 210; // A4 width in mm
-      const pageHeight = 297; // A4 height in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      // Calculate dimensions based on A4 format
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 5; // 5mm margin
 
-      // Add the image to the first page
-      pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
-
-      // If the content is taller than one page, add additional pages
-      if (imgHeight > pageHeight) {
-        let heightLeft = imgHeight - pageHeight;
-        let position = -pageHeight; // Starting position for the second page
-        
-        while (heightLeft > 0) {
-          position = position - pageHeight;
-          pdf.addPage();
-          pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-          heightLeft -= pageHeight;
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        windowWidth: 1200, 
+        backgroundColor: "#ffffff",
+        onclone: (clonedDoc) => {
+          // Apply print-specific styles to cloned document
+          const styleElement = clonedDoc.createElement('style');
+          styleElement.innerHTML = `
+            .printable-block { 
+              padding: 4px !important;
+              margin-bottom: 4px !important;
+              break-inside: avoid !important;
+              border: 0.5px solid #ddd !important;
+              border-radius: 2px !important;
+            }
+            #printable-content {
+              display: grid !important;
+              grid-template-columns: repeat(3, 1fr) !important;
+              gap: 0.25rem !important;
+            }
+            .printable-block h2 {
+              font-size: 9px !important;
+              margin-bottom: 2px !important;
+            }
+          `;
+          clonedDoc.head.appendChild(styleElement);
         }
+      });
+      
+      // Remove PDF export class
+      document.body.classList.remove('pdf-export-mode');
+
+      const imgData = canvas.toDataURL("image/jpeg", 1.0);
+      
+      // Calculate image dimensions preserving aspect ratio
+      const imgWidth = pageWidth - (margin * 2);
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      let heightLeft = imgHeight;
+      let position = 0;
+      let page = 1;
+
+      // Add first page
+      pdf.addImage(imgData, "JPEG", margin, margin, imgWidth, imgHeight);
+      heightLeft -= (pageHeight - (margin * 2));
+      position = -(pageHeight - (margin * 2));
+
+      // Add additional pages if needed
+      while (heightLeft > 0) {
+        pdf.addPage();
+        page++;
+        pdf.addImage(imgData, "JPEG", margin, position, imgWidth, imgHeight);
+        heightLeft -= (pageHeight - (margin * 2));
+        position -= (pageHeight - (margin * 2));
       }
 
       pdf.save(`fiche-produit-${new Date().toISOString().slice(0, 10)}.pdf`);
 
       toast({
         title: "PDF généré",
-        description: "Le fichier PDF a été téléchargé avec succès.",
+        description: `Le fichier PDF (${page} page${page > 1 ? 's' : ''}) a été téléchargé avec succès.`,
       });
     } catch (error) {
       console.error("Erreur lors de l'export PDF:", error);

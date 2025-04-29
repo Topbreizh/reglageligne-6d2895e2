@@ -25,8 +25,8 @@ const ProduitFicheBloc = ({ bloc, produit, estChampVisible, getChampValeur }: Pr
           .sort((a, b) => a.ordre - b.ordre)
           .map(champ => (
             <div key={champ.id} className="flex flex-row items-start gap-1 mb-0.5 print:mb-0">
-              <div className="font-semibold text-xs print:text-[8px] w-24 print:w-20 min-w-fit">{champ.nom}:</div>
-              <div className="text-xs print:text-[8px]">{getChampValeur(champ.nomTechnique)}</div>
+              <div className="font-semibold text-xs print:text-[8px] w-24 print:w-20 min-w-fit truncate">{champ.nom}:</div>
+              <div className="text-xs print:text-[8px] break-words">{getChampValeur(champ.nomTechnique)}</div>
             </div>
           ))
         }
