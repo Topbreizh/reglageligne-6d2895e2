@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import PageLayout from "@/components/layout/PageLayout";
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,7 @@ const Index = () => {
               <div className="w-16 h-16 bg-jaune-100 rounded-full flex items-center justify-center mb-4">
                 <Search className="h-8 w-8 text-jaune-500" />
               </div>
-              <h2 className="text-xl font-bold mb-2">Recherche</h2>
+              <h2 className="text-xl font-bold mb-2">Fiche réglage</h2>
               <p className="text-noir-600 mb-4">
                 Recherchez rapidement des réglages par code article, numéro de ligne ou désignation.
               </p>

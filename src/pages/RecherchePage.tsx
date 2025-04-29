@@ -176,7 +176,7 @@ const RecherchePage = () => {
     <PageLayout>
       <div className="max-w-5xl mx-auto">
         <h1 className="text-2xl md:text-3xl font-bold mb-6">
-          <span className="text-noir-800">Recherche de</span> <span className="text-jaune-300">réglages</span>
+          <span className="text-noir-800">Fiche de</span> <span className="text-jaune-300">réglage</span>
         </h1>
 
         <div className="space-y-6">
