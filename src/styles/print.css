@@ -30,7 +30,7 @@
     box-shadow: none !important;
     padding: 0 !important;
     margin: 0 !important;
-    font-size: 8px !important;  /* Increased base font size from 7px to 8px */
+    font-size: 12px !important;  /* Increased base font size from 8px to 12px */
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
@@ -66,7 +66,7 @@
   }
 
   .printable-block h2 {
-    font-size: 9px !important;  /* Increased from 8px to 9px */
+    font-size: 14px !important;  /* Increased from 9px to 14px */
     margin: 0 !important;
     padding: 0 !important;
   }
@@ -81,11 +81,11 @@
 
   /* Text styling */
   .printable-block .font-semibold {
-    font-size: 8px !important;  /* Increased from 7px to 8px */
+    font-size: 12px !important;  /* Increased from 8px to 12px */
   }
 
   .printable-block div > div {
-    font-size: 8px !important;  /* Increased from 7px to 8px */
+    font-size: 12px !important;  /* Increased from 8px to 12px */
   }
 
   /* Prevent content from being cut off */
@@ -128,7 +128,7 @@
   }
 
   td, th {
-    font-size: 8px !important;  /* Increased from 7px to 8px */
+    font-size: 12px !important;  /* Increased from 8px to 12px */
   }
 }
 
@@ -193,7 +193,7 @@ body.print-mode .printable-block {
 }
 
 body.print-mode .printable-block h2 {
-  font-size: 9px !important;  /* Increased from 8px to 9px */
+  font-size: 14px !important;  /* Increased from 9px to 14px */
   margin: 0 !important;
   padding: 0 !important;
 }
@@ -204,5 +204,5 @@ body.print-mode .printable-block > div > div {
   padding: 0 !important;
   margin: 0 !important;
   gap: 0.25mm !important;
-  font-size: 8px !important;  /* Increased from 7px to 8px */
+  font-size: 12px !important;  /* Increased from 8px to 12px */
 }

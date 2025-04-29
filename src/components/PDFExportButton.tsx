@@ -80,15 +80,15 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
               margin: 0 !important;
             }
             .printable-block h2 {
-              font-size: 9px !important;
+              font-size: 14px !important;
               margin: 0 !important;
               padding: 0 !important;
             }
             .printable-block .font-semibold {
-              font-size: 8px !important;
+              font-size: 12px !important;
             }
             .printable-block div > div {
-              font-size: 8px !important;
+              font-size: 12px !important;
             }
             /* Hide everything except the blocks */
             body > *:not(.printable-page),
