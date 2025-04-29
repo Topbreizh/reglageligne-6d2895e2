@@ -1,9 +1,8 @@
+
 import PageLayout from "@/components/layout/PageLayout";
 import { ReleveBloc } from "@/components/ReleveBloc";
 import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
-// Import the new print styles
-import "@/styles/print/index.css";
 
 const RelevesPage = () => {
   const handlePrint = () => {
