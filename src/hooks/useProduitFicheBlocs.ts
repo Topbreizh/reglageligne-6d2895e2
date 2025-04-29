@@ -39,12 +39,6 @@ export const useProduitFicheBlocs = (produit: Produit) => {
     const champ = bloc.champs.find(c => c.id === champId);
     if (!champ || !champ.visible) return false;
     
-    // Si c'est le bloc calculPate, on s'assure que les champs importants sont toujours visibles
-    if (blocId === "calculPate") {
-      const champsImportants = ["poidsPate", "poidPatequalistat", "poidFourragequalistat", "poidMarquantqualistat", "nbrDeBandes"];
-      if (champsImportants.includes(champ.nomTechnique)) return true;
-    }
-    
     if (produit.numeroLigne && champ.lignesApplicables.length > 0) {
       if (champ.lignesApplicables.includes("*")) return true;
       if (champ.lignesApplicables.includes(produit.numeroLigne)) return true;
@@ -57,9 +51,6 @@ export const useProduitFicheBlocs = (produit: Produit) => {
   const estBlocVisible = useCallback((blocId: string) => {
     const bloc = blocsConfig.find(b => b.id === blocId);
     if (!bloc || !bloc.visible) return false;
-    
-    // On s'assure que le bloc calculPate est toujours visible
-    if (blocId === "calculPate") return true;
     
     if (produit.numeroLigne && bloc.lignesApplicables.length > 0) {
       if (!bloc.lignesApplicables.includes("*")) {

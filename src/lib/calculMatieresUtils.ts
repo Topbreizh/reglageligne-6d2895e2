@@ -22,14 +22,10 @@ export function calculQuantite(
   cadence: number,
   rognure: number | null = null
 ): string {
-  if (!poids || !nbBandes || !cadence) return "0";
-  
-  let quantite = poids * nbBandes * cadence * 60 / 1000;
-  
-  // Apply rognure calculation if provided (for pâte)
+  let principal = poids * nbBandes * cadence * 60 / 1000;
   if (rognure !== null) {
-    quantite = quantite * (1 - rognure/100);
+    let pourcentage = (isNaN(rognure) ? 0 : rognure) / 100;
+    principal = principal * (1 + pourcentage);
   }
-  
-  return isNaN(quantite) ? "0" : quantite.toLocaleString("fr-FR", { maximumFractionDigits: 2 });
+  return isNaN(principal) ? "" : principal.toLocaleString("fr-FR", { maximumFractionDigits: 2 });
 }

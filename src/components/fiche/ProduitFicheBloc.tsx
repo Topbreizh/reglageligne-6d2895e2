@@ -13,8 +13,7 @@ const ProduitFicheBloc = ({ bloc, produit, estChampVisible, getChampValeur }: Pr
   // Get visible fields for this block
   const champsVisibles = bloc.champs.filter(champ => estChampVisible(bloc.id, champ.id));
   
-  // Skip rendering calculPate block since we handle it separately in CalculMatieresBloc
-  if (bloc.id === "calculPate" || champsVisibles.length === 0) {
+  if (champsVisibles.length === 0) {
     return null;
   }
 
