@@ -13,21 +13,9 @@ const ProduitFicheBloc = ({ bloc, produit, estChampVisible, getChampValeur }: Pr
   // Get visible fields for this block
   const champsVisibles = bloc.champs.filter(champ => estChampVisible(bloc.id, champ.id));
   
-  // Handle special case for calculPate bloc
-  const isCalculPateBloc = bloc.id === "calculPate";
-  
-  if (champsVisibles.length === 0 && !isCalculPateBloc) {
+  // Skip rendering calculPate block since we handle it separately in CalculMatieresBloc
+  if (bloc.id === "calculPate" || champsVisibles.length === 0) {
     return null;
-  }
-  
-  // S'assurer que les champs importants des calcul matières sont toujours traités
-  if (isCalculPateBloc) {
-    console.log("Rendering calculPate bloc with fields:", 
-      produit.poidPatequalistat,
-      produit.poidFourragequalistat,
-      produit.poidMarquantqualistat,
-      produit.nbrDeBandes
-    );
   }
 
   return (
@@ -43,42 +31,6 @@ const ProduitFicheBloc = ({ bloc, produit, estChampVisible, getChampValeur }: Pr
             </div>
           ))
         }
-        
-        {/* Afficher explicitement les champs importants pour le bloc calculPate si c'est ce bloc */}
-        {isCalculPateBloc && (
-          <>
-            {produit.poidPatequalistat && (
-              <div className="flex flex-col md:flex-row md:items-center mb-2">
-                <div className="font-semibold w-40">Poids pâte Qualistat:</div>
-                <div>{produit.poidPatequalistat}</div>
-              </div>
-            )}
-            {produit.poidFourragequalistat && (
-              <div className="flex flex-col md:flex-row md:items-center mb-2">
-                <div className="font-semibold w-40">Poids fourrage qualistat:</div>
-                <div>{produit.poidFourragequalistat}</div>
-              </div>
-            )}
-            {produit.poidMarquantqualistat && (
-              <div className="flex flex-col md:flex-row md:items-center mb-2">
-                <div className="font-semibold w-40">Poids marquant qualistat:</div>
-                <div>{produit.poidMarquantqualistat}</div>
-              </div>
-            )}
-            {produit.nbrDeBandes && (
-              <div className="flex flex-col md:flex-row md:items-center mb-2">
-                <div className="font-semibold w-40">Nombre de bandes:</div>
-                <div>{produit.nbrDeBandes}</div>
-              </div>
-            )}
-            {produit.rognure && (
-              <div className="flex flex-col md:flex-row md:items-center mb-2">
-                <div className="font-semibold w-40">% Rognure:</div>
-                <div>{produit.rognure}</div>
-              </div>
-            )}
-          </>
-        )}
       </div>
       
       {bloc.id === "cadencePersonnel" && estChampVisible("cadencePersonnel", "commentaire") && (

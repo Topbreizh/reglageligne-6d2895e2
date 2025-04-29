@@ -4,6 +4,7 @@ import { Produit } from "@/types";
 import ProduitFicheHeader from "./fiche/ProduitFicheHeader";
 import ProduitFicheBloc from "./fiche/ProduitFicheBloc";
 import ProduitFicheFooter from "./fiche/ProduitFicheFooter";
+import CalculMatieresBloc from "./fiche/CalculMatieresBloc";
 import { useProduitFicheBlocs } from "@/hooks/useProduitFicheBlocs";
 
 interface ProduitFicheProps {
@@ -32,15 +33,20 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
       <ProduitFicheHeader produit={produit} printFiche={printFiche} />
 
       <div id="printable-content" className="space-y-4">
-        {visibleBlocs.map(bloc => (
-          <ProduitFicheBloc
-            key={bloc.id}
-            bloc={bloc}
-            produit={produit}
-            estChampVisible={estChampVisible}
-            getChampValeur={getChampValeur}
-          />
-        ))}
+        {/* Insert the calculation blocks at the top */}
+        <CalculMatieresBloc produit={produit} />
+        
+        {visibleBlocs
+          .filter(bloc => bloc.id !== "calculPate") // Filter out the original calculPate block as we now have a dedicated component
+          .map(bloc => (
+            <ProduitFicheBloc
+              key={bloc.id}
+              bloc={bloc}
+              produit={produit}
+              estChampVisible={estChampVisible}
+              getChampValeur={getChampValeur}
+            />
+          ))}
       </div>
 
       <ProduitFicheFooter />
