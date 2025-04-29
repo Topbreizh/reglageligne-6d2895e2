@@ -39,7 +39,7 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
       // Calculate dimensions based on A4 format
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 5; // 5mm margin
+      const margin = 3; // 3mm margin
 
       const canvas = await html2canvas(element, {
         scale: 2,
@@ -52,21 +52,22 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
           const styleElement = clonedDoc.createElement('style');
           styleElement.innerHTML = `
             .printable-block { 
-              padding: 2px !important;
-              margin-bottom: 2mm !important;
+              padding: 1px !important;
+              margin-bottom: 1mm !important;
               break-inside: avoid !important;
               border: 0.5px solid #ddd !important;
-              border-radius: 2px !important;
+              border-radius: 1px !important;
               overflow: visible !important;
             }
             #printable-content {
               display: grid !important;
               grid-template-columns: repeat(3, 1fr) !important;
-              gap: 2mm !important;
+              gap: 1mm !important;
             }
             .printable-block h2 {
               font-size: 9px !important;
-              margin-bottom: 1px !important;
+              margin: 0 0 1px 0 !important;
+              padding: 0 !important;
             }
             /* Hide everything except the blocks */
             body > *:not(.printable-page),
@@ -87,6 +88,7 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
               align-items: flex-start !important;
               padding: 0 !important;
               margin: 0 !important;
+              gap: 0.5mm !important;
             }
           `;
           clonedDoc.head.appendChild(styleElement);

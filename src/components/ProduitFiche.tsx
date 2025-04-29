@@ -22,7 +22,7 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
     style.id = 'print-override-style';
     style.innerHTML = `
       @page {
-        margin: 10mm 5mm 0mm 5mm !important;
+        margin: 5mm 3mm 0mm 3mm !important;
         size: portrait;
       }
     `;
@@ -62,7 +62,7 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
       </div>
 
       {/* This is the only content that will be visible during printing */}
-      <div id="printable-content" className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-3 gap-2 print:gap-0.5">
+      <div id="printable-content" className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-3 gap-2 print:gap-0.25">
         {visibleBlocs.map(bloc => (
           <ProduitFicheBloc
             key={bloc.id}
