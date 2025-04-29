@@ -36,7 +36,7 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
   return (
     <div className="printable-page">
       {/* Wrapper for the page header that will be hidden during print/PDF */}
-      <div className="page-header-wrapper no-print">
+      <div className="page-header-wrapper print:hidden">
         <div className="text-xs text-right text-gray-500 mb-2">
           {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}
         </div>
@@ -59,7 +59,7 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
       <ProduitFicheFooter />
       
       {/* Wrapper for the page footer that will be hidden during print/PDF */}
-      <div className="page-footer-wrapper no-print">
+      <div className="page-footer-wrapper print:hidden">
         <div className="text-xs text-center text-gray-500 mt-4">
           Document généré le {new Date().toLocaleDateString()}
         </div>
