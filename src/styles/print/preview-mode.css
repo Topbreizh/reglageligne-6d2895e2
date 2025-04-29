@@ -1,0 +1,29 @@
+
+/* Preview Mode Styles */
+
+/* Ensure both print modes use identical styling */
+body.print-mode {
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+body.print-mode .printable-block {
+  padding: 0.5px !important;
+  border: 0.5px solid #ddd !important;
+  border-radius: 0.5px !important;
+}
+
+body.print-mode .printable-block h2 {
+  font-size: 14px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body.print-mode .printable-block > div > div {
+  display: flex !important;
+  align-items: flex-start !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  gap: 0.25mm !important;
+  font-size: 12px !important;
+}

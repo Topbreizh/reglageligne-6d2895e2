@@ -1,5 +1,5 @@
 
-/* Print Styles - Extracted from index.css */
+/* Base Print Styles */
 
 @media print {
   /* Base print styles */
@@ -30,7 +30,7 @@
     box-shadow: none !important;
     padding: 0 !important;
     margin: 0 !important;
-    font-size: 12px !important;  /* Increased base font size from 8px to 12px */
+    font-size: 12px !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
@@ -66,7 +66,7 @@
   }
 
   .printable-block h2 {
-    font-size: 14px !important;  /* Increased from 9px to 14px */
+    font-size: 14px !important;
     margin: 0 !important;
     padding: 0 !important;
   }
@@ -81,11 +81,11 @@
 
   /* Text styling */
   .printable-block .font-semibold {
-    font-size: 12px !important;  /* Increased from 8px to 12px */
+    font-size: 12px !important;
   }
 
   .printable-block div > div {
-    font-size: 12px !important;  /* Increased from 8px to 12px */
+    font-size: 12px !important;
   }
 
   /* Prevent content from being cut off */
@@ -128,81 +128,6 @@
   }
 
   td, th {
-    font-size: 12px !important;  /* Increased from 8px to 12px */
+    font-size: 12px !important;
   }
-}
-
-/* PDF Export specific styles - will be applied when html2canvas renders */
-.pdf-export-mode .printable-page,
-body.print-mode .printable-page {
-  width: 210mm !important;
-  padding: 2mm !important;
-  background-color: white !important;
-}
-
-.pdf-export-mode #printable-content,
-body.print-mode #printable-content {
-  display: grid !important;
-  grid-template-columns: repeat(3, 1fr) !important;
-  gap: 0.5mm !important;
-  padding: 0 !important;
-}
-
-.pdf-export-mode .printable-block,
-body.print-mode .printable-block {
-  padding: 0.5px !important;
-  margin-bottom: 0.5mm !important;
-  break-inside: avoid;
-  page-break-inside: avoid;
-  display: inline-block;
-  width: 100%;
-  border: 0.5px solid #ddd !important;
-  overflow: visible !important;
-}
-
-/* Hide everything except the blocks in PDF export mode */
-.pdf-export-mode > *:not(#printable-content),
-body.print-mode > *:not(#printable-content) {
-  display: none !important;
-}
-
-.pdf-export-mode .print\\:hidden,
-body.print-mode .print\\:hidden {
-  display: none !important;
-}
-
-/* Prevent content from being cut off in PDF */
-.pdf-export-mode .break-words,
-body.print-mode .break-words {
-  word-break: break-word !important;
-  white-space: normal !important;
-  overflow-wrap: break-word !important;
-  max-width: calc(100% - 5px) !important;
-}
-
-/* Ensure both print modes use identical styling */
-body.print-mode {
-  -webkit-print-color-adjust: exact !important;
-  print-color-adjust: exact !important;
-}
-
-body.print-mode .printable-block {
-  padding: 0.5px !important;
-  border: 0.5px solid #ddd !important;
-  border-radius: 0.5px !important;
-}
-
-body.print-mode .printable-block h2 {
-  font-size: 14px !important;  /* Increased from 9px to 14px */
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-body.print-mode .printable-block > div > div {
-  display: flex !important;
-  align-items: flex-start !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  gap: 0.25mm !important;
-  font-size: 12px !important;  /* Increased from 8px to 12px */
 }
