@@ -1,9 +1,10 @@
-
 import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+// Import the new print styles
+import "@/styles/print/index.css";
 
 interface PDFExportButtonProps {
   contentId: string;

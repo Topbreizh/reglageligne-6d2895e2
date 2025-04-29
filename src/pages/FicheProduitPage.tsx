@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import PageLayout from "@/components/layout/PageLayout";
@@ -9,6 +8,8 @@ import { ArrowLeft } from "lucide-react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
+// Import the new print styles
+import "@/styles/print/index.css";
 
 const FicheProduitPage = () => {
   const { id } = useParams<{ id: string }>();
