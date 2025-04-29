@@ -16,10 +16,25 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
   const printFiche = () => {
     // Add print-specific class to the body before printing
     document.body.classList.add('print-mode');
+    
+    // Override browser print styles to hide URL and page info
+    const style = document.createElement('style');
+    style.id = 'print-override-style';
+    style.innerHTML = `
+      @page {
+        margin: 10mm 5mm 0mm 5mm !important;
+        size: portrait;
+      }
+    `;
+    document.head.appendChild(style);
+    
     window.print();
-    // Remove the class after printing
+    
+    // Remove the class and style element after printing
     setTimeout(() => {
       document.body.classList.remove('print-mode');
+      const styleElem = document.getElementById('print-override-style');
+      if (styleElem) styleElem.remove();
     }, 500);
   };
 

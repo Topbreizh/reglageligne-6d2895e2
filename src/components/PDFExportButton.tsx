@@ -30,6 +30,10 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
         orientation: "portrait",
         unit: "mm",
         format: "a4",
+        putOnlyUsedFonts: true,
+        compress: true,
+        precision: 2,
+        userUnit: 1.0,
       });
 
       // Calculate dimensions based on A4 format
