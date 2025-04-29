@@ -25,6 +25,18 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
       // Add PDF export class to improve rendering
       document.body.classList.add('pdf-export-mode');
       
+      // Hide header and footer elements before PDF generation
+      const pageHeaderElements = document.querySelectorAll('.page-header-wrapper');
+      const pageFooterElements = document.querySelectorAll('.page-footer-wrapper');
+      
+      pageHeaderElements.forEach((el) => {
+        (el as HTMLElement).style.display = 'none';
+      });
+      
+      pageFooterElements.forEach((el) => {
+        (el as HTMLElement).style.display = 'none';
+      });
+      
       // A4 dimensions in mm (210×297mm)
       const pdf = new jsPDF({
         orientation: "portrait",
@@ -48,8 +60,8 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
           const styleElement = clonedDoc.createElement('style');
           styleElement.innerHTML = `
             .printable-block { 
-              padding: 4px !important;
-              margin-bottom: 4px !important;
+              padding: 2px !important;
+              margin-bottom: 2px !important;
               break-inside: avoid !important;
               border: 0.5px solid #ddd !important;
               border-radius: 2px !important;
@@ -61,11 +73,35 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
             }
             .printable-block h2 {
               font-size: 9px !important;
-              margin-bottom: 2px !important;
+              margin-bottom: 1px !important;
+            }
+            .page-header-wrapper, .page-footer-wrapper {
+              display: none !important;
             }
           `;
           clonedDoc.head.appendChild(styleElement);
+          
+          // Hide header and footer in the clone
+          const headerElements = clonedDoc.querySelectorAll('.page-header-wrapper');
+          const footerElements = clonedDoc.querySelectorAll('.page-footer-wrapper');
+          
+          headerElements.forEach((el) => {
+            (el as HTMLElement).style.display = 'none';
+          });
+          
+          footerElements.forEach((el) => {
+            (el as HTMLElement).style.display = 'none';
+          });
         }
+      });
+      
+      // Restore header and footer elements after canvas generation
+      pageHeaderElements.forEach((el) => {
+        (el as HTMLElement).style.display = '';
+      });
+      
+      pageFooterElements.forEach((el) => {
+        (el as HTMLElement).style.display = '';
       });
       
       // Remove PDF export class
