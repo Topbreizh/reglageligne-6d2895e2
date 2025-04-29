@@ -34,6 +34,7 @@ const App = () => (
             <Route path="/recherche" element={<RecherchePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/fiche/:id" element={<FicheProduitPage />} />
+            <Route path="/calcul-matieres" element={<CalculMatieresPage />} />
             
             {/* Protected Routes */}
             <Route path="/nouveau-produit" element={
@@ -59,11 +60,6 @@ const App = () => (
             <Route path="/gestion-blocs" element={
               <ProtectedRoute>
                 <GestionBlocsPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/calcul-matieres" element={
-              <ProtectedRoute>
-                <CalculMatieresPage />
               </ProtectedRoute>
             } />
             
