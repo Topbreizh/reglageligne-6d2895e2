@@ -101,8 +101,8 @@ const FicheProduitPage = () => {
 
   return (
     <PageLayout className="bg-gray-50 print:bg-white print:p-0">
-      <div className="max-w-5xl mx-auto bg-white shadow-sm rounded-lg overflow-hidden print:shadow-none print:rounded-none">
-        <div className="no-print p-4 bg-gray-100 border-b border-gray-200">
+      <div className="max-w-5xl mx-auto bg-white shadow-sm rounded-lg overflow-hidden print:shadow-none print:rounded-none print:border-0">
+        <div className="print:hidden p-4 bg-gray-100 border-b border-gray-200">
           <Button
             variant="outline"
             onClick={() => navigate(-1)}
@@ -113,7 +113,7 @@ const FicheProduitPage = () => {
           </Button>
         </div>
         
-        <div className="p-6">
+        <div className="p-6 print:p-0">
           <ProduitFiche produit={produit} />
         </div>
       </div>
