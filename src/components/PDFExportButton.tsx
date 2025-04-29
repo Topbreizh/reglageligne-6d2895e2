@@ -70,6 +70,10 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
             .print\\:hidden {
               display: none !important;
             }
+            /* Hide any headers and footers */
+            header, footer, nav, .header, .footer, .nav-container {
+              display: none !important;
+            }
             .break-words {
               word-break: break-word !important;
               white-space: normal !important;

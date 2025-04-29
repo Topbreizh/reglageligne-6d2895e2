@@ -35,7 +35,7 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
 
   return (
     <div className="printable-page">
-      {/* Wrapper for the page header that will be hidden during print/PDF */}
+      {/* All header elements marked as print:hidden */}
       <div className="print:hidden">
         <div className="text-xs text-right text-gray-500 mb-2">
           {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}
@@ -46,6 +46,7 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
         <ProduitFicheHeader produit={produit} printFiche={printFiche} />
       </div>
 
+      {/* This is the only content that will be visible during printing */}
       <div id="printable-content" className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-3 gap-2 print:gap-0.5">
         {visibleBlocs.map(bloc => (
           <ProduitFicheBloc
@@ -58,11 +59,11 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
         ))}
       </div>
 
+      {/* All footer elements marked as print:hidden */}
       <div className="print:hidden">
         <ProduitFicheFooter />
       </div>
       
-      {/* Wrapper for the page footer that will be hidden during print/PDF */}
       <div className="print:hidden">
         <div className="text-xs text-center text-gray-500 mt-4">
           Document généré le {new Date().toLocaleDateString()}

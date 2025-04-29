@@ -91,6 +91,11 @@
     display: none !important;
   }
 
+  /* Hide all navigation, headers, footers completely */
+  header, nav, footer, .navbar, .footer, .nav-container {
+    display: none !important;
+  }
+
   /* Improve table rendering */
   table {
     border-collapse: collapse !important;
