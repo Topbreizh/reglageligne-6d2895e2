@@ -31,7 +31,7 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
     <div className="printable-page">
       <ProduitFicheHeader produit={produit} printFiche={printFiche} />
 
-      <div id="printable-content" className="space-y-4">
+      <div id="printable-content" className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-3 gap-3 print:gap-2">
         {visibleBlocs.map(bloc => (
           <ProduitFicheBloc
             key={bloc.id}
