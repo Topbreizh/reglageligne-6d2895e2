@@ -9,6 +9,41 @@ interface ReleveProduitDetailsProps {
 export const ReleveProduitDetails = ({ produit }: ReleveProduitDetailsProps) => {
   const renderBlocs = () => {
     return blocsConfiguration.map((bloc) => {
+      // Special rendering for calculPate bloc
+      if (bloc.id === "calculPate") {
+        // Create an ordered list of fields we want to display
+        const fieldMap: Record<string, string> = {
+          "poidPatequalistat": "Poids pâte Qualistat",
+          "poidFourragequalistat": "Poids fourrage qualistat",
+          "poidMarquantqualistat": "Poids marquant Qualistat",
+          "nbrDeBandes": "Nombre de bandes",
+          "rognure": "% Rognure"
+        };
+        
+        const fieldOrder = ["poidPatequalistat", "poidFourragequalistat", "poidMarquantqualistat", "nbrDeBandes", "rognure"];
+        
+        return (
+          <div key={bloc.id} className="border-t pt-2 mt-2">
+            <div className="font-semibold mb-1 text-xs">{bloc.nom}</div>
+            <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs">
+              {fieldOrder.map(fieldName => {
+                const value = produit[fieldName as keyof Produit] || '';
+                if (value) {
+                  return (
+                    <div key={fieldName} className="overflow-hidden text-ellipsis">
+                      <span className="font-medium">{fieldMap[fieldName]}:</span>{" "}
+                      {value}
+                    </div>
+                  );
+                }
+                return null;
+              }).filter(Boolean)}
+            </div>
+          </div>
+        );
+      }
+      
+      // Standard rendering for other blocs
       const champsVisibles = bloc.champs.filter(champ => {
         return champ.visible && 
                (champ.lignesApplicables.includes('*') || 

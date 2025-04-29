@@ -19,25 +19,47 @@ const ProduitFormSection = ({
   // Enhanced logging for debugging the data flow
   console.log(`Rendering section ${bloc.nom} with id: ${bloc.id}`);
   
-  // Special logging for the calcul de pâte block
+  // Special styling for the calcul de pâte block
   if (bloc.id === "calculPate") {
-    console.log("Data in Calcul de pâte block:", {
-      poidsPate: formData.poidsPate,
-      poidsArticle: formData.poidsArticle,
-      quantitePate: formData.quantitePate,
-      poidPatequalistat: formData.poidPatequalistat,
-      poidFourragequalistat: formData.poidFourragequalistat,
-      poidMarquantqualistat: formData.poidMarquantqualistat,
-      nbrDeBandes: formData.nbrDeBandes,
-      rognure: formData.rognure
-    });
+    console.log("Rendering special Calcul de pâte block");
     
-    // Log visible fields to verify their technical names
-    console.log("Visible fields in Calcul de pâte:", 
-      champsVisibles.map(c => ({ id: c.id, nom: c.nom, nomTechnique: c.nomTechnique }))
+    // Find the specific fields we want to display
+    const fieldMap: Record<string, string> = {
+      "poidPatequalistat": "Poids pâte Qualistat:",
+      "poidFourragequalistat": "Poids fourrage qualistat:",
+      "poidMarquantqualistat": "Poids marquant Qualistat:",
+      "nbrDeBandes": "Nombre de bandes:",
+      "rognure": "% Rognure:"
+    };
+    
+    // Create an array of the field data we want to show in order
+    const fieldOrder = ["poidPatequalistat", "poidFourragequalistat", "poidMarquantqualistat", "nbrDeBandes", "rognure"];
+    
+    return (
+      <Card key={bloc.id}>
+        <CardHeader>
+          <CardTitle className="text-lg font-bold text-noir-800 border-b-2 border-jaune-300 pb-2">
+            {bloc.nom}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            {fieldOrder.map(fieldName => {
+              const value = formData[fieldName as keyof Produit] || '';
+              return (
+                <div key={fieldName} className="grid grid-cols-2 items-center">
+                  <span className="font-medium">{fieldMap[fieldName]}</span>
+                  <span>{value}</span>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
+  // Default rendering for all other blocks
   return (
     <Card key={bloc.id}>
       <CardHeader>
