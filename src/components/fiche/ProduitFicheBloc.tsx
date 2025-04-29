@@ -18,24 +18,24 @@ const ProduitFicheBloc = ({ bloc, produit, estChampVisible, getChampValeur }: Pr
   }
 
   return (
-    <div className="printable-block mb-3 p-2 border border-gray-200 rounded-lg print:p-1.5 print:text-xs">
-      <h2 className="text-base font-bold mb-1.5 text-jaune-500 print:mb-1 print:text-sm">{bloc.nom}</h2>
-      <div className="space-y-1">
+    <div className="printable-block mb-2 p-2 border border-gray-200 rounded-lg print:p-1 print:text-xs print:border-[0.5px] print:mb-1">
+      <h2 className="text-sm font-bold mb-1 text-jaune-500 print:mb-0.5 print:text-xs">{bloc.nom}</h2>
+      <div className="space-y-0.5">
         {champsVisibles
           .sort((a, b) => a.ordre - b.ordre)
           .map(champ => (
-            <div key={champ.id} className="flex flex-row items-start gap-1 mb-1 print:mb-0.5">
-              <div className="font-semibold text-sm print:text-xs w-28">{champ.nom}:</div>
-              <div className="text-sm print:text-xs">{getChampValeur(champ.nomTechnique)}</div>
+            <div key={champ.id} className="flex flex-row items-start gap-1 mb-0.5 print:mb-0">
+              <div className="font-semibold text-xs print:text-[8px] w-24 print:w-20 min-w-fit">{champ.nom}:</div>
+              <div className="text-xs print:text-[8px]">{getChampValeur(champ.nomTechnique)}</div>
             </div>
           ))
         }
       </div>
       
       {bloc.id === "cadencePersonnel" && estChampVisible("cadencePersonnel", "commentaire") && (
-        <div className="mt-2 print:mt-1">
-          <h3 className="font-semibold text-sm print:text-xs">Commentaire:</h3>
-          <p className="whitespace-pre-line text-sm print:text-xs">{produit.commentaire || "-"}</p>
+        <div className="mt-1 print:mt-0.5">
+          <h3 className="font-semibold text-xs print:text-[8px]">Commentaire:</h3>
+          <p className="whitespace-pre-line text-xs print:text-[8px] line-clamp-3 print:line-clamp-2">{produit.commentaire || "-"}</p>
         </div>
       )}
     </div>

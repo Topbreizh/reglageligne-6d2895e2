@@ -2,7 +2,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { FileText, Pencil } from "lucide-react";
+import { Printer, Pencil } from "lucide-react";
 import PDFExportButton from "@/components/PDFExportButton";
 import { Produit } from "@/types";
 
@@ -13,8 +13,8 @@ interface ProduitFicheHeaderProps {
 
 const ProduitFicheHeader = ({ produit, printFiche }: ProduitFicheHeaderProps) => {
   return (
-    <div className="printable-header mb-6">
-      <h1 className="text-2xl font-bold">
+    <div className="printable-header mb-4 print:mb-2">
+      <h1 className="text-xl font-bold print:text-sm">
         Fiche Produit: {produit.designation} ({produit.codeArticle})
       </h1>
       <div className="no-print flex flex-wrap gap-2 mt-2">
@@ -25,7 +25,7 @@ const ProduitFicheHeader = ({ produit, printFiche }: ProduitFicheHeaderProps) =>
           </Button>
         </Link>
         <Button onClick={printFiche} variant="outline">
-          <FileText className="h-4 w-4 mr-2" />
+          <Printer className="h-4 w-4 mr-2" />
           Imprimer
         </Button>
         <PDFExportButton contentId="printable-content" />

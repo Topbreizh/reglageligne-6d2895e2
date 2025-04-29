@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -122,7 +123,7 @@
   @media screen {
     #printable-content {
       columns: 1;
-      column-gap: 2rem;
+      column-gap: 1.5rem;
       orphans: 3;
       widows: 3;
     }
@@ -143,7 +144,7 @@
   @media print {
     @page {
       size: portrait;
-      margin: 10mm;
+      margin: 5mm;
     }
 
     html, body {
@@ -153,7 +154,7 @@
       box-shadow: none !important;
       padding: 0 !important;
       margin: 0 !important;
-      font-size: 9px !important;
+      font-size: 8px !important;
     }
 
     .printable-page {
@@ -166,18 +167,18 @@
     #printable-content {
       display: grid !important;
       grid-template-columns: repeat(3, 1fr) !important;
-      gap: 0.5rem !important;
+      gap: 0.25rem !important;
       width: 100% !important;
       padding: 0 !important;
     }
 
     .printable-header h1 {
-      font-size: 14px !important;
+      font-size: 12px !important;
     }
 
     .printable-block {
-      padding: 6px !important;
-      margin-bottom: 8px !important;
+      padding: 4px !important;
+      margin-bottom: 4px !important;
       break-inside: avoid;
       display: inline-block;
       width: 100%;
@@ -186,7 +187,7 @@
     .grid {
       display: grid !important;
       grid-template-columns: 1fr !important;
-      gap: 4px !important;
+      gap: 2px !important;
     }
 
     /* Force page breaks every 3 blocks */
@@ -199,3 +200,4 @@
     }
   }
 }
+
