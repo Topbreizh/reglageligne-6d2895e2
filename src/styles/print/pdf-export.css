@@ -1,0 +1,66 @@
+
+/* PDF Export specific styles */
+
+/* PDF Export specific styles - will be applied when html2canvas renders */
+.pdf-export-mode .printable-page,
+body.print-mode .printable-page {
+  width: 210mm !important;
+  padding: 5mm !important;
+  background-color: white !important;
+}
+
+.pdf-export-mode #printable-content,
+body.print-mode #printable-content {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 2mm !important;
+}
+
+.pdf-export-mode .printable-block,
+body.print-mode .printable-block {
+  padding: 2px !important;
+  margin-bottom: 2mm !important;
+  break-inside: avoid;
+  page-break-inside: avoid;
+  display: inline-block;
+  width: 100%;
+  border: 0.5px solid #ddd !important;
+  overflow: visible !important;
+}
+
+/* Hide everything except the blocks in PDF export mode */
+.pdf-export-mode > *:not(#printable-content),
+body.print-mode > *:not(#printable-content) {
+  display: none !important;
+}
+
+.pdf-export-mode .print\\:hidden,
+body.print-mode .print\\:hidden {
+  display: none !important;
+}
+
+/* Prevent content from being cut off in PDF */
+.pdf-export-mode .break-words,
+body.print-mode .break-words {
+  word-break: break-word !important;
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+  max-width: calc(100% - 20px) !important;
+}
+
+/* Ensure both print modes use identical styling */
+body.print-mode {
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+body.print-mode .printable-block {
+  padding: 2px !important;
+  border: 0.5px solid #ddd !important;
+  border-radius: 2px !important;
+}
+
+body.print-mode .printable-block h2 {
+  font-size: 9px !important;
+  margin-bottom: 1px !important;
+}

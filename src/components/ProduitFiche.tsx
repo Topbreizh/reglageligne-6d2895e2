@@ -1,10 +1,10 @@
-
 import React from "react";
 import { Produit } from "@/types";
 import ProduitFicheHeader from "./fiche/ProduitFicheHeader";
 import ProduitFicheBloc from "./fiche/ProduitFicheBloc";
 import ProduitFicheFooter from "./fiche/ProduitFicheFooter";
 import { useProduitFicheBlocs } from "@/hooks/useProduitFicheBlocs";
+import "@/styles/print/index.css"; // Updated import for modular print styles
 
 interface ProduitFicheProps {
   produit: Produit;
