@@ -30,22 +30,35 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
         orientation: "portrait",
         unit: "mm",
         format: "a4",
-        putOnlyUsedFonts: true,
         compress: true,
-        precision: 2,
-        userUnit: 1.0,
       });
 
       // Calculate dimensions based on A4 format
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 3; // 3mm margin
+      const margin = 2; // 2mm margin (reduced from 3mm)
+
+      // Create a clone of the element for PDF rendering to avoid affecting the actual DOM
+      const clonedElement = element.cloneNode(true) as HTMLElement;
+      clonedElement.style.width = '210mm';
+      clonedElement.style.padding = '0';
+      clonedElement.style.margin = '0';
+      clonedElement.style.display = 'grid';
+      clonedElement.style.gridTemplateColumns = 'repeat(3, 1fr)';
+      clonedElement.style.gap = '0.5mm';
+      
+      // Apply styling to ensure better PDF rendering
+      Array.from(clonedElement.querySelectorAll('.printable-block')).forEach((block: HTMLElement) => {
+        block.style.padding = '1px';
+        block.style.margin = '0 0 1px 0';
+        block.style.border = '0.5px solid #ddd';
+        block.style.overflow = 'visible';
+      });
 
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: 2, // Higher resolution
         useCORS: true,
         logging: false,
-        windowWidth: 1200, 
         backgroundColor: "#ffffff",
         onclone: (clonedDoc) => {
           // Apply print-specific styles to cloned document
@@ -53,25 +66,27 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
           styleElement.innerHTML = `
             .printable-block { 
               padding: 1px !important;
-              margin-bottom: 1mm !important;
+              margin-bottom: 0.5mm !important;
               break-inside: avoid !important;
               border: 0.5px solid #ddd !important;
-              border-radius: 1px !important;
+              border-radius: 0.5px !important;
               overflow: visible !important;
             }
-            #printable-content {
+            #${contentId} {
               display: grid !important;
               grid-template-columns: repeat(3, 1fr) !important;
-              gap: 1mm !important;
+              gap: 0.5mm !important;
+              padding: 0 !important;
+              margin: 0 !important;
             }
             .printable-block h2 {
-              font-size: 9px !important;
-              margin: 0 0 1px 0 !important;
+              font-size: 8px !important;
+              margin: 0 !important;
               padding: 0 !important;
             }
             /* Hide everything except the blocks */
             body > *:not(.printable-page),
-            .printable-page > *:not(#printable-content),
+            .printable-page > *:not(#${contentId}),
             .print\\:hidden {
               display: none !important;
             }
@@ -88,7 +103,7 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
               align-items: flex-start !important;
               padding: 0 !important;
               margin: 0 !important;
-              gap: 0.5mm !important;
+              gap: 0.25mm !important;
             }
           `;
           clonedDoc.head.appendChild(styleElement);
@@ -110,14 +125,13 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
       const imgWidth = pageWidth - (margin * 2);
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       
-      let heightLeft = imgHeight;
-      let position = 0;
-      let page = 1;
-
       // Add first page
       pdf.addImage(imgData, "JPEG", margin, margin, imgWidth, imgHeight);
-      heightLeft -= (pageHeight - (margin * 2));
-      position = -(pageHeight - (margin * 2));
+      
+      // Calculate number of pages needed
+      let heightLeft = imgHeight - (pageHeight - (margin * 2));
+      let position = -(pageHeight - (margin * 2));
+      let page = 1;
 
       // Add additional pages if needed
       while (heightLeft > 0) {
@@ -128,6 +142,7 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
         position -= (pageHeight - (margin * 2));
       }
 
+      // Save the PDF with the correct filename
       pdf.save(`fiche-produit-${new Date().toISOString().slice(0, 10)}.pdf`);
 
       toast({

@@ -22,8 +22,16 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
     style.id = 'print-override-style';
     style.innerHTML = `
       @page {
-        margin: 5mm 3mm 0mm 3mm !important;
+        margin: 2mm 2mm 0mm 2mm !important;
         size: portrait;
+      }
+      @page :footer {
+        display: none !important;
+        height: 0;
+      }
+      @page :header {
+        display: none !important;
+        height: 0;
       }
     `;
     document.head.appendChild(style);
@@ -52,7 +60,7 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
     <div className="printable-page">
       {/* All header elements marked as print:hidden */}
       <div className="print:hidden">
-        <div className="text-xs text-right text-gray-500 mb-2">
+        <div className="text-xs text-right text-gray-500 mb-1">
           {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}
         </div>
       </div>
@@ -62,7 +70,7 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
       </div>
 
       {/* This is the only content that will be visible during printing */}
-      <div id="printable-content" className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-3 gap-2 print:gap-0.25">
+      <div id="printable-content" className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-3 gap-1 print:gap-0">
         {visibleBlocs.map(bloc => (
           <ProduitFicheBloc
             key={bloc.id}
