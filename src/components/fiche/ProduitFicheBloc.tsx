@@ -26,9 +26,9 @@ const ProduitFicheBloc = ({ bloc, produit, estChampVisible, getChampValeur }: Pr
           .map(champ => {
             const valeur = getChampValeur(champ.nomTechnique);
             return (
-              <div key={champ.id} className="flex flex-row flex-wrap items-start gap-1 mb-0.5 print:mb-0.5 print:gap-0.5">
-                <div className="font-semibold text-xs print:text-[8px] w-12 print:w-10 min-w-fit whitespace-nowrap">{champ.nom}:</div>
-                <div className="text-xs print:text-[8px] break-words max-w-[calc(100%-55px)]">{valeur}</div>
+              <div key={champ.id} className="flex flex-row flex-wrap items-start gap-1 mb-0.5 print:mb-0.5 print:gap-1">
+                <div className="font-semibold text-xs print:text-[8px] w-12 print:w-10 min-w-fit whitespace-nowrap print:mr-1">{champ.nom}:</div>
+                <div className="text-xs print:text-[8px] break-words max-w-[calc(100%-55px)] print:ml-1">{valeur}</div>
               </div>
             );
           })

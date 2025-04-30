@@ -34,7 +34,7 @@ body.print-mode .printable-block {
 .pdf-export-mode h2,
 body.print-mode h2 {
   font-size: 10px !important;
-  margin: 0 0 1mm 0 !important;
+  margin: 0 0 1.5mm 0 !important;
   padding: 0 !important;
 }
 
@@ -65,9 +65,14 @@ body.print-mode .printable-block > div > div {
   flex-wrap: wrap !important;
   align-items: flex-start !important;
   padding: 0 !important;
-  margin: 0 0 1mm 0 !important;
-  gap: 1mm !important;
+  margin: 0 0 1.5mm 0 !important;
+  gap: 1.5mm !important; /* Increased gap between rows */
   font-size: 8px !important;
+}
+
+.pdf-export-mode .printable-block > div > div > div,
+body.print-mode .printable-block > div > div > div {
+  margin-right: 1.5mm !important; /* Add space between label and value */
 }
 
 .pdf-export-mode .printable-block .font-semibold,
@@ -75,7 +80,7 @@ body.print-mode .printable-block .font-semibold {
   font-size: 8px !important;
   max-width: 12mm !important;
   min-width: fit-content !important;
-  margin-right: 1mm !important;
+  margin-right: 2mm !important; /* Increased space after label */
 }
 
 /* Mobile-specific adjustments for PDF export */
@@ -91,7 +96,7 @@ body.print-mode .printable-block .font-semibold {
   .pdf-export-mode .printable-block,
   body.print-mode .printable-block {
     font-size: 8px !important;
-    padding: 1mm !important;
+    padding: 1.5mm !important;
     margin: 0 0 1.5mm 0 !important;
     width: 100% !important;
     box-sizing: border-box !important;
@@ -100,9 +105,9 @@ body.print-mode .printable-block .font-semibold {
   .pdf-export-mode .printable-block > div > div,
   body.print-mode .printable-block > div > div {
     font-size: 8px !important;
-    margin: 0 0 1mm 0 !important;
+    margin: 0 0 1.5mm 0 !important;
     padding: 0 !important;
-    gap: 1mm !important;
+    gap: 1.5mm !important;
   }
   
   .pdf-export-mode .printable-block .font-semibold,
@@ -110,6 +115,6 @@ body.print-mode .printable-block .font-semibold {
     font-size: 8px !important;
     max-width: 12mm !important;
     min-width: fit-content !important;
-    margin-right: 1mm !important;
+    margin-right: 2mm !important;
   }
 }
