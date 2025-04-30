@@ -58,29 +58,23 @@ body.print-mode .break-words {
   max-width: 100% !important;
 }
 
-/* Make sure text in labels doesn't overflow */
+/* Make sure text in labels doesn't overflow - now in column format */
 .pdf-export-mode .printable-block > div > div,
 body.print-mode .printable-block > div > div {
   display: flex !important;
-  flex-wrap: wrap !important;
+  flex-direction: column !important;
   align-items: flex-start !important;
   padding: 0 !important;
   margin: 0 0 1.5mm 0 !important;
-  gap: 1.5mm !important; /* Increased gap between rows */
+  gap: 0.8mm !important; /* Gap between label and value */
   font-size: 8px !important;
-}
-
-.pdf-export-mode .printable-block > div > div > div,
-body.print-mode .printable-block > div > div > div {
-  margin-right: 1.5mm !important; /* Add space between label and value */
 }
 
 .pdf-export-mode .printable-block .font-semibold,
 body.print-mode .printable-block .font-semibold {
   font-size: 8px !important;
-  max-width: 12mm !important;
-  min-width: fit-content !important;
-  margin-right: 2mm !important; /* Increased space after label */
+  width: 100% !important;
+  margin-bottom: 0.8mm !important;
 }
 
 /* Mobile-specific adjustments for PDF export */
@@ -107,14 +101,14 @@ body.print-mode .printable-block .font-semibold {
     font-size: 8px !important;
     margin: 0 0 1.5mm 0 !important;
     padding: 0 !important;
-    gap: 1.5mm !important;
+    gap: 0.8mm !important;
+    flex-direction: column !important;
   }
   
   .pdf-export-mode .printable-block .font-semibold,
   body.print-mode .printable-block .font-semibold {
     font-size: 8px !important;
-    max-width: 12mm !important;
-    min-width: fit-content !important;
-    margin-right: 2mm !important;
+    width: 100% !important;
+    margin-bottom: 0.8mm !important;
   }
 }
