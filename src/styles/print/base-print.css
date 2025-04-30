@@ -73,18 +73,16 @@
 
   .printable-block > div > div {
     display: flex !important;
-    flex-direction: column !important;
     align-items: flex-start !important;
     padding: 0 !important;
     margin: 0 0 1mm 0 !important;
-    gap: 0.8mm !important;
+    gap: 1mm !important;
   }
 
   /* Text styling */
   .printable-block .font-semibold {
     font-size: 8px !important;
-    width: 100% !important;
-    margin-bottom: 0.8mm !important;
+    margin-right: 1mm !important;
   }
 
   .printable-block div > div {
@@ -96,7 +94,7 @@
     word-break: break-word !important;
     white-space: normal !important;
     overflow-wrap: break-word !important;
-    max-width: 100% !important;
+    max-width: calc(100% - 5mm) !important;
   }
 
   /* Page break control */
@@ -156,15 +154,14 @@
     
     /* Ensure text fits in columns */
     .printable-block > div > div {
-      gap: 0.8mm !important;
+      gap: 1mm !important;
       margin: 0 0 1mm 0 !important;
-      flex-direction: column !important;
     }
     
     .printable-block .font-semibold {
       font-size: 8px !important;
-      width: 100% !important;
-      margin-bottom: 0.8mm !important;
+      max-width: 12mm !important;
+      margin-right: 1mm !important;
     }
   }
 }
