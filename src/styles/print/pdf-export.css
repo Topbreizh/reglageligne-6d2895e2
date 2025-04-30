@@ -14,18 +14,28 @@ body.print-mode #printable-content {
   grid-template-columns: repeat(3, 1fr) !important;
   gap: 0.5mm !important;
   padding: 0 !important;
+  width: 100% !important;
 }
 
 .pdf-export-mode .printable-block,
 body.print-mode .printable-block {
   padding: 0.5px !important;
   margin-bottom: 0.5mm !important;
-  break-inside: avoid;
-  page-break-inside: avoid;
-  display: inline-block;
-  width: 100%;
+  break-inside: avoid !important;
+  page-break-inside: avoid !important;
+  display: inline-block !important;
+  width: 100% !important;
   border: 0.5px solid #ddd !important;
   overflow: visible !important;
+  font-size: 8px !important;
+  box-sizing: border-box !important;
+}
+
+.pdf-export-mode h2,
+body.print-mode h2 {
+  font-size: 10px !important;
+  margin: 0 0 0.5px 0 !important;
+  padding: 0 !important;
 }
 
 /* Hide everything except the blocks in PDF export mode */
@@ -55,15 +65,16 @@ body.print-mode .printable-block > div > div {
   flex-wrap: wrap !important;
   align-items: flex-start !important;
   padding: 0 !important;
-  margin: 0 !important;
-  gap: 0.25mm !important;
-  font-size: 12px !important;
+  margin: 0 0 0.5px 0 !important;
+  gap: 0 !important;
+  font-size: 8px !important;
 }
 
 .pdf-export-mode .printable-block .font-semibold,
 body.print-mode .printable-block .font-semibold {
-  font-size: 12px !important;
-  max-width: 30% !important;
+  font-size: 8px !important;
+  max-width: 10px !important;
+  min-width: fit-content !important;
 }
 
 /* Mobile-specific adjustments for PDF export */
@@ -78,19 +89,25 @@ body.print-mode .printable-block .font-semibold {
   
   .pdf-export-mode .printable-block,
   body.print-mode .printable-block {
-    font-size: 10px !important;
+    font-size: 8px !important;
     padding: 0.25px !important;
     margin: 0 0 0.5mm 0 !important;
     width: 100% !important;
+    box-sizing: border-box !important;
   }
   
   .pdf-export-mode .printable-block > div > div,
   body.print-mode .printable-block > div > div {
-    font-size: 10px !important;
+    font-size: 8px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 0 !important;
   }
   
   .pdf-export-mode .printable-block .font-semibold,
   body.print-mode .printable-block .font-semibold {
-    font-size: 10px !important;
+    font-size: 8px !important;
+    max-width: 10px !important;
+    min-width: fit-content !important;
   }
 }
