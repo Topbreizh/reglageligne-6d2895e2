@@ -45,21 +45,52 @@ body.print-mode .break-words {
   word-break: break-word !important;
   white-space: normal !important;
   overflow-wrap: break-word !important;
-  max-width: calc(100% - 5px) !important;
+  max-width: 100% !important;
+}
+
+/* Make sure text in labels doesn't overflow */
+.pdf-export-mode .printable-block > div > div,
+body.print-mode .printable-block > div > div {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: flex-start !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  gap: 0.25mm !important;
+  font-size: 12px !important;
+}
+
+.pdf-export-mode .printable-block .font-semibold,
+body.print-mode .printable-block .font-semibold {
+  font-size: 12px !important;
+  max-width: 30% !important;
 }
 
 /* Mobile-specific adjustments for PDF export */
 @media screen and (max-width: 767px) {
-  .pdf-export-mode #printable-content {
-    width: 100vw !important;
+  .pdf-export-mode #printable-content,
+  body.print-mode #printable-content {
+    width: 100% !important;
     display: grid !important;
     grid-template-columns: repeat(3, 1fr) !important;
     gap: 0.25mm !important;
   }
   
-  .pdf-export-mode .printable-block {
+  .pdf-export-mode .printable-block,
+  body.print-mode .printable-block {
     font-size: 10px !important;
     padding: 0.25px !important;
+    margin: 0 0 0.5mm 0 !important;
+    width: 100% !important;
+  }
+  
+  .pdf-export-mode .printable-block > div > div,
+  body.print-mode .printable-block > div > div {
+    font-size: 10px !important;
+  }
+  
+  .pdf-export-mode .printable-block .font-semibold,
+  body.print-mode .printable-block .font-semibold {
+    font-size: 10px !important;
   }
 }
-

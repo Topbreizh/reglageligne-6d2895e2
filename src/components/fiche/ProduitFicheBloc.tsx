@@ -23,19 +23,22 @@ const ProduitFicheBloc = ({ bloc, produit, estChampVisible, getChampValeur }: Pr
       <div className="space-y-0">
         {champsVisibles
           .sort((a, b) => a.ordre - b.ordre)
-          .map(champ => (
-            <div key={champ.id} className="flex flex-row items-start gap-0.5 mb-0.5 print:mb-0 print:gap-0.25">
-              <div className="font-semibold text-xs print:text-[12px] w-16 print:w-12 min-w-fit whitespace-nowrap">{champ.nom}:</div>
-              <div className="text-xs print:text-[12px] print:break-words">{getChampValeur(champ.nomTechnique)}</div>
-            </div>
-          ))
+          .map(champ => {
+            const valeur = getChampValeur(champ.nomTechnique);
+            return (
+              <div key={champ.id} className="flex flex-row items-start gap-0.5 mb-0.5 print:mb-0 print:gap-0.25">
+                <div className="font-semibold text-xs print:text-[12px] w-16 print:w-12 min-w-fit whitespace-nowrap">{champ.nom}:</div>
+                <div className="text-xs print:text-[12px] break-words max-w-[calc(100%-70px)]">{valeur}</div>
+              </div>
+            );
+          })
         }
       </div>
       
       {bloc.id === "cadencePersonnel" && estChampVisible("cadencePersonnel", "commentaire") && (
         <div className="mt-0.5 print:mt-0">
           <h3 className="font-semibold text-xs print:text-[12px]">Commentaire:</h3>
-          <p className="whitespace-pre-line text-xs print:text-[12px] print:break-words">{produit.commentaire || "-"}</p>
+          <p className="whitespace-pre-line text-xs print:text-[12px] break-words max-w-full">{produit.commentaire || "-"}</p>
         </div>
       )}
     </div>

@@ -34,6 +34,13 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
         printableContent.style.display = 'grid';
         printableContent.style.gridTemplateColumns = 'repeat(3, 1fr)';
         printableContent.style.gap = '0.5mm';
+        
+        // Restore after printing
+        setTimeout(() => {
+          printableContent.style.display = originalStyles.display || '';
+          printableContent.style.gridTemplateColumns = originalStyles.gridTemplateColumns || '';
+          printableContent.style.gap = originalStyles.gap || '';
+        }, 1000);
       }
     }
     
@@ -77,7 +84,7 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
   const visibleBlocs = getVisibleBlocs();
 
   return (
-    <div className="printable-page">
+    <div className="printable-page w-full">
       {/* All header elements marked as print:hidden */}
       <div className="print:hidden">
         <div className="text-xs text-right text-gray-500 mb-1">
@@ -90,7 +97,11 @@ const ProduitFiche = ({ produit }: ProduitFicheProps) => {
       </div>
 
       {/* This is the only content that will be visible during printing */}
-      <div id="printable-content" className={`grid grid-cols-1 ${!isMobile ? 'md:grid-cols-2' : ''} print:grid-cols-3 gap-1 print:gap-0`}>
+      <div 
+        id="printable-content" 
+        className={`grid grid-cols-1 ${!isMobile ? 'md:grid-cols-2 lg:grid-cols-3' : ''} print:grid-cols-3 gap-1 print:gap-0`}
+        style={{ width: '100%' }}
+      >
         {visibleBlocs.map(bloc => (
           <ProduitFicheBloc
             key={bloc.id}
