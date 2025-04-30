@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
@@ -33,6 +32,9 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
         throw new Error("Contenu non trouvé");
       }
       
+      // Add the print mode class to the body to apply print styles
+      document.body.classList.add('print-mode');
+      
       // Create a wrapper div to ensure consistent layout
       const wrapper = document.createElement('div');
       wrapper.style.width = '210mm'; // A4 width
@@ -40,50 +42,51 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
       wrapper.style.position = 'absolute';
       wrapper.style.left = '-9999px';
       wrapper.style.top = '0';
+      wrapper.style.padding = '5mm';
       
       // Clone the content
       const clone = element.cloneNode(true) as HTMLElement;
       clone.id = 'pdf-export-clone';
       clone.style.display = 'grid';
       clone.style.gridTemplateColumns = 'repeat(3, 1fr)';
-      clone.style.gap = '0.5mm';
+      clone.style.gap = '2mm';
       clone.style.width = '100%';
-      clone.style.padding = '2mm';
       
-      // Apply PDF export styles to clone
+      // Apply PDF export styles
       Array.from(clone.querySelectorAll('.printable-block')).forEach((block: HTMLElement) => {
-        block.style.padding = '0.5px';
-        block.style.margin = '0 0 0.5mm 0';
+        // Keep the same styling as print mode
+        block.style.padding = '1.5mm';
+        block.style.marginBottom = '2mm';
         block.style.border = '0.5px solid #ddd';
         block.style.borderRadius = '0.5px';
-        block.style.fontSize = '8px';
         block.style.breakInside = 'avoid';
         block.style.pageBreakInside = 'avoid';
         block.style.display = 'inline-block';
         block.style.width = '100%';
         block.style.boxSizing = 'border-box';
+        block.style.overflow = 'visible';
 
         const title = block.querySelector('h2');
         if (title) {
           title.style.fontSize = '10px';
-          title.style.margin = '0 0 0.5px 0';
+          title.style.marginBottom = '1.5mm';
           title.style.padding = '0';
         }
         
         Array.from(block.querySelectorAll('div > div')).forEach((row: HTMLElement) => {
           row.style.display = 'flex';
+          row.style.flexDirection = 'row';
           row.style.flexWrap = 'wrap';
           row.style.alignItems = 'flex-start';
           row.style.padding = '0';
-          row.style.margin = '0 0 0.5px 0';
-          row.style.gap = '0';
+          row.style.margin = '0 0 1.5mm 0';
+          row.style.gap = '1.5mm';
           row.style.fontSize = '8px';
           
           const label = row.querySelector('.font-semibold');
           if (label) {
-            label.classList.add('break-words');
             (label as HTMLElement).style.fontSize = '8px';
-            (label as HTMLElement).style.maxWidth = '10px';
+            (label as HTMLElement).style.marginRight = '2mm';
             (label as HTMLElement).style.minWidth = 'fit-content';
           }
           
@@ -93,6 +96,7 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
             (value as HTMLElement).style.whiteSpace = 'normal';
             (value as HTMLElement).style.overflowWrap = 'break-word';
             (value as HTMLElement).style.maxWidth = 'calc(100% - 15px)';
+            (value as HTMLElement).style.marginLeft = '1mm';
           }
         });
       });
@@ -120,7 +124,9 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
 
       // Calculate dimensions
       const pageWidth = pdf.internal.pageSize.getWidth();
-      const margin = 2; // 2mm margin
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 5; // 5mm margin
+      const contentWidth = pageWidth - (margin * 2);
       
       console.log("Creating canvas for PDF export");
       
@@ -128,7 +134,7 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
       const canvas = await html2canvas(clone, {
         scale: 2, // Higher resolution
         useCORS: true,
-        logging: true,
+        logging: false,
         backgroundColor: "#ffffff",
         allowTaint: true,
         foreignObjectRendering: false,
@@ -138,9 +144,10 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
       
       // Clean up
       document.body.removeChild(wrapper);
+      document.body.classList.remove('print-mode');
       
       // Add to PDF
-      const imgWidth = pageWidth - (margin * 2);
+      const imgWidth = contentWidth;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       const imgData = canvas.toDataURL("image/jpeg", 1.0);
       
@@ -148,7 +155,6 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
       pdf.addImage(imgData, "JPEG", margin, margin, imgWidth, imgHeight);
       
       // Calculate number of pages needed
-      const pageHeight = pdf.internal.pageSize.getHeight();
       let heightLeft = imgHeight - (pageHeight - (margin * 2));
       let position = -(pageHeight - (margin * 2));
       let page = 1;

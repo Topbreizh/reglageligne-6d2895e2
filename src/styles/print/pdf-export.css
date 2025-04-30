@@ -26,6 +26,7 @@ body.print-mode .printable-block {
   display: inline-block !important;
   width: 100% !important;
   border: 0.5px solid #ddd !important;
+  border-radius: 0.5px !important;
   overflow: visible !important;
   font-size: 8px !important;
   box-sizing: border-box !important;
@@ -58,29 +59,32 @@ body.print-mode .break-words {
   max-width: 100% !important;
 }
 
-/* Make sure text in labels doesn't overflow */
+/* Make sure the layout of fields matches print layout */
 .pdf-export-mode .printable-block > div > div,
 body.print-mode .printable-block > div > div {
   display: flex !important;
+  flex-direction: row !important;
   flex-wrap: wrap !important;
   align-items: flex-start !important;
   padding: 0 !important;
   margin: 0 0 1.5mm 0 !important;
-  gap: 1.5mm !important; /* Increased gap between rows */
+  gap: 1.5mm !important;
   font-size: 8px !important;
 }
 
-.pdf-export-mode .printable-block > div > div > div,
-body.print-mode .printable-block > div > div > div {
-  margin-right: 1.5mm !important; /* Add space between label and value */
-}
-
+/* Label styling */
 .pdf-export-mode .printable-block .font-semibold,
 body.print-mode .printable-block .font-semibold {
   font-size: 8px !important;
-  max-width: 12mm !important;
   min-width: fit-content !important;
-  margin-right: 2mm !important; /* Increased space after label */
+  margin-right: 2mm !important;
+}
+
+/* Value styling */
+.pdf-export-mode .printable-block .break-words,
+body.print-mode .printable-block .break-words {
+  font-size: 8px !important;
+  margin-left: 1mm !important;
 }
 
 /* Mobile-specific adjustments for PDF export */
@@ -104,17 +108,10 @@ body.print-mode .printable-block .font-semibold {
   
   .pdf-export-mode .printable-block > div > div,
   body.print-mode .printable-block > div > div {
+    flex-direction: row !important;
     font-size: 8px !important;
     margin: 0 0 1.5mm 0 !important;
     padding: 0 !important;
     gap: 1.5mm !important;
-  }
-  
-  .pdf-export-mode .printable-block .font-semibold,
-  body.print-mode .printable-block .font-semibold {
-    font-size: 8px !important;
-    max-width: 12mm !important;
-    min-width: fit-content !important;
-    margin-right: 2mm !important;
   }
 }
