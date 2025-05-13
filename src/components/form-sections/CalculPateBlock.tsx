@@ -18,6 +18,22 @@ const CalculPateBlock = ({ formData, onChange }: CalculPateBlockProps) => {
     formData.rognure ? parseFloat(formData.rognure) : 0
   );
   
+  // Calculate fourrage quantity
+  const fourrageQuantity = calculQuantite(
+    parseNumberFR(formData.poidFourragequalistat || "0"),
+    parseFloat(formData.nbrDeBandes || "0"),
+    parseFloat(formData.cadence || "0"),
+    null
+  );
+  
+  // Calculate marquant quantity
+  const marquantQuantity = calculQuantite(
+    parseNumberFR(formData.poidMarquantqualistat || "0"),
+    parseFloat(formData.nbrDeBandes || "0"),
+    parseFloat(formData.cadence || "0"),
+    null
+  );
+  
   return (
     <Card>
       <CardHeader>
@@ -73,7 +89,27 @@ const CalculPateBlock = ({ formData, onChange }: CalculPateBlockProps) => {
             />
           </div>
         </div>
-        <div className="text-right text-lg font-semibold text-noir-700">
+        
+        {/* Résumé des quantités à l'heure */}
+        <div className="mt-4 p-3 bg-gray-50 rounded border border-gray-200">
+          <h3 className="text-md font-semibold mb-2">Quantités à l'heure :</h3>
+          <ul className="space-y-1 text-sm">
+            <li className="flex justify-between">
+              <span>Pâte:</span>
+              <span className="font-medium">{pateQuantity} kg</span>
+            </li>
+            <li className="flex justify-between">
+              <span>Fourrage:</span>
+              <span className="font-medium">{fourrageQuantity} kg</span>
+            </li>
+            <li className="flex justify-between">
+              <span>Marquant:</span>
+              <span className="font-medium">{marquantQuantity} kg</span>
+            </li>
+          </ul>
+        </div>
+        
+        <div className="text-right text-lg font-semibold text-noir-700 mt-2">
           Quantité à l'heure : {pateQuantity} kg
         </div>
       </CardContent>

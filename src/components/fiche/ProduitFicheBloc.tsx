@@ -1,6 +1,7 @@
 
 import React from "react";
 import { Produit, BlocConfiguration } from "@/types";
+import { parseNumberFR, calculQuantite } from "@/lib/calculMatieresUtils";
 
 interface ProduitFicheBlocProps {
   bloc: BlocConfiguration;
@@ -22,9 +23,34 @@ const ProduitFicheBloc = ({ bloc, produit, estChampVisible, getChampValeur }: Pr
   // Separately check if the commentaire field should be visible
   const showCommentaire = bloc.id === "cadencePersonnel" && estChampVisible("cadencePersonnel", "commentaire");
   
-  if (champsVisibles.length === 0 && !showCommentaire) {
+  // Check if we need to show quantities summary (only in calculPate bloc)
+  const showQuantities = bloc.id === "calculPate";
+  
+  if (champsVisibles.length === 0 && !showCommentaire && !showQuantities) {
     return null;
   }
+  
+  // Calculate quantities if needed
+  const pateQuantity = showQuantities ? calculQuantite(
+    parseNumberFR(produit.poidPatequalistat || "0"),
+    parseFloat(produit.nbrDeBandes || "0"),
+    parseFloat(produit.cadence || "0"),
+    produit.rognure ? parseFloat(produit.rognure as string) : 0
+  ) : "";
+  
+  const fourrageQuantity = showQuantities ? calculQuantite(
+    parseNumberFR(produit.poidFourragequalistat || "0"),
+    parseFloat(produit.nbrDeBandes || "0"),
+    parseFloat(produit.cadence || "0"),
+    null
+  ) : "";
+  
+  const marquantQuantity = showQuantities ? calculQuantite(
+    parseNumberFR(produit.poidMarquantqualistat || "0"),
+    parseFloat(produit.nbrDeBandes || "0"),
+    parseFloat(produit.cadence || "0"),
+    null
+  ) : "";
 
   return (
     <div className="printable-block mb-1 p-1 border border-gray-200 rounded-sm print:p-0.5 print:text-xs print:border-[0.5px] print:mb-0.5 print:break-inside-avoid">
@@ -42,6 +68,18 @@ const ProduitFicheBloc = ({ bloc, produit, estChampVisible, getChampValeur }: Pr
             );
           })
         }
+        
+        {/* Show quantities summary in the calculPate bloc */}
+        {showQuantities && (
+          <div className="mt-2 print:mt-1 border-t border-gray-100 pt-1 print:pt-0.5">
+            <div className="font-semibold text-xs print:text-[8px]">Quantités à l'heure:</div>
+            <div className="flex flex-row flex-wrap items-start gap-1 mb-0.5 print:mb-0.5 print:gap-0.5">
+              <div className="text-xs print:text-[8px]">Pâte: {pateQuantity} kg,</div>
+              <div className="text-xs print:text-[8px]">Fourrage: {fourrageQuantity} kg,</div>
+              <div className="text-xs print:text-[8px]">Marquant: {marquantQuantity} kg</div>
+            </div>
+          </div>
+        )}
       </div>
       
       {/* Only show commentaire once and only in the cadencePersonnel bloc */}
