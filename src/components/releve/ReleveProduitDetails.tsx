@@ -9,6 +9,11 @@ interface ReleveProduitDetailsProps {
 export const ReleveProduitDetails = ({ produit }: ReleveProduitDetailsProps) => {
   const renderBlocs = () => {
     return blocsConfiguration.map((bloc) => {
+      // Skip the "Article" block completely since we're displaying that information at the top
+      if (bloc.id === "Article") {
+        return null;
+      }
+      
       // Special rendering for calculPate bloc
       if (bloc.id === "calculPate") {
         // Create an ordered list of fields we want to display
@@ -41,11 +46,6 @@ export const ReleveProduitDetails = ({ produit }: ReleveProduitDetailsProps) => 
             </div>
           </div>
         );
-      }
-      
-      // Skip completely the "Article" block since we're displaying that information at the top
-      if (bloc.id === "Article") {
-        return null;
       }
       
       // Standard rendering for other blocs
