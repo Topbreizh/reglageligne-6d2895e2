@@ -12,14 +12,17 @@ interface ProduitFicheBlocProps {
 const ProduitFicheBloc = ({ bloc, produit, estChampVisible, getChampValeur }: ProduitFicheBlocProps) => {
   // Get visible fields for this block
   const champsVisibles = bloc.champs.filter(champ => {
-    // Filter out the commentaire field from regular blocks since it has special rendering
-    if (bloc.id !== "cadencePersonnel" && champ.nomTechnique === "commentaire") {
+    // Filter out all commentaire fields since we'll handle them separately
+    if (champ.nomTechnique === "commentaire") {
       return false;
     }
     return estChampVisible(bloc.id, champ.id);
   });
   
-  if (champsVisibles.length === 0) {
+  // Separately check if the commentaire field should be visible
+  const showCommentaire = bloc.id === "cadencePersonnel" && estChampVisible("cadencePersonnel", "commentaire");
+  
+  if (champsVisibles.length === 0 && !showCommentaire) {
     return null;
   }
 
@@ -41,7 +44,8 @@ const ProduitFicheBloc = ({ bloc, produit, estChampVisible, getChampValeur }: Pr
         }
       </div>
       
-      {bloc.id === "cadencePersonnel" && estChampVisible("cadencePersonnel", "commentaire") && (
+      {/* Only show commentaire once and only in the cadencePersonnel bloc */}
+      {showCommentaire && (
         <div className="mt-1 print:mt-0.5">
           <h3 className="font-semibold text-xs print:text-[8px]">Commentaire:</h3>
           <p className="whitespace-pre-line text-xs print:text-[8px] break-words max-w-full">{produit.commentaire || "-"}</p>
