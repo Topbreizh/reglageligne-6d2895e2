@@ -43,6 +43,11 @@ export const ReleveProduitDetails = ({ produit }: ReleveProduitDetailsProps) => 
         );
       }
       
+      // Skip the "Article" block since we're displaying that information at the top
+      if (bloc.id === "Article") {
+        return null;
+      }
+      
       // Standard rendering for other blocs
       const champsVisibles = bloc.champs.filter(champ => {
         return champ.visible && 
@@ -75,40 +80,6 @@ export const ReleveProduitDetails = ({ produit }: ReleveProduitDetailsProps) => 
     }).filter(Boolean);
   };
 
-  const renderChampsSupplémentaires = () => {
-    const champsConnus = new Set();
-    
-    blocsConfiguration.forEach(bloc => {
-      bloc.champs.forEach(champ => {
-        champsConnus.add(champ.nomTechnique);
-      });
-    });
-    
-    const champsSupplémentaires = Object.entries(produit)
-      .filter(([key, value]) => {
-        return !champsConnus.has(key) && 
-               key !== "id" && 
-               value && 
-               typeof value === 'string' && 
-               value.trim() !== "";
-      });
-    
-    if (champsSupplémentaires.length === 0) return null;
-    
-    return (
-      <div className="border-t pt-2 mt-2">
-        <div className="font-semibold mb-1 text-xs">Autres informations</div>
-        <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs">
-          {champsSupplémentaires.map(([key, value]) => (
-            <div key={key} className="overflow-hidden text-ellipsis">
-              <span className="font-medium">{key}:</span> {value}
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="space-y-0.5 mt-2 print:mt-0.5 print:space-y-0.5">
       <div className="grid grid-cols-2 gap-1 text-xs print:text-[7px] print:gap-0.5">
@@ -124,7 +95,6 @@ export const ReleveProduitDetails = ({ produit }: ReleveProduitDetailsProps) => 
       </div>
       
       {renderBlocs()}
-      {renderChampsSupplémentaires()}
       
       {produit.commentaire && (
         <div className="border-t pt-1 print:pt-0.5">
