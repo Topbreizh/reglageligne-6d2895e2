@@ -43,7 +43,7 @@ export const ReleveProduitDetails = ({ produit }: ReleveProduitDetailsProps) => 
         );
       }
       
-      // Skip the "Article" block since we're displaying that information at the top
+      // Skip completely the "Article" block since we're displaying that information at the top
       if (bloc.id === "Article") {
         return null;
       }
