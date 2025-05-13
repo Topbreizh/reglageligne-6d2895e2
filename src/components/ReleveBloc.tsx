@@ -13,10 +13,10 @@ export const ReleveBloc = ({ index }: ReleveBlocProps) => {
 
   return (
     <Card className="shadow-lg print:shadow-none print:border-black print:text-black ReleveBloc">
-      <CardHeader className="bg-gray-50 border-b print:bg-white print:p-2">
-        <div className="font-semibold text-lg print:text-sm">Relevé {index}</div>
+      <CardHeader className="bg-gray-50 border-b print:bg-white print:p-1">
+        <div className="font-semibold text-lg print:text-[10px]">Relevé {index}</div>
       </CardHeader>
-      <CardContent className="p-4 print:p-1">
+      <CardContent className="p-4 print:p-0.5">
         <ReleveSearchForm onSearch={handleSearch} loading={loading} />
 
         {loading ? (

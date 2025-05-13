@@ -50,6 +50,10 @@ const RelevesPage = () => {
         display: none !important;
         height: 0;
       }
+      /* Force page break after the first 3 elements */
+      #printable-content .ReleveBloc:nth-child(3) {
+        page-break-after: always !important;
+      }
     `;
     document.head.appendChild(style);
     
@@ -81,7 +85,7 @@ const RelevesPage = () => {
           </Button>
         </div>
         
-        <div id="printable-content" className={`grid grid-cols-1 ${!isMobile ? 'md:grid-cols-2 xl:grid-cols-3' : ''} gap-6 print:grid-cols-3 print:gap-2`}>
+        <div id="printable-content" className={`grid grid-cols-1 ${!isMobile ? 'md:grid-cols-2 xl:grid-cols-3' : ''} gap-6 print:grid-cols-3 print:gap-1`}>
           {[...Array(6)].map((_, index) => (
             <ReleveBloc key={index} index={index + 1} />
           ))}

@@ -23,9 +23,9 @@ export const ReleveProduitDetails = ({ produit }: ReleveProduitDetailsProps) => 
         const fieldOrder = ["poidPatequalistat", "poidFourragequalistat", "poidMarquantqualistat", "nbrDeBandes", "rognure"];
         
         return (
-          <div key={bloc.id} className="border-t pt-2 mt-2">
-            <div className="font-semibold mb-1 text-xs">{bloc.nom}</div>
-            <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs">
+          <div key={bloc.id} className="border-t pt-1 mt-1 print:pt-0.5 print:mt-0.5">
+            <div className="font-semibold mb-0.5 text-xs print:text-[8px]">{bloc.nom}</div>
+            <div className="grid grid-cols-2 gap-x-1 gap-y-0.5 text-xs print:text-[7px]">
               {fieldOrder.map(fieldName => {
                 const value = produit[fieldName as keyof Produit] || '';
                 if (value) {
@@ -53,9 +53,9 @@ export const ReleveProduitDetails = ({ produit }: ReleveProduitDetailsProps) => 
       if (champsVisibles.length === 0) return null;
 
       return (
-        <div key={bloc.id} className="border-t pt-2 mt-2">
-          <div className="font-semibold mb-1 text-xs">{bloc.nom}</div>
-          <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs">
+        <div key={bloc.id} className="border-t pt-1 mt-1 print:pt-0.5 print:mt-0.5">
+          <div className="font-semibold mb-0.5 text-xs print:text-[8px]">{bloc.nom}</div>
+          <div className="grid grid-cols-2 gap-x-1 gap-y-0.5 text-xs print:text-[7px]">
             {champsVisibles.map((champ) => {
               const valeur = produit[champ.nomTechnique as keyof Produit] || "";
               
@@ -110,8 +110,8 @@ export const ReleveProduitDetails = ({ produit }: ReleveProduitDetailsProps) => 
   };
 
   return (
-    <div className="space-y-1 mt-2 print:mt-0">
-      <div className="grid grid-cols-2 gap-2 text-xs">
+    <div className="space-y-0.5 mt-2 print:mt-0.5 print:space-y-0.5">
+      <div className="grid grid-cols-2 gap-1 text-xs print:text-[7px] print:gap-0.5">
         <div>
           <span className="font-medium">Code Article:</span> {produit.codeArticle}
         </div>
@@ -127,9 +127,9 @@ export const ReleveProduitDetails = ({ produit }: ReleveProduitDetailsProps) => 
       {renderChampsSupplémentaires()}
       
       {produit.commentaire && (
-        <div className="border-t pt-2">
-          <div className="font-medium text-xs">Commentaire</div>
-          <p className="text-xs">{produit.commentaire}</p>
+        <div className="border-t pt-1 print:pt-0.5">
+          <div className="font-medium text-xs print:text-[8px]">Commentaire</div>
+          <p className="text-xs print:text-[7px]">{produit.commentaire}</p>
         </div>
       )}
     </div>
