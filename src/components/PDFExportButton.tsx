@@ -73,6 +73,19 @@ const PDFExportButton = ({ contentId }: PDFExportButtonProps) => {
           title.style.padding = '0';
         }
         
+        // Handle the duplicate commentaire issue - remove if it's not in the cadencePersonnel block
+        const isPersonnelBlock = block.textContent?.includes('Personnel');
+        if (!isPersonnelBlock) {
+          const commentSections = Array.from(block.querySelectorAll('div')).filter(
+            div => div.textContent?.includes('Commentaire:')
+          );
+          commentSections.forEach(section => {
+            if (section.parentElement && !section.parentElement.textContent?.includes('Personnel')) {
+              section.remove();
+            }
+          });
+        }
+        
         Array.from(block.querySelectorAll('div > div')).forEach((row: HTMLElement) => {
           row.style.display = 'flex';
           row.style.flexDirection = 'row';

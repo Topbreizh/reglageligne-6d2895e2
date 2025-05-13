@@ -11,7 +11,13 @@ interface ProduitFicheBlocProps {
 
 const ProduitFicheBloc = ({ bloc, produit, estChampVisible, getChampValeur }: ProduitFicheBlocProps) => {
   // Get visible fields for this block
-  const champsVisibles = bloc.champs.filter(champ => estChampVisible(bloc.id, champ.id));
+  const champsVisibles = bloc.champs.filter(champ => {
+    // Filter out the commentaire field from regular blocks since it has special rendering
+    if (bloc.id !== "cadencePersonnel" && champ.nomTechnique === "commentaire") {
+      return false;
+    }
+    return estChampVisible(bloc.id, champ.id);
+  });
   
   if (champsVisibles.length === 0) {
     return null;
