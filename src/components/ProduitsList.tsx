@@ -12,8 +12,6 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import ExportProduitsButton from "@/components/ExportProduitsButton";
-import ExportAllFilesButton from "@/components/ExportAllFilesButton";
 
 interface ProduitsListProps {
   produits: Produit[];
@@ -51,11 +49,6 @@ const ProduitsList = ({ produits }: ProduitsListProps) => {
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-noir-200 overflow-x-auto">
-      <div className="p-4 flex flex-wrap gap-2 justify-end border-b border-noir-200">
-        <ExportProduitsButton />
-        <ExportAllFilesButton />
-      </div>
-      
       <Table>
         <TableHeader className="bg-noir-100">
           <TableRow>
